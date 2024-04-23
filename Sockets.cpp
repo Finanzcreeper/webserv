@@ -41,5 +41,5 @@ void Sockets::CheckForConnections() {
 				std::cout << "connection accepted from: " << inet_ntoa(client_address.sin_addr) << ":" << ntohs(client_address.sin_port) <<std::endl;
 			}
 		}
-		std::cout << "end" << std::endl;
+		std::cout << "end" << std::endl ;
 }
