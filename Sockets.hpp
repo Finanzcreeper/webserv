@@ -8,6 +8,11 @@
 #include <vector>
 #include <arpa/inet.h>
 
+enum sockoption{
+	OFF,
+	ON,
+};
+
 /*
  * On construction, create one listening socket.
  * have a public container containing connected sockets.
@@ -17,6 +22,7 @@
 
 class Sockets {
 private:
+	int socketOption;
 	int listening_socket;
 	sockaddr_in server_address;
 	pollfd listening_sockets[1];
