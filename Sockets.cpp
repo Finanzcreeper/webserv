@@ -29,16 +29,28 @@ Sockets::Sockets() : socketOption(ON), client_address_length(sizeof(client_addre
 }
 
 void Sockets::CheckForConnections() {
+	int newConnection = 0;
+	int f;
+	std::vector<int>::iterator it;
+
 	listening_sockets[0].fd = listening_socket;
 	listening_sockets[0].events = POLLIN;
 		std::cout << "listening on socket: " << listening_sockets[0].fd << std::endl;
 		int i = 0;
-		while (i <= 0) {
+		while (true) {
 			i = poll(listening_sockets,1,0);
 			if (i > 0) {
-				int test = accept(listening_socket,(sockaddr *) &client_address, &client_address_length);
-				write(test,"hello",5);
+				newConnection = accept(listening_socket,(sockaddr *) &client_address, &client_address_length);
+				write(newConnection,"hello",5);
 				std::cout << "connection accepted from: " << inet_ntoa(client_address.sin_addr) << ":" << ntohs(client_address.sin_port) <<std::endl;
+				connections.push_back(newConnection);
+				std::cout << "active connections: " << connections.size() << std::endl;
+				it = connections.begin();
+				f = 0;
+				while (it != connections.end()) {
+					std::cout << "connection nr "<< f++ <<" fd: " << *it << std::endl;
+					it++;
+				}
 			}
 		}
 		std::cout << "end" << std::endl;

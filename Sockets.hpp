@@ -29,7 +29,10 @@ private:
 
 	sockaddr_in client_address;
 	socklen_t client_address_length;
+
 	std::vector<int>connections;
+
+
 public:
 	Sockets();
 	void CheckForConnections();
