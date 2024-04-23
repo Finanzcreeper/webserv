@@ -1,0 +1,65 @@
+Relevant to us:
+===============
+Syntax:
+	Servers MUST be able to handle the URI of any resource they serve.
+URL:
+	If the abs_path is not present in the URL, it MUST be given as "/" when used as a Request-URI for a resource
+URI matching:
+	Comparisons of host names MUST be case-insensitive
+	Comparisons of scheme names MUST be case-insensitive
+Date format: (https://datatracker.ietf.org/doc/html/rfc2616#section-3.3.1)
+	servers that parse the date value MUST accept all three formats
+	servers MUST only generate the RFC 1123 format
+	All HTTP date/time stamps MUST be represented in Greenwich Mean Time (GMT)
+	GMT MUST be assumed for all incoming dates in asctime format
+Quality values:
+	HTTP/1.1 applications MUST NOT generate more than three digits after the decimal point
+Entity tags:
+	An entity tag MUST be unique across all versions of all entities associated with a particular resource.
+Messages types:
+	an HTTP/1.1 client MUST NOT preface or follow a request with an extra CRLF.
+----------------
+Probably relevant to us:
+================
+Backus naur form:
+	in a list of elements (#) there MUST be at least one non null element.
+	LWS (linear White spaces:" ") MUST exist between any two tokens in the BNF.
+Header:
+	Any field value containing special chars that would be interpreted MUST be a quoted string
+Transfer codings:
+	Whenever a transfer-coding is applied to a message-body, the set of transfer-codings MUST include "chunked", unless the message is terminated by closing the connection.
+	When the "chunked" transfer-coding is used, it MUST be the last transfer-coding applied to the message-body.
+	All HTTP/1.1 applications MUST be able to receive and decode the "chunked" transfer-coding, and MUST ignore chunk-extension extensions they do not understand.
+Canonicalization:
+	An entity-body transferred via HTTP messages MUST be represented in the appropriate canonical form prior to its transmission.
+	HTTP applications MUST accept CRLF, bare CR, and bare LF as being representative of a line break in text media received via HTTP.
+	If an entity-body is encoded with a content-coding, the underlying data MUST Canonicalized prior to being encoded.
+	Data in character sets other than "ISO-8859-1" or its subsets MUST be labeled with an appropriate charset value.
+Multipart Types:
+	All multipart types share a common syntax, as defined in section 5.1.1 of RFC 2046, and MUST include a boundary parameter as part of the media type value
+	The message body is itself a protocol element and MUST therefore use only CRLF to represent line breaks between body-parts.
+	the epilogue of any multipart message MUST be empty.
+	HTTP applications MUST NOT transmit the epilogue
+	If an application receives an unrecognized multipart subtype, the application MUST treat it as being equivalent to "multipart/mixed"
+Message Headers:
+	It MUST be possible to combine the multiple header fields into one "field-name: field-value" pair without changing the semantics of the message, by appending each subsequent field-value to the first, each separated by a comma.
+Message Body:
+	Transfer-Encoding MUST be used to indicate any transfer-codings applied by an application to ensure safe and proper transfer of the message.
+----------------
+Probably irrelevant to us:
+================
+Proxy:
+	A proxy MUST implement both the client and server requirements of this specification.
+Versioning:
+	Major and minor version numbers MUST be treated as separate ints
+	leading zeroes MUST be ignored and not sent
+	if something is using HTTP/1.1 as its version it MUST conform to rfc2616
+	proxys/gateways MUST never send messages of a higher HTTP version that the original message version
+	if lower version messages are received the version of the continuation message MUSt be either downgraded, not changed, or and error has to be returned
+Charsets:
+	The definition associated with a MIME character set name MUST fully specify the mapping to be performed from octets to characters.
+	any token that has a predefined value within the IANA Character Set registry MUST represent the character set defined by that registry.
+	HTTP/1.1 recipients MUST respect the charset label provided by the sender.
+	user agents that have a provision to "guess" a charset MUST use the charset from the content-type field if they support that charset, when initially displaying a document.
+
+----------------
