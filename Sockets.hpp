@@ -7,10 +7,17 @@
 #include <poll.h>
 #include <vector>
 #include <arpa/inet.h>
+#include <sys/types.h>
+#include <netdb.h>
 
 enum sockoption{
 	OFF,
 	ON,
+};
+
+struct AllSockets{
+	sockaddr_in clientSocketAddress;
+	pollfd clientPollFd;
 };
 
 /*
@@ -23,19 +30,22 @@ enum sockoption{
 class Sockets {
 private:
 	int socketOption;
-	int listening_socket;
-	sockaddr_in server_address;
-	pollfd listening_sockets[1];
 
-	sockaddr_in client_address;
+	addrinfo hints;
+	addrinfo *serverInfo;
+
+	AllSockets listening_socket;
+
+	AllSockets client;
 	socklen_t client_address_length;
 
-	std::vector<int>connections;
+	std::vector<AllSockets>connections;
 
 
 public:
 	Sockets();
 	void CheckForConnections();
+	~Sockets();
 };
 
 
