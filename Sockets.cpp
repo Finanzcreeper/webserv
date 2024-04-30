@@ -69,17 +69,22 @@ void Sockets::CheckForConnections() {
 					std::cout << "connection nr " << f++ << " fd: " << it->fd << std::endl;
 					it++;
 				}
+				--i;
 			}
-			if (i != 0 && connectionFds[0].revents == 0) {
+			if (i != 0) {
 				//read from fds here!
-				it = connectionFds.begin();
-				while (it != connectionFds.end()) {
-					if (it->revents == POLLIN){
-						std::cout << it->fd << " is ready to read" << std::endl;
-						it->revents = 0;
+				f = 1;
+				while ((long unsigned)f != connectionFds.size()) {
+					if (connectionFds[f].revents == POLLIN){
+						bzero(buffer, sizeof(buffer));
+						recv(connectionFds[f].fd, buffer,1000,0);
+						connectionMsgs[f] = connectionMsgs[f] + buffer;
 					}
-					it++;
+					f++;
 				}
+			}
+			if (connectionMsgs.size() > 1 && connectionFds[1].revents == 1) {
+				std::cout << connectionMsgs[1] << std::endl;
 			}
 		}
 		std::cout << "end" << std::endl;
@@ -88,12 +93,14 @@ void Sockets::CheckForConnections() {
 void Sockets::addToSocketArray(AllSockets insert) {
 	connectionAddrs.push_back(insert.clientSocketAddress);
 	connectionFds.push_back(insert.clientPollFd);
+	connectionMsgs.push_back("");
 }
 
 void Sockets::removeFromSocketArray(unsigned int pos) {
 	if (pos <= connectionFds.size()) {
 		connectionAddrs.erase(connectionAddrs.begin() + pos);
 		connectionFds.erase((connectionFds.begin() + pos));
+		connectionMsgs.erase((connectionMsgs.begin() + pos));
 	}
 }
 
