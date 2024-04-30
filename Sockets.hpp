@@ -39,8 +39,12 @@ private:
 	AllSockets client;
 	socklen_t client_address_length;
 
-	std::vector<AllSockets>connections;
+	std::vector<sockaddr_in>connectionAddrs;
+	std::vector<pollfd>connectionFds;
 
+	void addToSocketArray(AllSockets insert);
+
+	void removeFromSocketArray(unsigned int pos);
 
 public:
 	Sockets();
