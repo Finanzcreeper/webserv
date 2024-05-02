@@ -6,6 +6,7 @@
 #include <netinet/in.h>
 #include <poll.h>
 #include <vector>
+#include <map>
 #include <arpa/inet.h>
 #include <sys/types.h>
 #include <netdb.h>
@@ -13,11 +14,6 @@
 enum sockoption{
 	OFF,
 	ON,
-};
-
-struct AllSockets{
-	sockaddr_in clientSocketAddress;
-	pollfd clientPollFd;
 };
 
 /*
@@ -34,19 +30,15 @@ private:
 	addrinfo hints;
 	addrinfo *serverInfo;
 
-	AllSockets listening_socket;
+	pollfd listening_socket;
 
-	AllSockets client;
+	pollfd client;
 	socklen_t client_address_length;
 
 	char buffer[1000];
 
-	std::vector<sockaddr_in>connectionAddrs;
-	std::vector<pollfd>connectionFds;
-	std::vector<std::string>connectionMsgs;
-	void addToSocketArray(AllSockets insert);
-
-	void removeFromSocketArray(unsigned int pos);
+	std::vector<pollfd>Fds;
+	std::map<int, std::string>connectionMsgs;
 
 public:
 	Sockets();

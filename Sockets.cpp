@@ -4,7 +4,7 @@
 #include <cstring>
 #include <unistd.h>
 
-Sockets::Sockets() : socketOption(ON), client_address_length(sizeof(client.clientSocketAddress)){
+Sockets::Sockets() : socketOption(ON){
 	bzero(&listening_socket, sizeof(listening_socket));
 	bzero(&hints, sizeof(hints));
 	hints.ai_family = AF_INET;
@@ -16,96 +16,76 @@ Sockets::Sockets() : socketOption(ON), client_address_length(sizeof(client.clien
 		std::cerr << "getaddrinfo failed: " << std::strerror(errno) << std::endl;
 	}
 
-	listening_socket.clientPollFd.fd = socket(serverInfo->ai_family, serverInfo->ai_socktype, serverInfo->ai_protocol);
-	if (listening_socket.clientPollFd.fd == -1) {
+	listening_socket.fd = socket(serverInfo->ai_family, serverInfo->ai_socktype, serverInfo->ai_protocol);
+	if (listening_socket.fd == -1) {
 		//throw socket creation failure exception
 		std::cerr << "socket creation failure: "<< std::strerror(errno) << std::endl;
 	}
 
-	if (setsockopt(listening_socket.clientPollFd.fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &socketOption, sizeof(socketOption)) == -1) {
+	if (setsockopt(listening_socket.fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &socketOption, sizeof(socketOption)) == -1) {
 		std::cerr << "socket option could not be applied: " << std::strerror(errno) << std::endl;
 		//throw socket settings exception
 	}
 
-	if (bind(listening_socket.clientPollFd.fd, serverInfo->ai_addr, serverInfo->ai_addrlen) == -1) {
+	if (bind(listening_socket.fd, serverInfo->ai_addr, serverInfo->ai_addrlen) == -1) {
 		// throw socked binding failure exception
 		std::cerr << "socked binding failure: "<< std::strerror(errno) << std::endl;
 	}
 
-	if (listen(listening_socket.clientPollFd.fd, 1000) == -1) {
+	if (listen(listening_socket.fd, 1000) == -1) {
 		//throw socket listening error exception
 		std::cerr << "error making the socket listen: "<< std::strerror(errno) << std::endl;
 	}
 }
 
 void Sockets::CheckForConnections() {
-	int f;
 	std::vector<pollfd>::iterator it;
+	std::map<int, std::string>::iterator mt;
 
-	listening_socket.clientPollFd.events = POLLIN;
-	addToSocketArray(listening_socket);
+	listening_socket.events = POLLIN;
+	Fds.push_back(listening_socket);
 
-		std::cout << "listening on socket: " << connectionFds[0].fd << std::endl;
+		std::cout << "listening on socket: " << Fds[0].fd << std::endl;
 		int i = 0;
 		while (true) {
-			i = poll(connectionFds.data(), connectionFds.size(), 0);
-			if (connectionFds[0].revents != 0) {
-				client.clientPollFd.fd = accept(listening_socket.clientPollFd.fd, (sockaddr *) &client.clientSocketAddress, &client_address_length);
-				if (client.clientPollFd.fd == -1) {
+			i = poll(Fds.data(), Fds.size(), 0);
+			if (Fds[0].revents != 0) {
+				client.fd = accept(listening_socket.fd, NULL, NULL);
+				if (client.fd == -1) {
 					//throw accept connection exception
-					std::cerr << "connection failed: " << std::strerror(errno) << std::endl;
+					std::cerr << "a connection failed: " << std::strerror(errno) << std::endl;
 				}
-				client.clientPollFd.events = (POLLIN);
-				addToSocketArray(client);
-
-
-
-				write(client.clientPollFd.fd, "hello", 5);
-				std::cout << "connection accepted from: " << inet_ntoa(client.clientSocketAddress.sin_addr) << ":" << ntohs(client.clientSocketAddress.sin_port) <<std::endl;
-				std::cout << "active connections: " << connectionFds.size() << std::endl;
-				it = connectionFds.begin();
-				f = 0;
-				while (it != connectionFds.end()) {
-					std::cout << "connection nr " << f++ << " fd: " << it->fd << std::endl;
-					it++;
-				}
+				client.events = (POLLIN);
+				connectionMsgs.insert(std::make_pair(client.fd,""));
+				Fds.push_back(client);
 				--i;
 			}
 			if (i != 0) {
-				//read from fds here!
-				f = 1;
-				while ((long unsigned)f != connectionFds.size()) {
-					if (connectionFds[f].revents == POLLIN){
+				it = Fds.begin();
+				mt = connectionMsgs.begin();
+				while (it != Fds.end()) {
+					if (it->revents == POLLIN){
 						bzero(buffer, sizeof(buffer));
-						recv(connectionFds[f].fd, buffer,1000,0);
-						connectionMsgs[f] = connectionMsgs[f] + buffer;
+						while (mt->first != it->fd) {
+							++mt;
+						}
+						if (recv(it->fd, buffer, 1000, 0) != 0) {
+							mt->second.append(buffer);
+							std::cout << mt->second << std::endl;
+						} else {
+							Fds.erase(it);
+							connectionMsgs.erase(mt);
+							--it;
+						}
 					}
-					f++;
+					++it;
 				}
-			}
-			if (connectionMsgs.size() > 1 && connectionFds[1].revents == 1) {
-				std::cout << connectionMsgs[1] << std::endl;
 			}
 		}
 		std::cout << "end" << std::endl;
-}
-
-void Sockets::addToSocketArray(AllSockets insert) {
-	connectionAddrs.push_back(insert.clientSocketAddress);
-	connectionFds.push_back(insert.clientPollFd);
-	connectionMsgs.push_back("");
-}
-
-void Sockets::removeFromSocketArray(unsigned int pos) {
-	if (pos <= connectionFds.size()) {
-		connectionAddrs.erase(connectionAddrs.begin() + pos);
-		connectionFds.erase((connectionFds.begin() + pos));
-		connectionMsgs.erase((connectionMsgs.begin() + pos));
 	}
-}
 
 Sockets::~Sockets() {
 	freeaddrinfo(serverInfo);
 }
-
 
