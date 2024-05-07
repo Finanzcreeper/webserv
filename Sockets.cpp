@@ -40,7 +40,9 @@ Sockets::Sockets() : socketOption(ON){
 
 void Sockets::CheckForConnections() {
 	std::vector<pollfd>::iterator it;
-	std::map<int, std::string>::iterator mt;
+	std::map<int, Request>::iterator mt;
+
+	Request Request;
 
 	listening_socket.events = POLLIN;
 	Fds.push_back(listening_socket);
@@ -49,6 +51,7 @@ void Sockets::CheckForConnections() {
 		int i = 0;
 		while (true) {
 			i = poll(Fds.data(), Fds.size(), 0);
+			//accepting new connection if there is one
 			if (Fds[0].revents != 0) {
 				client.fd = accept(listening_socket.fd, NULL, NULL);
 				if (client.fd == -1) {
@@ -56,10 +59,11 @@ void Sockets::CheckForConnections() {
 					std::cerr << "a connection failed: " << std::strerror(errno) << std::endl;
 				}
 				client.events = (POLLIN);
-				connectionMsgs.insert(std::make_pair(client.fd,""));
+				connectionMsgs.insert(std::make_pair(client.fd,Request));
 				Fds.push_back(client);
 				--i;
 			}
+			//reading from connection (reading into buffers, or closing connections
 			if (i != 0) {
 				it = Fds.begin();
 				mt = connectionMsgs.begin();
@@ -70,9 +74,11 @@ void Sockets::CheckForConnections() {
 							++mt;
 						}
 						if (recv(it->fd, buffer, 1000, 0) != 0) {
-							mt->second.append(buffer);
-							std::cout << mt->second << std::endl;
+							mt->second.RequestBuffer.append(buffer);
+							SortMessage(mt);
 						} else {
+							//deletion MIGHT LEAD TO ERRORS!
+							std::cout << mt->first << " disconnected" << std::endl;
 							Fds.erase(it);
 							connectionMsgs.erase(mt);
 							--it;
@@ -85,7 +91,73 @@ void Sockets::CheckForConnections() {
 		std::cout << "end" << std::endl;
 	}
 
+	/*
+	 * Messages have structure:
+	 * first line is message type and path
+	 * after first line header begins
+	 *
+	 * header options:
+	 *	1: no hint to message -> no message
+	 *	\r\n\r\n ends message;
+	 *		Solution:
+	 *		1: send 411 code
+	 *		2: handle situation
+	 *
+	 *	2: Header contains Transfer-Encoding: chunked, ...
+	 *	multiple messages will be sent, each containing size of message in OCTET
+	 *	message follows after
+	 *	message chunks look like:
+	 *
+	 *	<OCTAL number>\r\n<message>\r\n
+	 *
+	 *	<message> MUST be the correct length
+	 *
+	 *	the last chunk is defined as
+	 *
+	 *	0\r\n\r\n
+	 *		Solution:
+	 *		handle chunked messages when Transfer-Encoding: chunked, ... is found
+	 *
+	 *	3: Header contains Content-Length: ...
+	 *		Solution: message is exactly ... bytes long, read that amount in total
+	 *
+	 *	4: Header contains Transfer-Encoding: and Content-Length:
+	 *		Solution: ignore Content-Length and apply Transfer-Encoding Rule.
+	 *
+	 *
+	 *
+	 * options after the header:
+	 *
+	 *
+	 *
+	 * Solution:
+	 *
+	 * when empty
+	 *
+	 * header ends with \r\n\r\n
+	*/
+
+void Sockets::SortMessage(std::map<int, Request>::iterator mt) {
+	size_t neck = mt->second.RequestBuffer.find("\r\n\r\n");
+	if (neck == mt->second.RequestBuffer.npos) {
+		std::cerr << "invalid header: \n"<< mt->second.RequestBuffer << std::endl;
+		//throw invalid header exception
+	}
+	if (mt->second.HeaderBuffer.empty() == true && neck != mt->second.RequestBuffer.npos) {
+		mt->second.HeaderBuffer = mt->second.RequestBuffer.substr(0, neck+4);
+	}
+	if (mt->second.RequestBuffer.rfind("\r\n\r\n") > neck) {
+		mt->second.Body = mt->second.RequestBuffer.substr(neck,mt->second.RequestBuffer.size());
+	}
+	if (mt->second.Body.empty() == true && mt->second.HeaderBuffer.size() == mt->second.RequestBuffer.size()) {
+
+	}
+	std::cout << "Header: " << std::endl << mt->second.HeaderBuffer << "|" << std::endl;
+	std::cout << "Body: " << std::endl << mt->second.Body << "|" << std::endl;
+}
+
 Sockets::~Sockets() {
 	freeaddrinfo(serverInfo);
 }
+
 
