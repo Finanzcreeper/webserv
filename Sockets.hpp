@@ -10,6 +10,7 @@
 #include <arpa/inet.h>
 #include <sys/types.h>
 #include <netdb.h>
+#include <algorithm>
 
 enum sockoption{
 	OFF,
@@ -73,8 +74,9 @@ struct s_Header{
 
 struct Request {
 	std::string RequestBuffer;
-	std::string HeaderBuffer;
-	s_Header Header;
+	std::string Header;
+	s_Header HeaderFields_s;
+	std::map<std::string,std::string> HeaderFields;
 	std::string Body;
 };
 
@@ -102,7 +104,9 @@ private:
 	std::vector<pollfd>Fds;
 	std::map<int, Request>connectionMsgs;
 
-	void SortMessage(std::map<int, Request>::iterator mt);
+	void beheader(std::map<int, Request>::iterator mt);
+	void decapitalizeHeaderFields(std::string& Header);
+	void extractHeaderFields(Request req);
 
 public:
 	Sockets();

@@ -47,49 +47,49 @@ void Sockets::CheckForConnections() {
 	listening_socket.events = POLLIN;
 	Fds.push_back(listening_socket);
 
-		std::cout << "listening on socket: " << Fds[0].fd << std::endl;
-		int i = 0;
-		while (true) {
-			i = poll(Fds.data(), Fds.size(), 0);
-			//accepting new connection if there is one
-			if (Fds[0].revents != 0) {
-				client.fd = accept(listening_socket.fd, NULL, NULL);
-				if (client.fd == -1) {
-					//throw accept connection exception
-					std::cerr << "a connection failed: " << std::strerror(errno) << std::endl;
-				}
-				client.events = (POLLIN);
-				connectionMsgs.insert(std::make_pair(client.fd,Request));
-				Fds.push_back(client);
-				--i;
+	std::cout << "listening on socket: " << Fds[0].fd << std::endl;
+	int i = 0;
+	while (true) {
+		i = poll(Fds.data(), Fds.size(), 0);
+		//accepting new connection if there is one
+		if (Fds[0].revents != 0) {
+			client.fd = accept(listening_socket.fd, NULL, NULL);
+			if (client.fd == -1) {
+				//throw accept connection exception
+				std::cerr << "a connection failed: " << std::strerror(errno) << std::endl;
 			}
-			//reading from connection (reading into buffers, or closing connections
-			if (i != 0) {
-				it = Fds.begin();
-				mt = connectionMsgs.begin();
-				while (it != Fds.end()) {
-					if (it->revents == POLLIN){
-						bzero(buffer, sizeof(buffer));
-						while (mt->first != it->fd) {
-							++mt;
-						}
-						if (recv(it->fd, buffer, 1000, 0) != 0) {
-							mt->second.RequestBuffer.append(buffer);
-							SortMessage(mt);
-						} else {
-							//deletion MIGHT LEAD TO ERRORS!
-							std::cout << mt->first << " disconnected" << std::endl;
-							Fds.erase(it);
-							connectionMsgs.erase(mt);
-							--it;
-						}
+			client.events = (POLLIN);
+			connectionMsgs.insert(std::make_pair(client.fd,Request));
+			Fds.push_back(client);
+			--i;
+		}
+		//reading from connection (reading into buffers, or closing connections
+		if (i != 0) {
+			it = Fds.begin();
+			mt = connectionMsgs.begin();
+			while (it != Fds.end()) {
+				if (it->revents == POLLIN){
+					bzero(buffer, sizeof(buffer));
+					while (mt->first != it->fd) {
+						++mt;
 					}
-					++it;
+					if (recv(it->fd, buffer, 1000, 0) != 0) {
+						mt->second.RequestBuffer.append(buffer);
+						beheader(mt);
+					} else {
+						//deletion MIGHT LEAD TO ERRORS!
+						std::cout << mt->first << " disconnected" << std::endl;
+						Fds.erase(it);
+						connectionMsgs.erase(mt);
+						--it;
+					}
 				}
+				++it;
 			}
 		}
-		std::cout << "end" << std::endl;
 	}
+	std::cout << "end" << std::endl;
+}
 
 	/*
 	 * Messages have structure:
@@ -137,27 +137,60 @@ void Sockets::CheckForConnections() {
 	 * header ends with \r\n\r\n
 	*/
 
-void Sockets::SortMessage(std::map<int, Request>::iterator mt) {
+void Sockets::beheader(std::map<int, Request>::iterator mt) {
 	size_t neck = mt->second.RequestBuffer.find("\r\n\r\n");
 	if (neck == mt->second.RequestBuffer.npos) {
-		std::cerr << "invalid header: \n"<< mt->second.RequestBuffer << std::endl;
+		std::cerr << "invalid/incomplete header: \n"<< /*mt->second.RequestBuffer << */std::endl;
+		return;
 		//throw invalid header exception
 	}
-	if (mt->second.HeaderBuffer.empty() == true && neck != mt->second.RequestBuffer.npos) {
-		mt->second.HeaderBuffer = mt->second.RequestBuffer.substr(0, neck+4);
+	if (mt->second.Header.empty() == true && neck != mt->second.RequestBuffer.npos) {
+		mt->second.Header = mt->second.RequestBuffer.substr(0, neck + 4);
 	}
 	if (mt->second.RequestBuffer.rfind("\r\n\r\n") > neck) {
-		mt->second.Body = mt->second.RequestBuffer.substr(neck,mt->second.RequestBuffer.size());
+		mt->second.Body = mt->second.RequestBuffer.substr(neck + 4,mt->second.RequestBuffer.size());
 	}
-	if (mt->second.Body.empty() == true && mt->second.HeaderBuffer.size() == mt->second.RequestBuffer.size()) {
 
-	}
-	std::cout << "Header: " << std::endl << mt->second.HeaderBuffer << "|" << std::endl;
+	decapitalizeHeaderFields(mt->second.Header);
+	std::cout << "Header: " << std::endl << mt->second.Header << "|" << std::endl;
 	std::cout << "Body: " << std::endl << mt->second.Body << "|" << std::endl;
+	extractHeaderFields(mt->second);
+}
+
+void Sockets::decapitalizeHeaderFields(std::string& Header) {
+	int i = 0;
+	while(Header[i] != '\n') {
+		i++;
+	}
+	while (Header[i]) {
+		Header[i] = tolower(Header[i]);
+		i++;
+		if ( Header[i] == ':') {
+			while (Header[i] != '\n') {
+				++i;
+			}
+		}
+	}
+}
+
+void Sockets::extractHeaderFields(Request req) {
+	std::vector<std::string> SearchedHeaderFields;
+	SearchedHeaderFields.push_back("connection");
+	SearchedHeaderFields.push_back("transferencoding");
+	SearchedHeaderFields.push_back("user-agent");
+
+	long unsigned int i = 0;
+	while (i < SearchedHeaderFields.size()) {
+		if (req.Header.find(SearchedHeaderFields[i]) != req.Header.npos) {
+			req.HeaderFields.insert(std::make_pair(SearchedHeaderFields[i],	req.Header.substr(req.Header.find(SearchedHeaderFields[i])+SearchedHeaderFields[i].size()+2, req.Header.find('\n',req.Header.find(SearchedHeaderFields[i])) - (req.Header.find(SearchedHeaderFields[i])+SearchedHeaderFields[i].size()+2))));
+		}
+		++i;
+	}
 }
 
 Sockets::~Sockets() {
 	freeaddrinfo(serverInfo);
 }
+
 
 
