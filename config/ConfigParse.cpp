@@ -6,7 +6,7 @@
 /*   By: siun <siun@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/17 22:37:44 by siun              #+#    #+#             */
-/*   Updated: 2024/05/22 17:05:19 by siun             ###   ########.fr       */
+/*   Updated: 2024/05/22 17:38:49 by siun             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,23 +25,27 @@ std::string openFile(std::string path)
 	return config;
 }
 
-std::vector<int>	findIndent(std::string str)
+std::vector<std::pair<std::string, int>>	findIndent(std::string str)
 {
-	std::vector<int> level;
+	std::vector<std::pair<std::string, int>> configs;
 	for (int i = 0; i < str.size(); i ++)
 	{
-		int j = 0;
-		for (j; str[i + j] == '\t'; j ++)
+		int start = i;
+		for (start; str[start] == '\t'; start ++)
 			;
-		for (i; str[i + j] != '\n'; i ++)
+		int	indent = start - i;
+		i = start;
+		int	end = i;
+		for (end; str[end] != '\n'; end ++)
 			;
-		level.push_back(j);
-		i = i + j;
+		i = end;
+		if (start != end)
+			configs.push_back(std::make_pair(str.substr(start, end - start), indent));
 	}
-	return level;
+	return configs;
 }
 
-std::vector<std::string> findChunck(std::string config, std::vector<int> indents)
+std::vector<std::string> findChunck(std::vector<std::pair<std::string, int>> indents)
 {
 	//have to change auto keyword to sth else
 	auto	start = std::find(indents.begin(), indents.end(), 0);
@@ -195,7 +199,7 @@ std::vector <t_server> configParse(std::string configFilePath)
 {
 	std::string				config;
 	std::vector <t_server>	servers;
-	std::vector<int>		indents;
+	std::vector<std::pair<std::string, int>> indents;
 	std::vector<std::string> chuncks;
 	
 	try{
@@ -204,6 +208,7 @@ std::vector <t_server> configParse(std::string configFilePath)
 		std::cerr << "Caught execption: " << e.what() << '\n';
 		return std::vector<t_server>();
 	}
+	indents = findIndent(config);
 	chuncks = findChunck(config, indents);
 	
 	// for (int i = 0; i < chuncks.size(); i ++)
