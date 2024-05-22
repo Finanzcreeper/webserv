@@ -1,17 +1,18 @@
 
-#include "Sockets.hpp"
+#include "Server.hpp"
 #include <cerrno>
 #include <cstring>
+#include "httpParser.hpp"
 #include <unistd.h>
 
-Sockets::Sockets() : socketOption(ON){
+Server::Server(WebservConfigStruct settings) : socketOption(ON){
 	bzero(&listening_socket, sizeof(listening_socket));
 	bzero(&hints, sizeof(hints));
 	hints.ai_family = AF_INET;
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_flags = AI_PASSIVE;
 
-	if (getaddrinfo(NULL,"8080",&hints,&serverInfo) != 0) {
+	if (getaddrinfo(settings.host.c_str(),settings.port.c_str(),&hints,&serverInfo) != 0) {
 		//throw getaddrinfo exception
 		std::cerr << "getaddrinfo failed: " << std::strerror(errno) << std::endl;
 	}
@@ -38,7 +39,7 @@ Sockets::Sockets() : socketOption(ON){
 	}
 }
 
-void Sockets::CheckForConnections() {
+void Server::CheckForConnections() {
 	std::vector<pollfd>::iterator it;
 	std::map<int, Request>::iterator mt;
 
@@ -64,7 +65,7 @@ void Sockets::CheckForConnections() {
 			--i;
 		}
 		//reading from connection (reading into buffers, or closing connections
-		if (i != 0) {
+		if (i > 0) {
 			it = Fds.begin();
 			mt = connectionMsgs.begin();
 			while (it != Fds.end()) {
@@ -75,9 +76,9 @@ void Sockets::CheckForConnections() {
 					}
 					if (recv(it->fd, buffer, 1000, 0) != 0) {
 						mt->second.RequestBuffer.append(buffer);
-						beheader(mt);
+						httpParser(*mt);
 					} else {
-						//deletion MIGHT LEAD TO ERRORS!
+						//cleanup
 						std::cout << mt->first << " disconnected" << std::endl;
 						Fds.erase(it);
 						connectionMsgs.erase(mt);
@@ -137,60 +138,10 @@ void Sockets::CheckForConnections() {
 	 * header ends with \r\n\r\n
 	*/
 
-void Sockets::beheader(std::map<int, Request>::iterator mt) {
-	size_t neck = mt->second.RequestBuffer.find("\r\n\r\n");
-	if (neck == mt->second.RequestBuffer.npos) {
-		std::cerr << "invalid/incomplete header: \n"<< /*mt->second.RequestBuffer << */std::endl;
-		return;
-		//throw invalid header exception
-	}
-	if (mt->second.Header.empty() == true && neck != mt->second.RequestBuffer.npos) {
-		mt->second.Header = mt->second.RequestBuffer.substr(0, neck + 4);
-	}
-	if (mt->second.RequestBuffer.rfind("\r\n\r\n") > neck) {
-		mt->second.Body = mt->second.RequestBuffer.substr(neck + 4,mt->second.RequestBuffer.size());
-	}
 
-	decapitalizeHeaderFields(mt->second.Header);
-	std::cout << "Header: " << std::endl << mt->second.Header << "|" << std::endl;
-	std::cout << "Body: " << std::endl << mt->second.Body << "|" << std::endl;
-	extractHeaderFields(mt->second);
-}
 
-void Sockets::decapitalizeHeaderFields(std::string& Header) {
-	int i = 0;
-	while(Header[i] != '\n') {
-		i++;
-	}
-	while (Header[i]) {
-		Header[i] = tolower(Header[i]);
-		i++;
-		if ( Header[i] == ':') {
-			while (Header[i] != '\n') {
-				++i;
-			}
-		}
-	}
-}
-
-void Sockets::extractHeaderFields(Request req) {
-	std::vector<std::string> SearchedHeaderFields;
-	SearchedHeaderFields.push_back("connection");
-	SearchedHeaderFields.push_back("transferencoding");
-	SearchedHeaderFields.push_back("user-agent");
-
-	long unsigned int i = 0;
-	while (i < SearchedHeaderFields.size()) {
-		if (req.Header.find(SearchedHeaderFields[i]) != req.Header.npos) {
-			req.HeaderFields.insert(std::make_pair(SearchedHeaderFields[i],	req.Header.substr(req.Header.find(SearchedHeaderFields[i])+SearchedHeaderFields[i].size()+2, req.Header.find('\n',req.Header.find(SearchedHeaderFields[i])) - (req.Header.find(SearchedHeaderFields[i])+SearchedHeaderFields[i].size()+2))));
-		}
-		++i;
-	}
-}
-
-Sockets::~Sockets() {
+Server::~Server() {
 	freeaddrinfo(serverInfo);
 }
-
 
 

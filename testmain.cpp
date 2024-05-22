@@ -1,9 +1,20 @@
-#include "Sockets.hpp"
+#include "Server.hpp"
+#include <vector>
+//#include "WebservServerConfigParser"
 
 int main() {
-	Sockets *sock = new Sockets();
+	//std::vector<WebservConfigStruct> configs;
+	//std::vector<WebservConfigStruct>::iterator servernbr = configs.begin();
 
-	sock->CheckForConnections();
+	//while (servernbr != configs.end()) {
+	struct WebservConfigStruct servernbr;
+
+	servernbr.host = "127.0.0.1";
+	servernbr.port = "8080";
+		Server *sock = new Server(servernbr);
+		sock->CheckForConnections();
+		//servernbr++;
+	//}
 
 	delete sock;
 }
