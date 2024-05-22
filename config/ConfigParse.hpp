@@ -6,7 +6,7 @@
 /*   By: siun <siun@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/17 22:37:54 by siun              #+#    #+#             */
-/*   Updated: 2024/05/22 17:29:57 by siun             ###   ########.fr       */
+/*   Updated: 2024/05/22 17:50:56 by siun             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ typedef struct s_server
 
 std::string openFile(std::string path);
 std::vector<std::pair<std::string, int>>	findIndent(std::string str);
-std::vector<std::string> findChunck(std::string config, std::vector<int> indents);
+std::vector<std::vector<std::pair<std::string, int>>> findChunck(std::vector<std::pair<std::string, int>> indents);
 std::vector<std::string> findMethods(std::string methods);
 std::vector<std::string> findPaths(std::string paths);
 std::map<std::string, std::string> findCgi(std::string cgi);

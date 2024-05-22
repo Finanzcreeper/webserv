@@ -6,7 +6,7 @@
 /*   By: siun <siun@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/17 22:37:44 by siun              #+#    #+#             */
-/*   Updated: 2024/05/22 17:38:49 by siun             ###   ########.fr       */
+/*   Updated: 2024/05/22 19:52:59 by siun             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,34 +45,26 @@ std::vector<std::pair<std::string, int>>	findIndent(std::string str)
 	return configs;
 }
 
-std::vector<std::string> findChunck(std::vector<std::pair<std::string, int>> indents)
+std::vector<std::vector<std::pair<std::string, int>>> findChunck(std::vector<std::pair<std::string, int>> indents)
 {
-	//have to change auto keyword to sth else
-	auto	start = std::find(indents.begin(), indents.end(), 0);
-	//have to add some error handlings
-	std::vector<std::string> chunck;
-	for (int j = 0; j + start <  indents.end(); j ++)
+	std::vector<std::vector<std::pair<std::string, int>>> multiChunck;
+
+	int start = 0;
+	int	end = 0;
+	
+	for (int i = 0; i < indents.size(); i ++)
 	{
-		auto	end = std::find(start + 1, indents.end(), 0);
-		chunck.push_back(config.substr(start - indents.begin(), end - start));
-		for (end; end < indents.end(); end ++)
-			if (indents[end - indents.begin()] > 0)
-				break ;
-			//if indent level rises up from 0, it means it entered another chunck
-		start = end;
+		start = i;
+		for (i; i < indents.size() && indents[i].first != "server"; i ++)
+			;
+		end = i;
+		if (start != end)
+		{
+			std::vector<std::pair<std::string, int>> chunck(indents.begin() + start, indents.begin() + end);
+			multiChunck.push_back(chunck);
+		}
 	}
-
-	// std::vector<std::string> chunck;
-
-	// for (int i = 0; i < config.length(); i ++)
-	// {
-	// 	int start = config.find("server");
-	// 	int end = config.find("server", start + 1);
-	// 	if (end == -1)
-	// 		end = config.length();
-	// 	chunck.push_back(config.substr(start, end - start));
-	// }
-	return chunck;
+	return multiChunck;
 }
 
 
@@ -200,7 +192,7 @@ std::vector <t_server> configParse(std::string configFilePath)
 	std::string				config;
 	std::vector <t_server>	servers;
 	std::vector<std::pair<std::string, int>> indents;
-	std::vector<std::string> chuncks;
+	std::vector<std::vector<std::pair<std::string, int>>> chuncks;
 	
 	try{
 		config = openFile(configFilePath);
@@ -209,7 +201,18 @@ std::vector <t_server> configParse(std::string configFilePath)
 		return std::vector<t_server>();
 	}
 	indents = findIndent(config);
-	chuncks = findChunck(config, indents);
+	chuncks = findChunck(indents);
+
+	
+	for (int i = 0; i < chuncks.size(); i++)
+	{
+		std::cout << "Chunk " << i + 1 << ":\n";
+		for (const auto& pair : chuncks[i])
+		{
+			std::cout << "Indent: " << pair.second << ", Chunk: " << pair.first << "\n";
+		}
+		std::cout << "------------------------\n";
+	}
 	
 	// for (int i = 0; i < chuncks.size(); i ++)
 	// {
