@@ -6,7 +6,7 @@
 /*   By: siun <siun@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/17 22:37:44 by siun              #+#    #+#             */
-/*   Updated: 2024/05/23 17:59:35 by siun             ###   ########.fr       */
+/*   Updated: 2024/05/23 18:42:37 by siun             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,9 +45,9 @@ std::vector<std::pair<std::string, int> >	findIndent(std::string str)
 	return configs;
 }
 
-std::vector<std::vector<std::pair<std::string, int>>> findChunck(std::vector<std::pair<std::string, int>> indents)
+std::vector<std::vector<std::pair<std::string, int> > > findChunck(std::vector<std::pair<std::string, int> > indents)
 {
-	std::vector<std::vector<std::pair<std::string, int>>> multiChunck;
+	std::vector<std::vector<std::pair<std::string, int> > > multiChunck;
 
 	int start = 0;
 	int	end = 0;
@@ -60,14 +60,14 @@ std::vector<std::vector<std::pair<std::string, int>>> findChunck(std::vector<std
 		end = i;
 		if (start != end)
 		{
-			std::vector<std::pair<std::string, int>> chunck(indents.begin() + start, indents.begin() + end);
+			std::vector<std::pair<std::string, int> > chunck(indents.begin() + start, indents.begin() + end);
 			multiChunck.push_back(chunck);
 		}
 	}
 	return multiChunck;
 }
 
-std::string	parseString(const std::vector<std::pair<std::string, int>> chunck, std::string keyword)
+std::string	parseString(const std::vector<std::pair<std::string, int> > chunck, std::string keyword)
 {
 	for (int i = 0; i < chunck.size(); i ++)
 	{
@@ -98,11 +98,30 @@ std::vector<std::string>	parseMethod(const std::vector<std::pair<std::string, in
 	std::string method;
 
 	while (iss >> method)
-	{
-//		std::cout << method << std::endl;
 		methods.push_back(method);
-	}
 	return methods;
+}
+
+std::vector<std::string>	parsePath(const std::vector<std::pair<std::string, int> > chunck)
+{
+	std::vector<std::string> paths;
+	std::string				keyword = "path";
+	int	i;
+
+	for (i = 0; chunck[i].first.find(keyword) == std::string::npos; i ++)
+		;
+	int	indent = chunck[i].second;
+	std::cout << chunck[i].first << " indent :" << chunck[i].second << std::endl;
+	i ++;
+	for (i; chunck[i].second == indent + 1; i++)
+	{
+		std::istringstream iss(chunck[i].first);
+		std::string path;
+		iss >> path;
+		std::cout << path << std::endl;
+		paths.push_back(path);
+	}
+	return paths;
 }
 
 t_server parseServerConfig(const std::vector<std::pair<std::string, int> > chunck) {
@@ -116,11 +135,11 @@ t_server parseServerConfig(const std::vector<std::pair<std::string, int> > chunc
 	server.client_max_body_size = std::atoi(parseString(chunck, "client_max_body_size").c_str());
 	server.httpMethods = parseMethod(chunck);
 	std::vector<std::string> methods = parseMethod(chunck);
-
 	server.httpRedirection = parseString(chunck, "httpRedirection");
-	//server.path
+	server.path = parsePath(chunck);
 	//server.cgi_extension =
-	//server.dir_listing 
+	server.dir_listing = std::atoi(parseString(chunck, "dir_listing").c_str());
+	server.dir_request_default = parseString(chunck, "dir_request_default");
 	return server;
 }
 
@@ -129,8 +148,8 @@ std::vector <t_server> configParse(std::string configFilePath)
 {
 	std::string				config;
 	std::vector <t_server>	servers;
-	std::vector<std::pair<std::string, int>> indents;
-	std::vector<std::vector<std::pair<std::string, int>>> chuncks;
+	std::vector<std::pair<std::string, int> > indents;
+	std::vector<std::vector<std::pair<std::string, int> > > chuncks;
 	
 	try{
 		config = openFile(configFilePath);
@@ -168,14 +187,15 @@ int main()
 		
 		std::cout << "HTTP Methods:\n";
 		for (const auto& method : server.httpMethods) {
-			std::cout << method << "\n";
+			std::cout << method << "\t";
 		}
+		std::cout << "\n";
 		
 		std::cout << "HTTP Redirection: " << server.httpRedirection << "\n";
 		
 		std::cout << "Paths:\n";
 		for (const auto& path : server.path) {
-			std::cout << path << "\t";
+			std::cout << path << "\n";
 		}
 		
 		std::cout << "CGI Extensions:\n";
