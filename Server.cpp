@@ -47,6 +47,8 @@ void Server::CheckForConnections() {
 	MethodExecutor executor = MethodExecutor(this);
 
 	Request request;
+	Response response;
+
 	request.ReqType = NONE;
 	request.Integrity = OK;
 
@@ -67,7 +69,7 @@ void Server::CheckForConnections() {
 			client.events = (POLLIN);
 
 			connectionMsgs.insert(std::make_pair(client.fd, request));
-			answerMsgs.insert(std::make_pair(client.fd,Response));
+			answerMsgs.insert(std::make_pair(client.fd,response));
 			Fds.push_back(client);
 			--i;
 		}
@@ -80,10 +82,21 @@ void Server::CheckForConnections() {
 					bzero(buffer, sizeof(buffer));
 					while (mt->first != it->fd) {
 						++mt;
+						++resps;
 					}
 					if (recv(it->fd, buffer, 1000, 0) != 0) {
 						mt->second.RequestBuffer.append(buffer);
 						httpParser(mt,this->settings);
+						//std::cout << "Request from file descriptor " <<it->fd << std::endl << std::endl \
+						//	<< mt->second.RequestBuffer << std::endl;
+						
+						if (mt->second.Integrity == OK)
+						{
+							std::cout << "REQUEST TYPE IDENTIFIER: " << mt->second.ReqType << std::endl;
+							executor.wrapperRequest(mt->second, resps->second);
+							//send(it->fd, resps->second.ResponseBuffer.c_str(), \
+							//	resps->second.ResponseBuffer.length(), 0);
+						}
 					} else {
 						//cleanup
 						std::cout << mt->first << " disconnected" << std::endl;

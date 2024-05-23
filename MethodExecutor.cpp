@@ -27,7 +27,7 @@ void    MethodExecutor::_executeGet(Request &requ, Response &resp)
 	std::string		path = "/home/thofting/repos/webserv_creeper/content";
 	//std::string		filename = "example.html";
 	
-	is.open((path + "/" + requ.filename).c_str());
+	is.open((path + "/" + requ.RequestedPath).c_str());
 	if (is.is_open())
 		is >> resp.ResponseBuffer;
 }

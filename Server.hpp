@@ -11,7 +11,7 @@
 #include <sys/types.h>
 #include <netdb.h>
 #include <algorithm>
-#include "httpParser.hpp"
+//#include "httpParser.hpp"
 #include "MethodExecutor.hpp"
 //#include "httpParser.hpp"
 
@@ -63,6 +63,13 @@ struct Request {
 	RequestIntegrity Integrity;
 	std::string RequestedPath;
 	std::string BodyBuffer;
+	std::string Body;
+};
+
+struct Response {
+	std::string ResponseBuffer;
+	std::string HeaderBuffer;
+	std::map<std::string,std::string> HeaderFields;
 	std::string Body;
 };
 
