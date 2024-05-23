@@ -6,7 +6,7 @@
 /*   By: siun <siun@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/17 22:37:44 by siun              #+#    #+#             */
-/*   Updated: 2024/05/22 19:52:59 by siun             ###   ########.fr       */
+/*   Updated: 2024/05/23 17:00:42 by siun             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,122 +67,39 @@ std::vector<std::vector<std::pair<std::string, int>>> findChunck(std::vector<std
 	return multiChunck;
 }
 
-
-//going to change later to handle multiple spaces
-std::vector<std::string> findMethods(std::string methods)
+std::string	parseString(const std::vector<std::pair<std::string, int>> chunck, std::string keyword)
 {
-	std::vector<std::string> httpMethods;
-	std::string::size_type start = 0;
-	std::string::size_type end = methods.find(' ');
-	while (end != std::string::npos)
+	for (int i = 0; i < chunck.size(); i ++)
 	{
-		httpMethods.push_back(methods.substr(start, end - start));
-		start = end + 1;
-		end = methods.find(' ', start);
-	}
-	httpMethods.push_back(methods.substr(start));
-	for (int i = 0; i < httpMethods.size(); i ++)
-	{
-		if (httpMethods[i] != "GET" || httpMethods[i] != "POST" || httpMethods[i] != "DELETE")
-			throw std::runtime_error("Invalid http method: " + httpMethods[i] + " in config file");
-	}
-	return httpMethods;
-}
-
-std::vector<std::string> findPaths(std::string paths)
-{
-	std::vector<std::string> path;
-	std::string::size_type start = 0;
-	std::string::size_type end = paths.find(' ');
-	while (end != std::string::npos)
-	{
-		path.push_back(paths.substr(start, end - start));
-		start = end + 1;
-		end = paths.find(' ', start);
-	}
-	path.push_back(paths.substr(start));
-	return path;
-}
-
-std::map<std::string, std::string> findCgi(std::string cgi)
-{
-	std::map<std::string, std::string> cgi_extension;
-	std::string::size_type start = 0;
-	std::string::size_type end = cgi.find(' ');
-	while (end != std::string::npos)
-	{
-		cgi_extension[cgi.substr(start, end - start)] = cgi.substr(end + 1, cgi.find(' ', end + 1) - end - 1);
-		start = end + 1;
-		end = cgi.find(' ', start);
-	}
-	cgi_extension[cgi.substr(start)] = cgi.substr(end + 1);
-	return cgi_extension;
-}
-
-std::string findAndExtractValue(const std::string& chunck, const std::string& keyword) {
-	size_t index = chunck.find(keyword);
-	if (index != std::string::npos) {
-		size_t start = index + keyword.size() + 1;
-		size_t end = chunck.find('\n', start);
-		return chunck.substr(start, end - start);
+		if (chunck[i].first.find(keyword) != std::string::npos)
+		{
+			std::string str = chunck[i].first;
+			std::string::iterator start = str.begin() + keyword.size() + 1;
+			while(start != str.end() && std::isspace(*start))
+				++ start;
+			std::string::iterator end = str.end();
+			while (end != start && std::isspace(*end))
+				-- end;
+			return (std::string(start, end + 1));
+		}
 	}
 	return "";
 }
 
-t_server parseServerConfig(const std::string& chunck) {
+t_server parseServerConfig(const std::vector<std::pair<std::string, int>> chunck) {
+
 	t_server server;
 
-	std::string value = findAndExtractValue(chunck, "port");
-	if (!value.empty()) server.port = value;
-
-	value = findAndExtractValue(chunck, "host");
-	if (!value.empty()) server.host = value;
-
-	value = findAndExtractValue(chunck, "server_name");
-	if (!value.empty()) server.server_name = value;
-
-	value = findAndExtractValue(chunck, "default_error_page");
-	if (!value.empty()) server.default_error_page = value;
-
-	value = findAndExtractValue(chunck, "client_max_body_size");
-	if (!value.empty()) server.client_max_body_size = std::stoi(value);
-
-	value = findAndExtractValue(chunck, "httpMethods");
-	if (!value.empty()) {
-		try {
-			server.httpMethods = findMethods(value);
-		} catch (const std::runtime_error &e){
-			std::cerr << "Caught exception: " << e.what() << '\n';
-		}
-	}
-
-	value = findAndExtractValue(chunck, "httpRedirection");
-	if (!value.empty()) server.httpRedirection = value;
-
-	value = findAndExtractValue(chunck, "path");
-	if (!value.empty()) {
-		try {
-			server.path = findPaths(value);
-		} catch (const std::runtime_error &e){
-			std::cerr << "Caught exception: " << e.what() << '\n';
-		}
-	}
-
-	value = findAndExtractValue(chunck, "cgi_extension");
-	if (!value.empty()) {
-		try {
-			server.cgi_extension = findCgi(value);
-		} catch (const std::runtime_error &e){
-			std::cerr << "Caught exception: " << e.what() << '\n';
-		}
-	}
-
-	value = findAndExtractValue(chunck, "dir_listing");
-	if (!value.empty()) server.dir_listing = std::stoi(value);
-
-	value = findAndExtractValue(chunck, "dir_request_default");
-	if (!value.empty()) server.dir_request_default = value;
-
+	server.port = parseString(chunck, "port");
+	server.host = parseString(chunck, "host");
+	server.server_name = parseString(chunck, "server_name");
+	server.default_error_page = parseString(chunck, "default_error_page");
+	//server.client_max_body_size = std::atoi(parseString(chunck, "client_max_body_size"));
+	//server.httpMethods = ;
+	server.httpRedirection = parseString(chunck, "httpRedirection");
+	//server.path
+	//server.cgi_extension =
+	//server.dir_listing 
 	return server;
 }
 
@@ -202,28 +119,16 @@ std::vector <t_server> configParse(std::string configFilePath)
 	}
 	indents = findIndent(config);
 	chuncks = findChunck(indents);
-
-	
-	for (int i = 0; i < chuncks.size(); i++)
+	for (int i = 0; i < chuncks.size(); i ++)
 	{
-		std::cout << "Chunk " << i + 1 << ":\n";
-		for (const auto& pair : chuncks[i])
-		{
-			std::cout << "Indent: " << pair.second << ", Chunk: " << pair.first << "\n";
+		try {
+			servers.push_back(parseServerConfig(chuncks[i]));
+		} catch (const std::runtime_error &e){
+			std::cerr << "Caught exception: " << e.what() << '\n';
+			return std::vector<t_server>();
 		}
-		std::cout << "------------------------\n";
 	}
-	
-	// for (int i = 0; i < chuncks.size(); i ++)
-	// {
-	// 	try {
-	// 		servers.push_back(parseServerConfig(chuncks[i]));
-	// 	} catch (const std::runtime_error &e){
-	// 		std::cerr << "Caught exception: " << e.what() << '\n';
-	// 		return std::vector<t_server>();
-	// 	}
-	// }
-	// return servers;
+	return servers;
 	return std::vector<t_server>();
 }
 
