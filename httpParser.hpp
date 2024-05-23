@@ -25,7 +25,7 @@ private:
 	void beheader(Request& request);
 	void decapitalizeHeaderFields(std::string& Header);
 	void extractHeaderFields(Request& req);
-	void handleChunked(Request& body);
+	void handleBody(Request& body);
 public:
 	httpParser(std::map<int, Request>::iterator& req, struct WebservConfigStruct sett);
 

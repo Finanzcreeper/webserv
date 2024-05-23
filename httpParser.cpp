@@ -9,8 +9,9 @@ httpParser::httpParser(std::map<int, Request>::iterator& pair, const WebservConf
 	if (req.second.BodyBuffer.empty() == true) {
 		return;
 	}
-	handleChunked(req.second);
+	handleBody(req.second);
 	std::cout << req.second.Body << std::endl;
+	std::cout << req.second.ReqType << std::endl;
 }
 
 void httpParser::beheader(Request& request) {
@@ -96,22 +97,28 @@ void httpParser::extractHeaderFields(Request& req) {
 	}
 }
 
-void httpParser::handleChunked(Request& req) {
+void httpParser::handleBody(Request& req) {
 	std::map<std::string ,std::string>::iterator trew;
 	int ChunkSize = 0;
-
 	trew = req.HeaderFields.find("transfer-encoding");
+
 	if (trew == req.HeaderFields.end()) {
 		return;
 	}
-
-	while (req.BodyBuffer.empty() == false) {
-		std::string ChunkHexSize = req.BodyBuffer.substr(0, req.BodyBuffer.find_first_of("\r\n"));
-		req.BodyBuffer.erase(0,req.BodyBuffer.find("\r\n",0) + 2);
-		std::istringstream iss(ChunkHexSize);
-		iss >> std::hex >> ChunkSize;
- 		req.Body.append(req.BodyBuffer.substr(0,ChunkSize));
-		req.BodyBuffer.erase(0,ChunkSize + 2);
+	if (trew->second == "chunked") {
+		while (req.BodyBuffer.empty() == false) {
+			std::string ChunkHexSize = req.BodyBuffer.substr(
+				0, req.BodyBuffer.find_first_of("\r\n"));
+			req.BodyBuffer.erase(0,req.BodyBuffer.find("\r\n",0) + 2);
+			std::istringstream iss(ChunkHexSize);
+			iss >> std::hex >> ChunkSize;
+			req.Body.append(req.BodyBuffer.substr(0,ChunkSize));
+			req.BodyBuffer.erase(0,ChunkSize + 2);
+		}
+	}
+	else {
+		req.Body.append(req.BodyBuffer);
+		req.BodyBuffer.erase();
 	}
 }
 
