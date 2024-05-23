@@ -13,8 +13,17 @@
 #include <algorithm>
 #include "httpParser.hpp"
 #include "MethodExecutor.hpp"
+//#include "httpParser.hpp"
+
+enum RequestIntegrity {
+	OK,
+	INVALID_HEADER,
+	BODY_TOO_BIG,
+	TIMED_OUT,
+};
 
 enum RequestType {
+	NONE = -2,
 	INVALID = -1,
 	GET,
 	HEAD,
@@ -37,7 +46,7 @@ struct WebservConfigStruct {
 	std::string	host;
 	std::string	server_name;
 	std::string	default_error_page;
-	int			client_max_body_size;
+	long unsigned int			client_max_body_size;
 	std::vector	<std::string> httpMethods;
 	std::string	httpRedirection;
 	std::vector	<std::string> path;
@@ -48,21 +57,13 @@ struct WebservConfigStruct {
 
 struct Request {
 	std::string RequestBuffer;
-	std::string Header;
+	std::string HeaderBuffer;
 	std::map<std::string,std::string> HeaderFields;
 	RequestType ReqType;
+	RequestIntegrity Integrity;
 	std::string RequestedPath;
+	std::string BodyBuffer;
 	std::string Body;
-	std::string	filename;
-	int			isComplete;
-};
-
-struct Response {
-	std::string ResponseBuffer;
-	std::string Header;
-	std::map<std::string,std::string> HeaderFields;
-	std::string Body;
-	int			isComplete;
 };
 
 /*
@@ -75,6 +76,8 @@ struct Response {
 
 class Server {
 private:
+
+	const WebservConfigStruct settings;
 
 	int socketOption;
 
@@ -92,8 +95,9 @@ private:
 	std::map<int, Request>connectionMsgs;
 	std::map<int, Response>answerMsgs;
 
+
 public:
-	Server(WebservConfigStruct settings);
+	Server(WebservConfigStruct sett);
 	void CheckForConnections();
 	~Server();
 };
@@ -133,7 +137,7 @@ public:
  * 	std::string Referer;
  * 	std::string TE;
  * 	std::string UserAgent;
- * 	//Response Header Fields
+ * 	//Response HeaderBuffer Fields
  * 	std::string AcceptRanges;
  * 	std::string Age;
  * 	std::string ETag;
@@ -143,7 +147,7 @@ public:
  * 	std::string Server;
  * 	std::string Vary;
  * 	std::string WWWAuthenticate;
- * 	//Entity Header Fields
+ * 	//Entity HeaderBuffer Fields
  * 	std::string Allow;
  * 	std::string ContentEncoding;
  * 	std::string ContentLanguage;

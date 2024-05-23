@@ -5,7 +5,7 @@
 #include "httpParser.hpp"
 #include <unistd.h>
 
-Server::Server(WebservConfigStruct settings) : socketOption(ON){
+Server::Server(WebservConfigStruct sett) : settings(sett), socketOption(ON){
 	bzero(&listening_socket, sizeof(listening_socket));
 	bzero(&hints, sizeof(hints));
 	hints.ai_family = AF_INET;
@@ -46,8 +46,9 @@ void Server::CheckForConnections() {
 
 	MethodExecutor executor = MethodExecutor(this);
 
-	Request 	Request;
-	Response	Response;
+	Request request;
+	request.ReqType = NONE;
+	request.Integrity = OK;
 
 	listening_socket.events = POLLIN;
 	Fds.push_back(listening_socket);
@@ -55,7 +56,7 @@ void Server::CheckForConnections() {
 	std::cout << "listening on socket: " << Fds[0].fd << std::endl;
 	int i = 0;
 	while (true) {
-		i = poll(Fds.data(), Fds.size(), 0);
+ 		i = poll(Fds.data(), Fds.size(), 0);
 		//accepting new connection if there is one
 		if (Fds[0].revents != 0) {
 			client.fd = accept(listening_socket.fd, NULL, NULL);
@@ -65,14 +66,14 @@ void Server::CheckForConnections() {
 			}
 			client.events = (POLLIN);
 
-			connectionMsgs.insert(std::make_pair(client.fd,Request));
+			connectionMsgs.insert(std::make_pair(client.fd, request));
 			answerMsgs.insert(std::make_pair(client.fd,Response));
 			Fds.push_back(client);
 			--i;
 		}
 		//reading from connection (reading into buffers, or closing connections
 		if (i > 0) {
-			it = Fds.begin();
+			it = Fds.begin() + 1;
 			mt = connectionMsgs.begin();
 			while (it != Fds.end()) {
 				if (it->revents == POLLIN){
@@ -82,19 +83,7 @@ void Server::CheckForConnections() {
 					}
 					if (recv(it->fd, buffer, 1000, 0) != 0) {
 						mt->second.RequestBuffer.append(buffer);
-						mt->second.isComplete = 0;
-						httpParser(*mt);
-						mt->second.isComplete = true;
-						std::cout << std::endl << "Revieved from Client on socket " << it->fd << ":" << std::endl << std::endl;
-						std::cout << buffer << std::endl << std::endl << std::endl;
-						mt->second.ReqType = GET;
-						if (mt->second.isComplete)
-						{
-							std::cout << "Type of method: " << mt->second.ReqType << std::endl;
-							executor.wrapperRequest(mt->second, resps->second);
-							send(it->fd, "SUCCESS\n", 9, 0);
-							//clear_request(mt->second);
-						}
+						httpParser(mt,this->settings);
 					} else {
 						//cleanup
 						std::cout << mt->first << " disconnected" << std::endl;
@@ -123,7 +112,7 @@ void Server::CheckForConnections() {
 	 *		1: send 411 code
 	 *		2: handle situation
 	 *
-	 *	2: Header contains Transfer-Encoding: chunked, ...
+	 *	2: HeaderBuffer contains Transfer-Encoding: chunked, ...
 	 *	multiple messages will be sent, each containing size of message in OCTET
 	 *	message follows after
 	 *	message chunks look like:
@@ -138,10 +127,10 @@ void Server::CheckForConnections() {
 	 *		Solution:
 	 *		handle chunked messages when Transfer-Encoding: chunked, ... is found
 	 *
-	 *	3: Header contains Content-Length: ...
+	 *	3: HeaderBuffer contains Content-Length: ...
 	 *		Solution: message is exactly ... bytes long, read that amount in total
 	 *
-	 *	4: Header contains Transfer-Encoding: and Content-Length:
+	 *	4: HeaderBuffer contains Transfer-Encoding: and Content-Length:
 	 *		Solution: ignore Content-Length and apply Transfer-Encoding Rule.
 	 *
 	 *

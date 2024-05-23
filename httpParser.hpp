@@ -13,16 +13,25 @@
 #include <algorithm>
 #include "Server.hpp"
 
+//struct Request;
 
+class httpParser {
+private:
+	std::pair<int, Request> req;
+	const struct WebservConfigStruct settings;
 
-struct Request;
-void httpParser(std::pair<int, Request> pair);
-void GetRequestedPath(Request& request);
-void GetRequestType(Request& request);
-void beheader(Request& request);
-void decapitalizeHeaderFields(std::string& Header);
-void extractHeaderFields(Request& req);
-void handleChuncked(std::string body);
+	void GetRequestedPath(Request& request);
+	void GetRequestType(Request& request);
+	void beheader(Request& request);
+	void decapitalizeHeaderFields(std::string& Header);
+	void extractHeaderFields(Request& req);
+	void handleChunked(Request& body);
+public:
+	httpParser(std::map<int, Request>::iterator& req, struct WebservConfigStruct sett);
+
+	//httpParser(std::map<int, Request>::iterator& req, const WebservConfigStruct sett);
+};
+
 
 
 #endif //WEBSERV_HTTPPARSER_HPP

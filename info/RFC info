@@ -24,7 +24,7 @@ Probably relevant to us:
 Backus naur form:
 	in a list of elements (#) there MUST be at least one non null element.
 	LWS (linear White spaces:" ") MUST exist between any two tokens in the BNF.
-Header:
+HeaderBuffer:
 	Any field value containing special chars that would be interpreted MUST be a quoted string
 Transfer codings:
 	Whenever a transfer-coding is applied to a message-body, the set of transfer-codings MUST include "chunked", unless the message is terminated by closing the connection.
@@ -43,7 +43,7 @@ Multipart Types:
 	If an application receives an unrecognized multipart subtype, the application MUST treat it as being equivalent to "multipart/mixed"
 Message Headers:
 	It MUST be possible to combine the multiple header fields into one "field-name: field-value" pair without changing the semantics of the message, by appending each subsequent field-value to the first, each separated by a comma.
-Message Body:
+Message BodyBuffer:
 	Transfer-Encoding MUST be used to indicate any transfer-codings applied by an application to ensure safe and proper transfer of the message.
 ----------------
 Probably irrelevant to us:

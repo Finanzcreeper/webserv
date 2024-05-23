@@ -11,6 +11,7 @@ int main() {
 
 	servernbr.host = "127.0.0.1";
 	servernbr.port = "8080";
+	servernbr.client_max_body_size = 50;
 		Server *sock = new Server(servernbr);
 		sock->CheckForConnections();
 		//servernbr++;
