@@ -6,7 +6,7 @@
 /*   By: siun <siun@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/17 22:37:54 by siun              #+#    #+#             */
-/*   Updated: 2024/05/23 17:49:25 by siun             ###   ########.fr       */
+/*   Updated: 2024/05/23 18:59:41 by siun             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,9 +48,9 @@ typedef struct s_server
 }t_server;
 
 std::string openFile(std::string path);
-std::vector<std::pair<std::string, int>>	findIndent(std::string str);
-std::vector<std::vector<std::pair<std::string, int>>> findChunck(std::vector<std::pair<std::string, int>> indents);
-t_server parseServerConfig(const std::vector<std::pair<std::string, int>> chunck);
+std::vector<std::pair<std::string, int> >	findIndent(std::string str);
+std::vector<std::vector<std::pair<std::string, int> > > findChunck(std::vector<std::pair<std::string, int> > indents);
+t_server parseServerConfig(const std::vector<std::pair<std::string, int> > chunck);
 
 std::vector <t_server> configParse(std::string configFilePath);
 
