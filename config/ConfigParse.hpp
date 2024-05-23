@@ -6,7 +6,7 @@
 /*   By: siun <siun@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/17 22:37:54 by siun              #+#    #+#             */
-/*   Updated: 2024/05/23 16:46:20 by siun             ###   ########.fr       */
+/*   Updated: 2024/05/23 17:49:25 by siun             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 # include <iterator>
 # include <exception>
 # include <algorithm>
+# include <sstream>
 # include <map>
 
 class ConfigParse

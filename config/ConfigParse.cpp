@@ -6,7 +6,7 @@
 /*   By: siun <siun@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/17 22:37:44 by siun              #+#    #+#             */
-/*   Updated: 2024/05/23 17:00:42 by siun             ###   ########.fr       */
+/*   Updated: 2024/05/23 17:59:35 by siun             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ std::string openFile(std::string path)
 	return config;
 }
 
-std::vector<std::pair<std::string, int>>	findIndent(std::string str)
+std::vector<std::pair<std::string, int> >	findIndent(std::string str)
 {
 	std::vector<std::pair<std::string, int>> configs;
 	for (int i = 0; i < str.size(); i ++)
@@ -86,7 +86,26 @@ std::string	parseString(const std::vector<std::pair<std::string, int>> chunck, s
 	return "";
 }
 
-t_server parseServerConfig(const std::vector<std::pair<std::string, int>> chunck) {
+std::vector<std::string>	parseMethod(const std::vector<std::pair<std::string, int> > chunck)
+{
+	std::vector<std::string> methods;
+	std::string str;
+
+	str = parseString(chunck, "httpMethods");
+	if (str.empty())
+		return std::vector<std::string>();
+	std::istringstream iss(str);
+	std::string method;
+
+	while (iss >> method)
+	{
+//		std::cout << method << std::endl;
+		methods.push_back(method);
+	}
+	return methods;
+}
+
+t_server parseServerConfig(const std::vector<std::pair<std::string, int> > chunck) {
 
 	t_server server;
 
@@ -94,8 +113,10 @@ t_server parseServerConfig(const std::vector<std::pair<std::string, int>> chunck
 	server.host = parseString(chunck, "host");
 	server.server_name = parseString(chunck, "server_name");
 	server.default_error_page = parseString(chunck, "default_error_page");
-	//server.client_max_body_size = std::atoi(parseString(chunck, "client_max_body_size"));
-	//server.httpMethods = ;
+	server.client_max_body_size = std::atoi(parseString(chunck, "client_max_body_size").c_str());
+	server.httpMethods = parseMethod(chunck);
+	std::vector<std::string> methods = parseMethod(chunck);
+
 	server.httpRedirection = parseString(chunck, "httpRedirection");
 	//server.path
 	//server.cgi_extension =
@@ -154,7 +175,7 @@ int main()
 		
 		std::cout << "Paths:\n";
 		for (const auto& path : server.path) {
-			std::cout << path << "\n";
+			std::cout << path << "\t";
 		}
 		
 		std::cout << "CGI Extensions:\n";
