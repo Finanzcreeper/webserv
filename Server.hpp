@@ -12,6 +12,7 @@
 #include <netdb.h>
 #include <algorithm>
 #include "httpParser.hpp"
+#include "MethodExecutor.hpp"
 
 enum RequestType {
 	INVALID = -1,
@@ -52,6 +53,16 @@ struct Request {
 	RequestType ReqType;
 	std::string RequestedPath;
 	std::string Body;
+	std::string	filename;
+	int			isComplete;
+};
+
+struct Response {
+	std::string ResponseBuffer;
+	std::string Header;
+	std::map<std::string,std::string> HeaderFields;
+	std::string Body;
+	int			isComplete;
 };
 
 /*
@@ -60,6 +71,7 @@ struct Request {
  * have one public function that uses poll to check if new connections have arrived in queue.
  * if new connections are in queue, accept them and put them into container.
 */
+
 
 class Server {
 private:
@@ -72,14 +84,13 @@ private:
 	pollfd listening_socket;
 
 	pollfd client;
-	socklen_t client_address_length;
+	//socklen_t client_address_length;
 
 	char buffer[1000];
 
 	std::vector<pollfd>Fds;
 	std::map<int, Request>connectionMsgs;
-
-
+	std::map<int, Response>answerMsgs;
 
 public:
 	Server(WebservConfigStruct settings);

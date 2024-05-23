@@ -1,4 +1,4 @@
-SRCS = testmain.cpp Sockets.cpp
+SRCS = testmain.cpp Server.cpp httpParser.cpp MethodExecutor.cpp
 
 OBJS = ${SRCS:.cpp=.o}
 

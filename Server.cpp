@@ -42,8 +42,12 @@ Server::Server(WebservConfigStruct settings) : socketOption(ON){
 void Server::CheckForConnections() {
 	std::vector<pollfd>::iterator it;
 	std::map<int, Request>::iterator mt;
+	std::map<int, Response>::iterator resps;
 
-	Request Request;
+	MethodExecutor executor = MethodExecutor(this);
+
+	Request 	Request;
+	Response	Response;
 
 	listening_socket.events = POLLIN;
 	Fds.push_back(listening_socket);
@@ -60,7 +64,9 @@ void Server::CheckForConnections() {
 				std::cerr << "a connection failed: " << std::strerror(errno) << std::endl;
 			}
 			client.events = (POLLIN);
+
 			connectionMsgs.insert(std::make_pair(client.fd,Request));
+			answerMsgs.insert(std::make_pair(client.fd,Response));
 			Fds.push_back(client);
 			--i;
 		}
@@ -76,7 +82,19 @@ void Server::CheckForConnections() {
 					}
 					if (recv(it->fd, buffer, 1000, 0) != 0) {
 						mt->second.RequestBuffer.append(buffer);
+						mt->second.isComplete = 0;
 						httpParser(*mt);
+						mt->second.isComplete = true;
+						std::cout << std::endl << "Revieved from Client on socket " << it->fd << ":" << std::endl << std::endl;
+						std::cout << buffer << std::endl << std::endl << std::endl;
+						mt->second.ReqType = GET;
+						if (mt->second.isComplete)
+						{
+							std::cout << "Type of method: " << mt->second.ReqType << std::endl;
+							executor.wrapperRequest(mt->second, resps->second);
+							send(it->fd, "SUCCESS\n", 9, 0);
+							//clear_request(mt->second);
+						}
 					} else {
 						//cleanup
 						std::cout << mt->first << " disconnected" << std::endl;
@@ -85,6 +103,7 @@ void Server::CheckForConnections() {
 						--it;
 					}
 				}
+				//check_timeout();
 				++it;
 			}
 		}
@@ -137,8 +156,6 @@ void Server::CheckForConnections() {
 	 *
 	 * header ends with \r\n\r\n
 	*/
-
-
 
 Server::~Server() {
 	freeaddrinfo(serverInfo);
