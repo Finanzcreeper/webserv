@@ -6,7 +6,7 @@
 /*   By: siun <siun@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/17 22:37:44 by siun              #+#    #+#             */
-/*   Updated: 2024/05/23 18:42:37 by siun             ###   ########.fr       */
+/*   Updated: 2024/05/23 18:56:04 by siun             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,6 @@ std::vector<std::pair<std::string, int> >	findIndent(std::string str)
 std::vector<std::vector<std::pair<std::string, int> > > findChunck(std::vector<std::pair<std::string, int> > indents)
 {
 	std::vector<std::vector<std::pair<std::string, int> > > multiChunck;
-
 	int start = 0;
 	int	end = 0;
 	
@@ -108,20 +107,39 @@ std::vector<std::string>	parsePath(const std::vector<std::pair<std::string, int>
 	std::string				keyword = "path";
 	int	i;
 
-	for (i = 0; chunck[i].first.find(keyword) == std::string::npos; i ++)
+	for (i = 0; i < chunck.size() && chunck[i].first.find(keyword) == std::string::npos; i ++)
 		;
 	int	indent = chunck[i].second;
-	std::cout << chunck[i].first << " indent :" << chunck[i].second << std::endl;
 	i ++;
-	for (i; chunck[i].second == indent + 1; i++)
+	for (i; i < chunck.size() && chunck[i].second == indent + 1; i++)
 	{
 		std::istringstream iss(chunck[i].first);
 		std::string path;
 		iss >> path;
-		std::cout << path << std::endl;
 		paths.push_back(path);
 	}
 	return paths;
+}
+
+std::map<std::string, std::string> parseCgi(std::vector<std::pair<std::string, int> > chunck)
+{
+	std::map<std::string, std::string> cgi;
+	std::string keyword = "cgi";
+	int	i;
+
+	for (i = 0; i < chunck.size() && chunck[i].first.find(keyword) == std::string::npos; i ++)
+		;
+	int	indent = chunck[i].second;
+	i ++;
+	for (i; i < chunck.size() && chunck[i].second == indent + 1; i ++)
+	{
+		std::istringstream iss(chunck[i].first);
+		std::string extension;
+		std::string path;
+		iss >> extension >> path;
+		cgi[extension] = path;
+	}
+	return cgi;
 }
 
 t_server parseServerConfig(const std::vector<std::pair<std::string, int> > chunck) {
@@ -137,7 +155,7 @@ t_server parseServerConfig(const std::vector<std::pair<std::string, int> > chunc
 	std::vector<std::string> methods = parseMethod(chunck);
 	server.httpRedirection = parseString(chunck, "httpRedirection");
 	server.path = parsePath(chunck);
-	//server.cgi_extension =
+	server.cgi_extension = parseCgi(chunck);
 	server.dir_listing = std::atoi(parseString(chunck, "dir_listing").c_str());
 	server.dir_request_default = parseString(chunck, "dir_request_default");
 	return server;
