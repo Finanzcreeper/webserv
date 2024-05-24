@@ -96,20 +96,20 @@ void httpParser::extractHeaderFields(Request& req) {
 }
 
 void httpParser::handleBody(Request& req) {
-	std::map<std::string ,std::string>::iterator trew;
+	std::map<std::string ,std::string>::iterator trenc;
 	int ChunkSize = 0;
-	trew = req.HeaderFields.find("transfer-encoding");
+	trenc = req.HeaderFields.find("transfer-encoding");
 
-	if (trew == req.HeaderFields.end()) {
+	if (trenc == req.HeaderFields.end()) {
 		return;
 	}
-	if (trew->second == "chunked") {
+	if (trenc->second == "chunked") {
 		while (req.BodyBuffer.empty() == false) {
 			std::string ChunkHexSize = req.BodyBuffer.substr(
 				0, req.BodyBuffer.find_first_of("\r\n"));
 			req.BodyBuffer.erase(0,req.BodyBuffer.find("\r\n",0) + 2);
-			std::istringstream iss(ChunkHexSize);
-			iss >> std::hex >> ChunkSize;
+			std::istringstream HexStream(ChunkHexSize);
+			HexStream >> std::hex >> ChunkSize;
 			req.Body.append(req.BodyBuffer.substr(0,ChunkSize));
 			req.BodyBuffer.erase(0,ChunkSize + 2);
 		}
