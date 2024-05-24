@@ -17,7 +17,7 @@
 
 class httpParser {
 private:
-	std::pair<int, Request> req;
+	std::map<int,Request>::iterator& req;
 	const struct WebservConfigStruct settings;
 
 	void GetRequestedPath(Request& request);
@@ -27,7 +27,7 @@ private:
 	void extractHeaderFields(Request& req);
 	void handleBody(Request& body);
 public:
-	httpParser(std::map<int, Request>::iterator& req, struct WebservConfigStruct sett);
+		httpParser(std::map<int, Request>::iterator& req, struct WebservConfigStruct sett);
 
 	//httpParser(std::map<int, Request>::iterator& req, const WebservConfigStruct sett);
 };

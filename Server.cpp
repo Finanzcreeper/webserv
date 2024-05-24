@@ -73,12 +73,10 @@ void Server::CheckForConnections() {
 			while (it != Fds.end()) {
 				if (it->revents == POLLIN){
 					bzero(buffer, sizeof(buffer));
-					while (mt->first != it->fd) {
-						++mt;
-					}
+					mt = connectionMsgs.find(it->fd);
 					if (recv(it->fd, buffer, 1000, 0) != 0) {
 						mt->second.RequestBuffer.append(buffer);
-						httpParser(mt,this->settings);
+						httpParser test(mt,this->settings);
 					} else {
 						//cleanup
 						std::cout << mt->first << " disconnected" << std::endl;

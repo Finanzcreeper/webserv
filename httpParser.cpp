@@ -1,17 +1,15 @@
 #include "httpParser.hpp"
 #include <sstream>
 
-httpParser::httpParser(std::map<int, Request>::iterator& pair, const WebservConfigStruct sett): req(*pair), settings(sett) {
-	beheader(req.second);
-	if (req.second.HeaderBuffer.empty() == true) {
+httpParser::httpParser(std::map<int, Request>::iterator& pair, const WebservConfigStruct sett): req(pair), settings(sett) {
+	beheader(req->second);
+	if (req->second.HeaderBuffer.empty() == true) {
 		return;
 	}
-	if (req.second.BodyBuffer.empty() == true) {
+	if (req->second.BodyBuffer.empty() == true) {
 		return;
 	}
-	handleBody(req.second);
-	std::cout << req.second.Body << std::endl;
-	std::cout << req.second.ReqType << std::endl;
+	handleBody(req->second);
 }
 
 void httpParser::beheader(Request& request) {
@@ -30,7 +28,7 @@ void httpParser::beheader(Request& request) {
 	request.BodyBuffer.append(request.RequestBuffer.substr(0, request.RequestBuffer.size()));
 	request.RequestBuffer.erase(0,request.RequestBuffer.size());
 	if (request.Body.size() > settings.client_max_body_size) {
-		this->req.second.Integrity = BODY_TOO_BIG;
+		this->req->second.Integrity = BODY_TOO_BIG;
 	}
 	//std::cout << request.HeaderBuffer << std::endl;
 }
