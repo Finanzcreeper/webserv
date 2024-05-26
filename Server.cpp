@@ -81,6 +81,7 @@ void Server::CheckForConnections() {
 				if (it->revents == POLLIN){
 					bzero(buffer, sizeof(buffer));
 					mt = connectionMsgs.find(it->fd);
+					resps = answerMsgs.find(it->fd);
 					if (recv(it->fd, buffer, 1000, 0) != 0) {
 						mt->second.RequestBuffer.append(buffer);
 						httpParser(mt,this->settings);
