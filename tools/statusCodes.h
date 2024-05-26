@@ -3,9 +3,10 @@
 
 #include <string>
 
+#define MIN_CLIENT_ERROR 400
+#define MAX_SERVER_ERROR 599
 // Explanation of status codes:
 // https://httpwg.org/specs/rfc9110.html#overview.of.status.codes
-
 enum statusCode{
 	// Information responses
 	CONTINUE = 100,

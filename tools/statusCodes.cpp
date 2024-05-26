@@ -147,7 +147,7 @@ std::string getStatusCodeDescription(statusCode code){
 		case (NOT_FOUND):
             return ("Not Found");
 		case (METHOD_NOT_ALLOWED):
-            return ("Method Not Allowed");
+            return ("Method not allowed or not supported yet");
 		case (NOT_ACCEPTABLE):
             return ("Not Acceptable");
 		case (PROXY_AUTHENTIFICATION_REQUIRED):

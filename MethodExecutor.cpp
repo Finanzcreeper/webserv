@@ -3,6 +3,7 @@
 #include<sstream>
 
 std::string		root = "/home/thofting/repos/webserv_creeper/content";
+std::string		defaultPage = "index.html";
 
 MethodExecutor::MethodExecutor( void ): _server(0) {};
 
@@ -13,7 +14,7 @@ MethodExecutor::MethodExecutor(Server *server)
 
 void	MethodExecutor::wrapperRequest(Request &requ, Response &resp)
 {
-	std::cout << "**** HEADER OF REQUEST: ****" << requ.HeaderBuffer << std::endl << "**** END OF HEADER ****" << std::endl;
+	std::cout << "**** HEADER OF REQUEST: ****\n" << requ.HeaderBuffer << std::endl << "**** END OF HEADER ****" << std::endl;
 	resp.statusCode = OK_HTTP;
 	resp.body.clear();
 	resp.headerBuffer.clear();
@@ -33,14 +34,16 @@ void	MethodExecutor::wrapperRequest(Request &requ, Response &resp)
 		//	break ;
 		default:
 			std::cerr << "Method type not found\n";
+			resp.statusCode = METHOD_NOT_ALLOWED;
 	}
-	if ((int)resp.statusCode >= 400 && (int)resp.statusCode < 600)
+	if ((int)resp.statusCode >= MIN_CLIENT_ERROR && (int)resp.statusCode <= MAX_SERVER_ERROR)
 		_generateErrorBody(resp);
 	_generateHeader(requ, resp);
+
 	//Body header separation
 	resp.responseBuffer.append("\r\n\r\n");
 	resp.responseBuffer.append(resp.body);
-	std::cout << "**** RESPONSE: ****" << resp.responseBuffer << "**** END OF RESPONSE ****" << std::endl;
+	std::cout << "**** RESPONSE: ****\n" << resp.responseBuffer << "**** END OF RESPONSE ****" << std::endl;
 }
 
 void    MethodExecutor::_executeGet(Request &requ, Response &resp)
@@ -51,6 +54,11 @@ void    MethodExecutor::_executeGet(Request &requ, Response &resp)
 	size_t			pos = path.find(" ");
 	path.replace(pos, 1, "");
 
+	// default page if no path specified
+	if (path.length() == root.length() + 1)
+		path.append(defaultPage);
+	
+	std::cout << "PATH:" << path << "*" << std::endl;
 	std::ifstream	ifs(path.c_str());
 	
 	// TODO: More detailed access check for files
@@ -142,5 +150,5 @@ void	MethodExecutor::_generateErrorBody(Response &resp)
 	resp.body.append("        <p><a href=\"/home/thofting/repos/webserv_creeper\">Go to Homepage</a></p>\n");
 	resp.body.append("    </div>");
 	resp.body.append("</body>");
-	resp.body.append("</html>");
+	resp.body.append("</html>\n");
 }
