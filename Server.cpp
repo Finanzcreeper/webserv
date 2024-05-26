@@ -85,15 +85,12 @@ void Server::CheckForConnections() {
 					if (recv(it->fd, buffer, 1000, 0) != 0) {
 						mt->second.RequestBuffer.append(buffer);
 						httpParser(mt,this->settings);
-						//std::cout << "Request from file descriptor " <<it->fd << std::endl << std::endl \
-						//	<< mt->second.RequestBuffer << std::endl;
-						
 						if (mt->second.Integrity == OK)
 						{
-							std::cout << "REQUEST TYPE IDENTIFIER: " << mt->second.ReqType << std::endl;
 							executor.wrapperRequest(mt->second, resps->second);
-							//send(it->fd, resps->second.ResponseBuffer.c_str(), \
-							//	resps->second.ResponseBuffer.length(), 0);
+							send(it->fd, resps->second.responseBuffer.c_str(), \
+								resps->second.responseBuffer.length(), 0);
+							mt->second.RequestBuffer.clear();
 						}
 					} else {
 						//cleanup

@@ -11,9 +11,8 @@
 #include <sys/types.h>
 #include <netdb.h>
 #include <algorithm>
-//#include "httpParser.hpp"
 #include "MethodExecutor.hpp"
-//#include "httpParser.hpp"
+#include "tools/statusCodes.h"
 
 enum RequestIntegrity {
 	OK,
@@ -25,11 +24,11 @@ enum RequestIntegrity {
 enum RequestType {
 	NONE = -2,
 	INVALID = -1,
-	GET,
-	HEAD,
-	POST,
+	GET, // REQUIRED
+	HEAD, // REQUIRED (not part of subject but mandatory for general purpose http server)
+	POST, // REQUIRED
 	PUT,
-	DELETE,
+	DELETE, // REQUIRED
 	CONNECT,
 	OPTIONS,
 	TRACE,
@@ -67,10 +66,10 @@ struct Request {
 };
 
 struct Response {
-	std::string ResponseBuffer;
-	std::string HeaderBuffer;
-	std::map<std::string,std::string> HeaderFields;
-	std::string Body;
+	std::string 	responseBuffer;
+	std::string 	headerBuffer;
+	statusCode		statusCode;
+	std::string 	body;
 };
 
 /*

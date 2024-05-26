@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <fstream>
 #include "Server.hpp"
+//#include "tools/statusCodes.h"
 
 class Server;
 struct Response;
@@ -17,6 +18,8 @@ class MethodExecutor
 	private:
 		Server*	_server;
 		void	_executeGet(Request &requ, Response &resp);
+		void	_generateHeader(Request &requ, Response &resp);
+		void	_generateErrorBody(Response &resp);
 		//void    exexutePost();
 		//void    exexuteDelete();
 	public:
