@@ -90,7 +90,7 @@ void Server::CheckForConnections() {
 							executor.wrapperRequest(mt->second, resps->second);
 							send(it->fd, resps->second.responseBuffer.c_str(), \
 								resps->second.responseBuffer.length(), 0);
-							mt->second.RequestBuffer.clear();
+							mt->second.HeaderBuffer.clear();
 						}
 					} else {
 						//cleanup
