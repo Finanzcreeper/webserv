@@ -38,7 +38,7 @@ typedef struct s_server
 	std::string 	host = "";
 	std::string		server_name = "";
 	std::string 	default_error_page = "";
-	int 			client_max_body_size = 0;
+	long unsigned int 			client_max_body_size = 0;
 	std::vector		<std::string> httpMethods = std::vector<std::string>();
 	std::string		httpRedirection = "";
 	std::vector		<std::string> path = std::vector<std::string>();
