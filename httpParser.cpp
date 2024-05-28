@@ -29,6 +29,7 @@ void httpParser::beheader(Request& request) {
 	request.RequestBuffer.erase(0,request.RequestBuffer.size());
 	if (request.Body.size() > settings.client_max_body_size) {
 		this->req->second.Integrity = BODY_TOO_BIG;
+		throw std::runtime_error("Http request has an oversized Body!");
 	}
 	//std::cout << request.HeaderBuffer << std::endl;
 }
@@ -54,6 +55,16 @@ void httpParser::GetRequestType(Request& request) {
 		request.ReqType = PATCH;
 	} else {
 		request.ReqType = INVALID;
+	}
+	for (long unsigned int i = 0; i < settings.httpMethods.size(); ++i) {
+		request.Integrity = UNSUPPORTED_REQUEST_TYPE;
+		if (request.ReqType == settings.httpMethods[i]) {
+			request.Integrity = OK;
+		}
+		++i;
+	}
+	if (request.Integrity != OK) {
+		throw std::runtime_error("Unsupported Request type recieved!");
 	}
 }
 

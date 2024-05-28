@@ -11,6 +11,7 @@
 #include <sys/types.h>
 #include <netdb.h>
 #include <algorithm>
+#include <exception>
 //#include "httpParser.hpp"
 
 enum RequestIntegrity {
@@ -18,6 +19,7 @@ enum RequestIntegrity {
 	INVALID_HEADER,
 	BODY_TOO_BIG,
 	TIMED_OUT,
+	UNSUPPORTED_REQUEST_TYPE
 };
 
 enum RequestType {
@@ -45,7 +47,7 @@ struct WebservConfigStruct {
 	std::string	server_name;
 	std::string	default_error_page;
 	long unsigned int			client_max_body_size;
-	std::vector	<std::string> httpMethods;
+	std::vector	<RequestType> httpMethods;
 	std::string	httpRedirection;
 	std::vector	<std::string> path;
 	std::map	<std::string, std::string> cgi_extension;

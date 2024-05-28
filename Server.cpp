@@ -55,13 +55,13 @@ void Server::CheckForConnections() {
 	while (true) {
  		i = poll(Fds.data(), Fds.size(), 0);
 		//accepting new connection if there is one
-		if (Fds[0].revents != 0) {
+		if ((Fds[0].revents & POLLIN)!= 0) {
 			client.fd = accept(listening_socket.fd, NULL, NULL);
 			if (client.fd == -1) {
 				//throw accept connection exception
 				std::cerr << "a connection failed: " << std::strerror(errno) << std::endl;
 			}
-			client.events = (POLLIN);
+			client.events = (POLLIN | POLLOUT);
 			connectionMsgs.insert(std::make_pair(client.fd, request));
 			Fds.push_back(client);
 			--i;
@@ -71,12 +71,19 @@ void Server::CheckForConnections() {
 			it = Fds.begin() + 1;
 			mt = connectionMsgs.begin();
 			while (it != Fds.end()) {
-				if (it->revents == POLLIN){
+				if ((it->revents & POLLIN) != 0){
 					bzero(buffer, sizeof(buffer));
 					mt = connectionMsgs.find(it->fd);
 					if (recv(it->fd, buffer, 1000, 0) != 0) {
 						mt->second.RequestBuffer.append(buffer);
-						httpParser test(mt,this->settings);
+
+						try {
+							httpParser test(mt,this->settings);
+						}
+						catch (const std::runtime_error &e){
+							std::cerr << e.what() << std::endl;
+							//get error page based on request.integrity!
+						}
 					} else {
 						//cleanup
 						std::cout << mt->first << " disconnected" << std::endl;
@@ -84,6 +91,9 @@ void Server::CheckForConnections() {
 						connectionMsgs.erase(mt);
 						--it;
 					}
+				}
+				if ((it->revents & POLLOUT) != 0 /* && Answer is ready*/) {
+					send(it->fd,"answer",6,0);
 				}
 				++it;
 			}
