@@ -66,6 +66,11 @@ struct Request {
 	std::string Body;
 };
 
+struct Response {
+	int test;
+	std::string rest;
+};
+
 /*
  * On construction, create one listening socket.
  * have a public container containing connected sockets.
@@ -93,6 +98,7 @@ private:
 	std::vector<pollfd>Fds;
 	std::map<int, Request>connectionMsgs;
 
+	void responder(std::map <int, Response>::iterator& response);
 
 public:
 	Server(WebservConfigStruct sett);

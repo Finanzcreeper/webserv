@@ -102,6 +102,17 @@ void Server::CheckForConnections() {
 	std::cout << "end" << std::endl;
 }
 
+void Server::responder(std::map <int, Response>::iterator& response) {
+	int sentAmt = 0;
+
+	std::map <int, Response>::iterator& re = response;
+	sentAmt = send(re->first,re->second.rest.c_str(),re->second.rest.size(),MSG_DONTWAIT);
+	if (sentAmt == -1) {
+		return;
+	}
+		response->second.rest.erase(0,sentAmt);
+}
+
 	/*
 	 * Messages have structure:
 	 * first line is message type and path
@@ -153,5 +164,4 @@ void Server::CheckForConnections() {
 Server::~Server() {
 	freeaddrinfo(serverInfo);
 }
-
 
