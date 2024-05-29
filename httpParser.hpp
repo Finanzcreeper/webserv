@@ -1,5 +1,5 @@
-#ifndef WEBSERV_HTTPPARSER_HPP
-#define WEBSERV_HTTPPARSER_HPP
+#ifndef HTTPPARSER_HPP
+#define HTTPPARSER_HPP
 
 #include <iostream>
 #include <sys/socket.h>
@@ -34,4 +34,4 @@ public:
 
 
 
-#endif //WEBSERV_HTTPPARSER_HPP
+#endif //HTTPPARSER_HPP
