@@ -84,7 +84,6 @@ void Server::CheckForConnections() {
 							std::cerr << e.what() << std::endl;
 							//get error page based on request.integrity!
 						}
-						std::cout << "\"" << mt->second.RequestedPath << "\"" << std::endl;
 					} else {
 						//cleanup
 						std::cout << mt->first << " disconnected" << std::endl;
