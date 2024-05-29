@@ -1,7 +1,7 @@
 #include "httpParser.hpp"
 #include <sstream>
 
-httpParser::httpParser(std::map<int, Request>::iterator& pair, const WebservConfigStruct sett): req(pair), settings(sett) {
+httpParser::httpParser(std::map<int, Request>::iterator& pair, const t_server sett): req(pair), settings(sett) {
 	beheader(req->second);
 	if (req->second.HeaderBuffer.empty() == true) {
 		return;
@@ -57,12 +57,8 @@ void httpParser::GetRequestType(Request& request) {
 	} else {
 		request.ReqType = INVALID;
 	}
-	for (long unsigned int i = 0; i < settings.httpMethods.size(); ++i) {
+	if ((request.ReqType & settings.httpMethods) == 0) {
 		request.Integrity = UNSUPPORTED_REQUEST_TYPE;
-		if (request.ReqType == settings.httpMethods[i]) {
-			request.Integrity = OK;
-		}
-		++i;
 	}
 	if (request.Integrity != OK) {
 		throw std::runtime_error("Unsupported Request type recieved!");

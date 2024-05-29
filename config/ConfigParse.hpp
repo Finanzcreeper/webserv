@@ -23,6 +23,7 @@
 # include <algorithm>
 # include <sstream>
 # include <map>
+#include "../CommonIncludes.hpp"
 
 class ConfigParse
 {
@@ -31,27 +32,26 @@ class ConfigParse
 };
 
 
-//going to saved as a vector to save multiple servers inside of one config file
+//going to be saved as a vector to save multiple servers inside of one config file
 typedef struct s_server
 {
-	std::string	 	port = "";
-	std::string 	host = "";
-	std::string		server_name = "";
-	std::string 	default_error_page = "";
-	long unsigned int 			client_max_body_size = 0;
-	std::vector		<std::string> httpMethods = std::vector<std::string>();
-	std::string		httpRedirection = "";
-	std::vector		<std::string> path = std::vector<std::string>();
-	std::map 		<std::string, std::string> cgi_extension = std::map<std::string, std::string>();
-	bool			dir_listing = false;
-	std::string		dir_request_default = ""; //default file if the request is a directory
+	std::string	 						port;
+	std::string 						host;
+	std::string							server_name;
+	std::string 						default_error_page;
+	long unsigned int					client_max_body_size;
+	RequestType							httpMethods;
+	std::string							httpRedirection;
+	std::vector<std::string>			path;
+	std::map<std::string, std::string>	cgi_extension;
+	bool								dir_listing;
+	std::string							dir_request_default; //default file if the request is a directory
 }t_server;
 
-std::string openFile(std::string path);
-std::vector<std::pair<std::string, int> >	findIndent(std::string str);
-std::vector<std::vector<std::pair<std::string, int> > > findChunck(std::vector<std::pair<std::string, int> > indents);
-t_server parseServerConfig(const std::vector<std::pair<std::string, int> > chunck);
-
-std::vector <t_server> configParse(std::string configFilePath);
+std::string												openFile(std::string path);
+std::vector<std::pair<std::string, int> >				findIndent(std::string str);
+std::vector<std::vector<std::pair<std::string, int> > >	findChunck(std::vector<std::pair<std::string, int> > indents);
+t_server												parseServerConfig(const std::vector<std::pair<std::string, int> >chunck);
+std::vector<t_server>									configParse(std::string configFilePath);
 
 # endif

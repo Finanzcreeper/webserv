@@ -12,13 +12,14 @@
 #include <netdb.h>
 #include <algorithm>
 #include "Server.hpp"
+#include "CommonIncludes.hpp"
 
 //struct Request;
 
 class httpParser {
 private:
 	std::map<int,Request>::iterator& req;
-	const struct WebservConfigStruct settings;
+	const t_server settings;
 
 	void GetRequestedPath(Request& request);
 	void GetRequestType(Request& request);
@@ -27,9 +28,9 @@ private:
 	void extractHeaderFields(Request& req);
 	void handleBody(Request& body);
 public:
-		httpParser(std::map<int, Request>::iterator& req, struct WebservConfigStruct sett);
+		httpParser(std::map<int, Request>::iterator& req, t_server sett);
 
-	//httpParser(std::map<int, Request>::iterator& req, const WebservConfigStruct sett);
+	//httpParser(std::map<int, Request>::iterator& req, const t_server sett);
 };
 
 

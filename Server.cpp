@@ -5,7 +5,7 @@
 #include "httpParser.hpp"
 #include <unistd.h>
 
-Server::Server(WebservConfigStruct sett) : settings(sett), socketOption(ON){
+Server::Server(t_server sett) : settings(sett), socketOption(ON){
 	bzero(&listening_socket, sizeof(listening_socket));
 	bzero(&hints, sizeof(hints));
 	hints.ai_family = AF_INET;
