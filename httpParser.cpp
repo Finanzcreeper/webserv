@@ -108,6 +108,8 @@ void httpParser::handleBody(Request& req) {
 	trenc = req.HeaderFields.find("transfer-encoding");
 
 	if (trenc == req.HeaderFields.end()) {
+		req.Body.append(req.BodyBuffer);
+		req.BodyBuffer.erase();
 		return;
 	}
 	if (trenc->second == "chunked") {
