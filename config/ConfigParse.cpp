@@ -28,16 +28,17 @@ std::string openFile(std::string path)
 std::vector<std::pair<std::string, int> >	findIndent(std::string str)
 {
 	std::vector<std::pair<std::string, int> > configs;
-	for (int i = 0; i < str.size(); i ++)
-	{
+	for (size_t i = 0; i < str.size(); i ++) {
 		int start = i;
-		for (start; str[start] == '\t'; start ++)
-			;
-		int	indent = start - i;
+		while (str[start] == '\t') {
+			++start;
+		}
+		int indent = start - i;
 		i = start;
-		int	end = i;
-		for (end; str[end] != '\n'; end ++)
-			;
+		int end = i;
+		while (str[end] != '\n') {
+			++end;
+		}
 		i = end;
 		if (start != end)
 			configs.push_back(std::make_pair(str.substr(start, end - start), indent));
@@ -48,14 +49,15 @@ std::vector<std::pair<std::string, int> >	findIndent(std::string str)
 std::vector<std::vector<std::pair<std::string, int> > > findChunck(std::vector<std::pair<std::string, int> > indents)
 {
 	std::vector<std::vector<std::pair<std::string, int> > > multiChunck;
-	int start = 0;
-	int	end = 0;
+	size_t start = 0;
+	size_t	end = 0;
 	
-	for (int i = 0; i < indents.size(); i ++)
+	for (size_t i = 0; i < indents.size(); i ++)
 	{
 		start = i;
-		for (i; i < indents.size() && indents[i].first != "server"; i ++)
-			;
+		while (i < indents.size() && indents[i].first != "server") {
+			++i;
+		}
 		end = i;
 		if (start != end)
 		{
@@ -68,7 +70,7 @@ std::vector<std::vector<std::pair<std::string, int> > > findChunck(std::vector<s
 
 std::string	parseString(const std::vector<std::pair<std::string, int> > chunck, std::string keyword)
 {
-	for (int i = 0; i < chunck.size(); i ++)
+	for (size_t i = 0; i < chunck.size(); i ++)
 	{
 		if (chunck[i].first.find(keyword) != std::string::npos)
 		{
@@ -105,18 +107,19 @@ std::vector<std::string>	parsePath(const std::vector<std::pair<std::string, int>
 {
 	std::vector<std::string> paths;
 	std::string				keyword = "path";
-	int	i;
+	size_t	i;
 
-	for (i = 0; i < chunck.size() && chunck[i].first.find(keyword) == std::string::npos; i ++)
-		;
+	while (i < chunck.size() && chunck[i].first.find(keyword) == std::string::npos) {
+		++i;
+	}
 	int	indent = chunck[i].second;
-	i ++;
-	for (i; i < chunck.size() && chunck[i].second == indent + 1; i++)
-	{
+	i++;
+	while (i < chunck.size() && chunck[i].second == indent + 1) {
 		std::istringstream iss(chunck[i].first);
 		std::string path;
 		iss >> path;
 		paths.push_back(path);
+		++i;
 	}
 	return paths;
 }
@@ -125,19 +128,20 @@ std::map<std::string, std::string> parseCgi(std::vector<std::pair<std::string, i
 {
 	std::map<std::string, std::string> cgi;
 	std::string keyword = "cgi";
-	int	i;
+	size_t	i = 0;
 
-	for (i = 0; i < chunck.size() && chunck[i].first.find(keyword) == std::string::npos; i ++)
-		;
+	while (i < chunck.size() && chunck[i].first.find(keyword) == std::string::npos) {
+		++i;
+	}
 	int	indent = chunck[i].second;
 	i ++;
-	for (i; i < chunck.size() && chunck[i].second == indent + 1; i ++)
-	{
+	while (i < chunck.size() && chunck[i].second == indent + 1) {
 		std::istringstream iss(chunck[i].first);
 		std::string extension;
 		std::string path;
 		iss >> extension >> path;
 		cgi[extension] = path;
+		++i;
 	}
 	return cgi;
 }
@@ -177,7 +181,7 @@ std::vector <t_server> configParse(std::string configFilePath)
 	}
 	indents = findIndent(config);
 	chuncks = findChunck(indents);
-	for (int i = 0; i < chuncks.size(); i ++)
+	for (size_t i = 0; i < chuncks.size(); i ++)
 	{
 		try {
 			servers.push_back(parseServerConfig(chuncks[i]));
