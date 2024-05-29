@@ -84,6 +84,7 @@ void Server::CheckForConnections() {
 							std::cerr << e.what() << std::endl;
 							//get error page based on request.integrity!
 						}
+						std::cout << "\"" << mt->second.RequestedPath << "\"" << std::endl;
 					} else {
 						//cleanup
 						std::cout << mt->first << " disconnected" << std::endl;
@@ -92,7 +93,8 @@ void Server::CheckForConnections() {
 						--it;
 					}
 				}
-				if ((it->revents & POLLOUT) != 0 /* && Answer is ready*/) {
+				int b = 0;
+				if ((it->revents & POLLOUT) != 0 && b == 1/* && Answer is ready*/) {
 					send(it->fd,"answer",6,0);
 				}
 				++it;

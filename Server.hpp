@@ -72,6 +72,9 @@ struct Response {
 };
 
 /*
+ *    |
+ * GET / HDYGDEGD
+ *      |
  * On construction, create one listening socket.
  * have a public container containing connected sockets.
  * have one public function that uses poll to check if new connections have arrived in queue.
