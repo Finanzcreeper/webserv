@@ -29,38 +29,49 @@ void httpParser::beheader(Request& request) {
 	request.RequestBuffer.erase(0,request.RequestBuffer.size());
 	if (request.Body.size() > settings.client_max_body_size) {
 		this->req->second.Integrity = BODY_TOO_BIG;
+		throw std::runtime_error("Http request has an oversized Body!");
 	}
 	//std::cout << request.HeaderBuffer << std::endl;
 }
 
 void httpParser::GetRequestType(Request& request) {
-	if (request.HeaderBuffer.find("GET") == 0) {
+	std::string firstLine = request.HeaderBuffer.substr(0,request.HeaderBuffer.find('\r'));
+	if (firstLine.find("GET") == 0) {
 		request.ReqType = GET;
-	} else if (request.HeaderBuffer.find("HEAD") == 0) {
+	} else if (firstLine.find("HEAD") == 0) {
 		request.ReqType = HEAD;
-	}else if (request.HeaderBuffer.find("POST") == 0) {
+	}else if (firstLine.find("POST") == 0) {
 		request.ReqType = POST;
-	} else if (request.HeaderBuffer.find("PUT") == 0) {
+	} else if (firstLine.find("PUT") == 0) {
 		request.ReqType = PUT;
-	} else if (request.HeaderBuffer.find("DELETE") == 0) {
+	} else if (firstLine.find("DELETE") == 0) {
 		request.ReqType = DELETE;
-	} else if (request.HeaderBuffer.find("CONNECT") == 0) {
+	} else if (firstLine.find("CONNECT") == 0) {
 		request.ReqType = CONNECT;
-	} else if (request.HeaderBuffer.find("OPTIONS") == 0) {
+	} else if (firstLine.find("OPTIONS") == 0) {
 		request.ReqType = OPTIONS;
-	} else if (request.HeaderBuffer.find("TRACE") == 0) {
+	} else if (firstLine.find("TRACE") == 0) {
 		request.ReqType = TRACE;
-	} else if (request.HeaderBuffer.find("PATCH") == 0) {
+	} else if (firstLine.find("PATCH") == 0) {
 		request.ReqType = PATCH;
 	} else {
 		request.ReqType = INVALID;
 	}
+	for (long unsigned int i = 0; i < settings.httpMethods.size(); ++i) {
+		request.Integrity = UNSUPPORTED_REQUEST_TYPE;
+		if (request.ReqType == settings.httpMethods[i]) {
+			request.Integrity = OK;
+		}
+		++i;
+	}
+	if (request.Integrity != OK) {
+		throw std::runtime_error("Unsupported Request type recieved!");
+	}
 }
 
 void httpParser::GetRequestedPath(Request& request) {
-	request.RequestedPath = request.HeaderBuffer.substr(
-		request.HeaderBuffer.find(' ') + 1,
-		request.HeaderBuffer.find(' ', request.HeaderBuffer.find(' ') + 1) - request.HeaderBuffer.find(' '));
+	int startOfPath = request.HeaderBuffer.find(' ') + 1;
+	request.RequestedPath = request.HeaderBuffer.substr(startOfPath, request.HeaderBuffer.find(' ', startOfPath) - startOfPath);
 }
 
 void httpParser::decapitalizeHeaderFields(std::string& Header) {

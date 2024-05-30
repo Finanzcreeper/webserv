@@ -11,6 +11,7 @@
 #include <sys/types.h>
 #include <netdb.h>
 #include <algorithm>
+#include <exception>
 #include "MethodExecutor.hpp"
 #include "tools/statusCodes.h"
 
@@ -19,6 +20,7 @@ enum RequestIntegrity {
 	INVALID_HEADER,
 	BODY_TOO_BIG,
 	TIMED_OUT,
+	UNSUPPORTED_REQUEST_TYPE
 };
 
 enum RequestType {
@@ -46,7 +48,7 @@ struct WebservConfigStruct {
 	std::string	server_name;
 	std::string	default_error_page;
 	long unsigned int			client_max_body_size;
-	std::vector	<std::string> httpMethods;
+	std::vector	<RequestType> httpMethods;
 	std::string	httpRedirection;
 	std::vector	<std::string> path;
 	std::map	<std::string, std::string> cgi_extension;
@@ -73,6 +75,9 @@ struct Response {
 };
 
 /*
+ *    |
+ * GET / HDYGDEGD
+ *      |
  * On construction, create one listening socket.
  * have a public container containing connected sockets.
  * have one public function that uses poll to check if new connections have arrived in queue.
@@ -101,6 +106,7 @@ private:
 	std::map<int, Request>connectionMsgs;
 	std::map<int, Response>answerMsgs;
 
+	void responder(std::map <int, Response>::iterator& response);
 
 public:
 	Server(WebservConfigStruct sett);

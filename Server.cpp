@@ -60,14 +60,13 @@ void Server::CheckForConnections() {
 	while (true) {
  		i = poll(Fds.data(), Fds.size(), 0);
 		//accepting new connection if there is one
-		if (Fds[0].revents != 0) {
+		if ((Fds[0].revents & POLLIN)!= 0) {
 			client.fd = accept(listening_socket.fd, NULL, NULL);
 			if (client.fd == -1) {
 				//throw accept connection exception
 				std::cerr << "a connection failed: " << std::strerror(errno) << std::endl;
 			}
-			client.events = (POLLIN);
-
+			client.events = (POLLIN | POLLOUT);
 			connectionMsgs.insert(std::make_pair(client.fd, request));
 			answerMsgs.insert(std::make_pair(client.fd,response));
 			Fds.push_back(client);
@@ -78,19 +77,19 @@ void Server::CheckForConnections() {
 			it = Fds.begin() + 1;
 			mt = connectionMsgs.begin();
 			while (it != Fds.end()) {
-				if (it->revents == POLLIN){
+				if ((it->revents & POLLIN) != 0){
 					bzero(buffer, sizeof(buffer));
 					mt = connectionMsgs.find(it->fd);
 					resps = answerMsgs.find(it->fd);
 					if (recv(it->fd, buffer, 1000, 0) != 0) {
 						mt->second.RequestBuffer.append(buffer);
-						httpParser(mt,this->settings);
-						if (mt->second.Integrity == OK)
-						{
-							executor.wrapperRequest(mt->second, resps->second);
-							send(it->fd, resps->second.responseBuffer.c_str(), \
-								resps->second.responseBuffer.length(), 0);
-							mt->second.HeaderBuffer.clear();
+
+						try {
+							httpParser test(mt,this->settings);
+						}
+						catch (const std::runtime_error &e){
+							std::cerr << e.what() << std::endl;
+							//get error page based on request.integrity!
 						}
 					} else {
 						//cleanup
@@ -100,12 +99,26 @@ void Server::CheckForConnections() {
 						--it;
 					}
 				}
-				//check_timeout();
+				int b = 0;
+				if ((it->revents & POLLOUT) != 0 && b == 1/* && Answer is ready*/) {
+					send(it->fd,"answer",6,0);
+				}
 				++it;
 			}
 		}
 	}
 	std::cout << "end" << std::endl;
+}
+
+void Server::responder(std::map <int, Response>::iterator& response) {
+	int sentAmt = 0;
+
+	std::map <int, Response>::iterator& re = response;
+	sentAmt = send(re->first,re->second.rest.c_str(),re->second.rest.size(),MSG_DONTWAIT);
+	if (sentAmt == -1) {
+		return;
+	}
+		response->second.rest.erase(0,sentAmt);
 }
 
 	/*
@@ -157,5 +170,4 @@ void Server::CheckForConnections() {
 Server::~Server() {
 	freeaddrinfo(serverInfo);
 }
-
 
