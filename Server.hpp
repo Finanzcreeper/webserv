@@ -12,7 +12,8 @@
 #include <netdb.h>
 #include <algorithm>
 #include <exception>
-//#include "httpParser.hpp"
+#include "MethodExecutor.hpp"
+#include "tools/statusCodes.h"
 
 enum RequestIntegrity {
 	OK,
@@ -25,11 +26,11 @@ enum RequestIntegrity {
 enum RequestType {
 	NONE = -2,
 	INVALID = -1,
-	GET,
-	HEAD,
-	POST,
+	GET, // REQUIRED
+	HEAD, // REQUIRED (not part of subject but mandatory for general purpose http server)
+	POST, // REQUIRED
 	PUT,
-	DELETE,
+	DELETE, // REQUIRED
 	CONNECT,
 	OPTIONS,
 	TRACE,
@@ -67,8 +68,11 @@ struct Request {
 };
 
 struct Response {
-	int test;
-	std::string rest;
+	std::string 	responseBuffer;
+	std::string 	headerBuffer;
+	statusCode		statusCode;
+	std::string 	body;
+	bool			isReady;
 };
 
 /*
@@ -80,6 +84,7 @@ struct Response {
  * have one public function that uses poll to check if new connections have arrived in queue.
  * if new connections are in queue, accept them and put them into container.
 */
+
 
 class Server {
 private:
@@ -94,12 +99,13 @@ private:
 	pollfd listening_socket;
 
 	pollfd client;
-	socklen_t client_address_length;
+	//socklen_t client_address_length;
 
 	char buffer[1000];
 
 	std::vector<pollfd>Fds;
 	std::map<int, Request>connectionMsgs;
+	std::map<int, Response>answerMsgs;
 
 	void responder(std::map <int, Response>::iterator& response);
 
