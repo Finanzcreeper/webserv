@@ -72,6 +72,7 @@ struct Response {
 	std::string 	headerBuffer;
 	statusCode		statusCode;
 	std::string 	body;
+	bool			isReady;
 };
 
 /*

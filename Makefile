@@ -5,7 +5,7 @@ OBJS = ${SRCS:.cpp=.o}
 NAME = server
 
 CXX = c++
-CXXFLAGS = -Wall -Werror -Wextra #-std=c++98 #-g #-fsanitize=thread
+CXXFLAGS = -Wall -Werror -Wextra -std=c++98 #-g #-fsanitize=thread
 
 all: ${NAME}
 

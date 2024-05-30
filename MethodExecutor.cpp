@@ -43,16 +43,13 @@ void	MethodExecutor::wrapperRequest(Request &requ, Response &resp)
 	//Body header separation
 	resp.responseBuffer.append("\r\n\r\n");
 	resp.responseBuffer.append(resp.body);
+	resp.isReady = true;
 	std::cout << "**** RESPONSE: ****\n" << resp.responseBuffer << "**** END OF RESPONSE ****" << std::endl;
 }
 
 void    MethodExecutor::_executeGet(Request &requ, Response &resp)
 {
 	std::string		path = root + requ.RequestedPath;
-
-	// removing trailing whitespace, could be done during parsing as well
-	size_t			pos = path.find(" ");
-	path.replace(pos, 1, "");
 
 	// default page if no path specified
 	if (path.length() == root.length() + 1)
@@ -84,12 +81,18 @@ void	MethodExecutor::_generateHeader(Request &requ, Response &resp)
 	int	temp = requ.Body.length();
 	temp++;
 
+	// Convert string to int
+	std::stringstream statusCode_str;
+	statusCode_str << resp.statusCode;
+	std::stringstream bodyLength;
+	bodyLength << resp.body.length();
+
 	// First line:
 	resp.responseBuffer.append(vProtocol
-		+ " " + std::to_string(resp.statusCode)
+		+ " " + statusCode_str.str()
 		+ " " + getStatusCodeMessage(resp.statusCode) + "\n");
 	resp.responseBuffer.append("Content-Length: "
-		+ std::to_string(resp.body.length()));
+		+ bodyLength.str());
 	return ;
 }
 
@@ -97,13 +100,15 @@ void	MethodExecutor::_generateErrorBody(Response &resp)
 {
 	std::ifstream	ifs;
 	std::string		errorBody;
-	
+	std::stringstream statusCode_str;
+	statusCode_str << resp.statusCode;
+
 	resp.body.append("<!DOCTYPE html>\n<html lang=\"en\">\n");
 	resp.body.append("<head>\n");
 	resp.body.append("	<meta charset=\"UTF-8\">\n");
     resp.body.append("	<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n");
     resp.body.append("	<title>");
-	resp.body.append(std::to_string(resp.statusCode));
+	resp.body.append(statusCode_str.str());
 	resp.body.append(" ");
 	resp.body.append(getStatusCodeMessage(resp.statusCode));
 	resp.body.append(" </title>\n");
@@ -140,7 +145,7 @@ void	MethodExecutor::_generateErrorBody(Response &resp)
 	resp.body.append("<body>\n");
 	resp.body.append("    <div class=\"container\">\n");
 	resp.body.append("        <h1>");
-	resp.body.append(std::to_string(resp.statusCode));
+	resp.body.append(statusCode_str.str());
 	resp.body.append(" ");
 	resp.body.append(getStatusCodeMessage(resp.statusCode));
 	resp.body.append( + " </h1>\n");
