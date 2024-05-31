@@ -40,7 +40,7 @@ typedef struct s_server
 	std::string							server_name;
 	std::string 						default_error_page;
 	long unsigned int					client_max_body_size;
-	RequestType							httpMethods;
+	int									httpMethods;
 	std::string							httpRedirection;
 	std::vector<std::string>			path;
 	std::map<std::string, std::string>	cgi_extension;

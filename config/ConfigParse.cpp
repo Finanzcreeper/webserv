@@ -11,10 +11,12 @@
 /* ************************************************************************** */
 
 #include "ConfigParse.hpp"
+#include "../CommonIncludes.hpp"
 
 std::string openFile(std::string path)
 {
 	std::ifstream	file(path.c_str());
+
 	if (!file.is_open())
 	{
 		throw std::runtime_error("Could not open file " + path);
@@ -87,6 +89,7 @@ std::string	parseString(const std::vector<std::pair<std::string, int> > chunck, 
 	return "";
 }
 
+/*
 std::vector<std::string>	parseMethod(const std::vector<std::pair<std::string, int> > chunck)
 {
 	std::vector<std::string> methods;
@@ -101,13 +104,46 @@ std::vector<std::string>	parseMethod(const std::vector<std::pair<std::string, in
 	while (iss >> method)
 		methods.push_back(method);
 	return methods;
+}*/
+
+int parseMethod(const std::vector<std::pair<std::string, int> >& chunck) {
+	int methods;
+	std::string str;
+	std::string method;
+
+	str = parseString(chunck,"httpMethods");
+	std::istringstream stream(str);
+	while(stream >> method) {
+		if (method.find("GET") == 0) {
+			methods = methods | GET;
+		} else if (method == "HEAD") {
+			methods = methods | HEAD;
+		} else if (method == "POST") {
+			methods = methods | POST;
+		} else if (method == "PUT") {
+			methods = methods | PUT;
+		} else if (method == "DELETE") {
+			methods = methods | DELETE;
+		} else if (method == "CONNECT") {
+			methods = methods | CONNECT;
+		} else if (method == "OPTIONS") {
+			methods = methods | OPTIONS;
+		} else if (method == "TRACE") {
+			methods = methods | TRACE;
+		} else if (method == "PATCH") {
+			methods = methods | PATCH;
+		} else {
+			methods = methods | INVALID;
+		}
+	}
+	return (methods);
 }
 
 std::vector<std::string>	parsePath(const std::vector<std::pair<std::string, int> > chunck)
 {
 	std::vector<std::string> paths;
 	std::string				keyword = "path";
-	size_t	i;
+	size_t	i = 0;
 
 	while (i < chunck.size() && chunck[i].first.find(keyword) == std::string::npos) {
 		++i;
@@ -156,7 +192,6 @@ t_server parseServerConfig(const std::vector<std::pair<std::string, int> > chunc
 	server.default_error_page = parseString(chunck, "default_error_page");
 	server.client_max_body_size = std::atoi(parseString(chunck, "client_max_body_size").c_str());
 	server.httpMethods = parseMethod(chunck);
-	std::vector<std::string> methods = parseMethod(chunck);
 	server.httpRedirection = parseString(chunck, "httpRedirection");
 	server.path = parsePath(chunck);
 	server.cgi_extension = parseCgi(chunck);
@@ -172,7 +207,7 @@ std::vector <t_server> configParse(std::string configFilePath)
 	std::vector <t_server>	servers;
 	std::vector<std::pair<std::string, int> > indents;
 	std::vector<std::vector<std::pair<std::string, int> > > chuncks;
-	
+
 	try{
 		config = openFile(configFilePath);
 	} catch (const std::runtime_error &e){
@@ -198,7 +233,7 @@ std::vector <t_server> configParse(std::string configFilePath)
 // {
 // 	std::vector<t_server> servers = configParse("sampleConfig.conf");
 
-	
+
 // 	for (const auto& server : servers) {
 // 		std::cout << "Server Configuration:\n";
 // 		std::cout << "Port: " << server.port << "\n";

@@ -23,12 +23,12 @@ private:
 
 	void GetRequestedPath(Request& request);
 	void GetRequestType(Request& request);
-	void beheader(Request& request);
 	void decapitalizeHeaderFields(std::string& Header);
 	void extractHeaderFields(Request& req);
-	void handleBody(Request& body);
+	void handleHeader(Request &request, size_t endOfBlock);
+	void handleBody(Request &request, size_t endOfBlock);
 public:
-		httpParser(std::map<int, Request>::iterator& req, t_server sett);
+		httpParser(std::map<int, Request>::iterator& req, const t_server& sett);
 
 	//httpParser(std::map<int, Request>::iterator& req, const t_server sett);
 };
