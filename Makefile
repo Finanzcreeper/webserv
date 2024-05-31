@@ -1,8 +1,10 @@
-SRCS = testmain.cpp Server.cpp httpParser.cpp MethodExecutor.cpp tools/statusCodes.cpp
+SRCS =	server/MethodExecutor.cpp server/statusCodes.cpp server/Server.cpp \
+		parsers/ConfigParse.cpp parsers/httpParser.cpp\
+		testmain.cpp
 
 OBJS = ${SRCS:.cpp=.o}
 
-NAME = server
+NAME = webserv
 
 CXX = c++
 CXXFLAGS = -Wall -Werror -Wextra -std=c++98 #-g #-fsanitize=thread

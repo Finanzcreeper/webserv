@@ -12,8 +12,8 @@
 #include <netdb.h>
 #include <algorithm>
 #include <exception>
-#include "config/ConfigParse.hpp"
-#include "CommonIncludes.hpp"
+#include "../parsers/ConfigParse.hpp"
+#include "../CommonIncludes.hpp"
 //#include "httpParser.hpp"
 
 /*
@@ -36,12 +36,13 @@ private:
 	pollfd listening_socket;
 
 	pollfd client;
-	socklen_t client_address_length;
+	//socklen_t client_address_length;
 
 	char buffer[1000];
 
 	std::vector<pollfd>Fds;
 	std::map<int, Request>connectionMsgs;
+	std::map<int, Response>answerMsgs;
 
 	void responder(std::map <int, Response>::iterator& response);
 

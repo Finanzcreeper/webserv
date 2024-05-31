@@ -7,7 +7,6 @@
 #include <algorithm>
 #include <fstream>
 #include "Server.hpp"
-//#include "tools/statusCodes.h"
 
 class Server;
 struct Response;

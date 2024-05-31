@@ -2,8 +2,9 @@
 #include "Server.hpp"
 #include <cerrno>
 #include <cstring>
-#include "httpParser.hpp"
+#include "../parsers/httpParser.hpp"
 #include <unistd.h>
+#include "MethodExecutor.hpp"
 
 Server::Server(t_server sett) : settings(sett), socketOption(ON){
 	bzero(&listening_socket, sizeof(listening_socket));
