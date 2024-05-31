@@ -11,10 +11,12 @@
 /* ************************************************************************** */
 
 #include "ConfigParse.hpp"
+#include "../CommonIncludes.hpp"
 
 std::string openFile(std::string path)
 {
 	std::ifstream	file(path.c_str());
+
 	if (!file.is_open())
 	{
 		throw std::runtime_error("Could not open file " + path);
@@ -28,16 +30,17 @@ std::string openFile(std::string path)
 std::vector<std::pair<std::string, int> >	findIndent(std::string str)
 {
 	std::vector<std::pair<std::string, int> > configs;
-	for (int i = 0; i < str.size(); i ++)
-	{
+	for (size_t i = 0; i < str.size(); i ++) {
 		int start = i;
-		for (start; str[start] == '\t'; start ++)
-			;
-		int	indent = start - i;
+		while (str[start] == '\t') {
+			++start;
+		}
+		int indent = start - i;
 		i = start;
-		int	end = i;
-		for (end; str[end] != '\n'; end ++)
-			;
+		int end = i;
+		while (str[end] != '\n') {
+			++end;
+		}
 		i = end;
 		if (start != end)
 			configs.push_back(std::make_pair(str.substr(start, end - start), indent));
@@ -48,14 +51,15 @@ std::vector<std::pair<std::string, int> >	findIndent(std::string str)
 std::vector<std::vector<std::pair<std::string, int> > > findChunck(std::vector<std::pair<std::string, int> > indents)
 {
 	std::vector<std::vector<std::pair<std::string, int> > > multiChunck;
-	int start = 0;
-	int	end = 0;
+	size_t start = 0;
+	size_t	end = 0;
 	
-	for (int i = 0; i < indents.size(); i ++)
+	for (size_t i = 0; i < indents.size(); i ++)
 	{
 		start = i;
-		for (i; i < indents.size() && indents[i].first != "server"; i ++)
-			;
+		while (i < indents.size() && indents[i].first != "server") {
+			++i;
+		}
 		end = i;
 		if (start != end)
 		{
@@ -68,7 +72,7 @@ std::vector<std::vector<std::pair<std::string, int> > > findChunck(std::vector<s
 
 std::string	parseString(const std::vector<std::pair<std::string, int> > chunck, std::string keyword)
 {
-	for (int i = 0; i < chunck.size(); i ++)
+	for (size_t i = 0; i < chunck.size(); i ++)
 	{
 		if (chunck[i].first.find(keyword) != std::string::npos)
 		{
@@ -85,6 +89,7 @@ std::string	parseString(const std::vector<std::pair<std::string, int> > chunck, 
 	return "";
 }
 
+/*
 std::vector<std::string>	parseMethod(const std::vector<std::pair<std::string, int> > chunck)
 {
 	std::vector<std::string> methods;
@@ -99,24 +104,58 @@ std::vector<std::string>	parseMethod(const std::vector<std::pair<std::string, in
 	while (iss >> method)
 		methods.push_back(method);
 	return methods;
+}*/
+
+int parseMethod(const std::vector<std::pair<std::string, int> >& chunck) {
+	int methods;
+	std::string str;
+	std::string method;
+
+	str = parseString(chunck,"httpMethods");
+	std::istringstream stream(str);
+	while(stream >> method) {
+		if (method.find("GET") == 0) {
+			methods = methods | GET;
+		} else if (method == "HEAD") {
+			methods = methods | HEAD;
+		} else if (method == "POST") {
+			methods = methods | POST;
+		} else if (method == "PUT") {
+			methods = methods | PUT;
+		} else if (method == "DELETE") {
+			methods = methods | DELETE;
+		} else if (method == "CONNECT") {
+			methods = methods | CONNECT;
+		} else if (method == "OPTIONS") {
+			methods = methods | OPTIONS;
+		} else if (method == "TRACE") {
+			methods = methods | TRACE;
+		} else if (method == "PATCH") {
+			methods = methods | PATCH;
+		} else {
+			methods = methods | INVALID;
+		}
+	}
+	return (methods);
 }
 
 std::vector<std::string>	parsePath(const std::vector<std::pair<std::string, int> > chunck)
 {
 	std::vector<std::string> paths;
 	std::string				keyword = "path";
-	int	i;
+	size_t	i = 0;
 
-	for (i = 0; i < chunck.size() && chunck[i].first.find(keyword) == std::string::npos; i ++)
-		;
+	while (i < chunck.size() && chunck[i].first.find(keyword) == std::string::npos) {
+		++i;
+	}
 	int	indent = chunck[i].second;
-	i ++;
-	for (i; i < chunck.size() && chunck[i].second == indent + 1; i++)
-	{
+	i++;
+	while (i < chunck.size() && chunck[i].second == indent + 1) {
 		std::istringstream iss(chunck[i].first);
 		std::string path;
 		iss >> path;
 		paths.push_back(path);
+		++i;
 	}
 	return paths;
 }
@@ -125,19 +164,20 @@ std::map<std::string, std::string> parseCgi(std::vector<std::pair<std::string, i
 {
 	std::map<std::string, std::string> cgi;
 	std::string keyword = "cgi";
-	int	i;
+	size_t	i = 0;
 
-	for (i = 0; i < chunck.size() && chunck[i].first.find(keyword) == std::string::npos; i ++)
-		;
+	while (i < chunck.size() && chunck[i].first.find(keyword) == std::string::npos) {
+		++i;
+	}
 	int	indent = chunck[i].second;
 	i ++;
-	for (i; i < chunck.size() && chunck[i].second == indent + 1; i ++)
-	{
+	while (i < chunck.size() && chunck[i].second == indent + 1) {
 		std::istringstream iss(chunck[i].first);
 		std::string extension;
 		std::string path;
 		iss >> extension >> path;
 		cgi[extension] = path;
+		++i;
 	}
 	return cgi;
 }
@@ -152,7 +192,6 @@ t_server parseServerConfig(const std::vector<std::pair<std::string, int> > chunc
 	server.default_error_page = parseString(chunck, "default_error_page");
 	server.client_max_body_size = std::atoi(parseString(chunck, "client_max_body_size").c_str());
 	server.httpMethods = parseMethod(chunck);
-	std::vector<std::string> methods = parseMethod(chunck);
 	server.httpRedirection = parseString(chunck, "httpRedirection");
 	server.path = parsePath(chunck);
 	server.cgi_extension = parseCgi(chunck);
@@ -168,7 +207,7 @@ std::vector <t_server> configParse(std::string configFilePath)
 	std::vector <t_server>	servers;
 	std::vector<std::pair<std::string, int> > indents;
 	std::vector<std::vector<std::pair<std::string, int> > > chuncks;
-	
+
 	try{
 		config = openFile(configFilePath);
 	} catch (const std::runtime_error &e){
@@ -177,7 +216,7 @@ std::vector <t_server> configParse(std::string configFilePath)
 	}
 	indents = findIndent(config);
 	chuncks = findChunck(indents);
-	for (int i = 0; i < chuncks.size(); i ++)
+	for (size_t i = 0; i < chuncks.size(); i ++)
 	{
 		try {
 			servers.push_back(parseServerConfig(chuncks[i]));
@@ -194,7 +233,7 @@ std::vector <t_server> configParse(std::string configFilePath)
 // {
 // 	std::vector<t_server> servers = configParse("sampleConfig.conf");
 
-	
+
 // 	for (const auto& server : servers) {
 // 		std::cout << "Server Configuration:\n";
 // 		std::cout << "Port: " << server.port << "\n";

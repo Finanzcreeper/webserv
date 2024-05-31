@@ -1,37 +1,30 @@
 #include "httpParser.hpp"
 #include <sstream>
 
-httpParser::httpParser(std::map<int, Request>::iterator& pair, const WebservConfigStruct sett): req(pair), settings(sett) {
-	beheader(req->second);
+httpParser::httpParser(std::map<int, Request>::iterator& pair, const t_server& sett): req(pair), settings(sett) {
+	size_t endOfBlock = req->second.RequestBuffer.find("\r\n\r\n");
+	if ( endOfBlock == std::string::npos) {
+		return;
+	}
 	if (req->second.HeaderBuffer.empty() == true) {
-		return;
+		handleHeader(req->second, endOfBlock);
 	}
-	if (req->second.BodyBuffer.empty() == true) {
-		return;
+	if (req->second.Body.empty() == true) {
+		handleBody(req->second, endOfBlock);
 	}
-	handleBody(req->second);
+	if (req->second.RequestBuffer.empty() == false) {
+		req->second.Integrity = INVALID_HTTP_MESSAGE;
+		throw std::runtime_error("Content after Body recieved!");
+	}
 }
 
-void httpParser::beheader(Request& request) {
-	size_t neck = request.RequestBuffer.find("\r\n\r\n");
-	if (neck == request.RequestBuffer.npos) {
-		std::cerr << "invalid/incomplete header: \n" << std::endl;
-		return;
-	} else if (request.HeaderBuffer.empty() == true){
-		request.HeaderBuffer = request.RequestBuffer.substr(0, neck + 4);
-		request.RequestBuffer.erase(0,neck+4);
-		GetRequestType(request);
-		GetRequestedPath(request);
-		decapitalizeHeaderFields(request.HeaderBuffer);
-		extractHeaderFields(request);
-	}
-	request.BodyBuffer.append(request.RequestBuffer.substr(0, request.RequestBuffer.size()));
-	request.RequestBuffer.erase(0,request.RequestBuffer.size());
-	if (request.Body.size() > settings.client_max_body_size) {
-		this->req->second.Integrity = BODY_TOO_BIG;
-		throw std::runtime_error("Http request has an oversized Body!");
-	}
-	//std::cout << request.HeaderBuffer << std::endl;
+void httpParser::handleHeader(Request &request, size_t endOfBlock) {
+	request.HeaderBuffer = request.RequestBuffer.substr(0, endOfBlock + 4);
+	request.RequestBuffer.erase(0,endOfBlock + 4);
+	GetRequestType(request);
+	GetRequestedPath(request);
+	decapitalizeHeaderFields(request.HeaderBuffer);
+	extractHeaderFields(request);
 }
 
 void httpParser::GetRequestType(Request& request) {
@@ -57,11 +50,8 @@ void httpParser::GetRequestType(Request& request) {
 	} else {
 		request.ReqType = INVALID;
 	}
-	for (long unsigned int i = 0; i < settings.httpMethods.size(); ++i) {
+	if ((request.ReqType & settings.httpMethods) == 0) {
 		request.Integrity = UNSUPPORTED_REQUEST_TYPE;
-		if (request.ReqType == settings.httpMethods[i]) {
-			request.Integrity = OK;
-		}
 	}
 	if (request.Integrity != OK) {
 		throw std::runtime_error("Unsupported Request type recieved!");
@@ -105,28 +95,27 @@ void httpParser::extractHeaderFields(Request& req) {
 	}
 }
 
-void httpParser::handleBody(Request& req) {
-	std::map<std::string ,std::string>::iterator trenc;
+void httpParser::handleBody(Request &request, size_t endOfBlock) {
+	std::map<std::string ,std::string>::iterator TransferCoding;
 	int ChunkSize = 0;
-	trenc = req.HeaderFields.find("transfer-encoding");
-
-	if (trenc == req.HeaderFields.end()) {
-		return;
-	}
-	if (trenc->second == "chunked") {
-		while (req.BodyBuffer.empty() == false) {
-			std::string ChunkHexSize = req.BodyBuffer.substr(
-				0, req.BodyBuffer.find_first_of("\r\n"));
-			req.BodyBuffer.erase(0,req.BodyBuffer.find("\r\n",0) + 2);
+	TransferCoding = request.HeaderFields.find("transfer-encoding");
+	if (TransferCoding->second == "chunked") {
+		while (request.RequestBuffer.empty() == false) {
+			std::string ChunkHexSize = request.RequestBuffer.substr(
+				0, request.RequestBuffer.find_first_of("\r\n"));
+			request.RequestBuffer.erase(0, request.RequestBuffer.find("\r\n", 0) + 2);
 			std::istringstream HexStream(ChunkHexSize);
 			HexStream >> std::hex >> ChunkSize;
-			req.Body.append(req.BodyBuffer.substr(0,ChunkSize));
-			req.BodyBuffer.erase(0,ChunkSize + 2);
+			request.Body.append(request.RequestBuffer.substr(0, ChunkSize));
+			request.RequestBuffer.erase(0, ChunkSize + 2);
 		}
+	} else {
+		request.Body.append(request.RequestBuffer.substr(0,endOfBlock + 4));
+		request.RequestBuffer.erase(0, endOfBlock + 4);
 	}
-	else {
-		req.Body.append(req.BodyBuffer);
-		req.BodyBuffer.erase();
+	if (request.Body.size() > settings.client_max_body_size) {
+		this->req->second.Integrity = BODY_TOO_BIG;
+		throw std::runtime_error("Http request has an oversized Body!");
 	}
 }
 
