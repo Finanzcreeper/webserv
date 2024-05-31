@@ -42,8 +42,13 @@ Server::Server(t_server sett) : settings(sett), socketOption(ON){
 void Server::CheckForConnections() {
 	std::vector<pollfd>::iterator it;
 	std::map<int, Request>::iterator mt;
+	std::map<int, Response>::iterator resps;
+
+	MethodExecutor executor = MethodExecutor(this);
 
 	Request request;
+	Response response;
+
 	request.ReqType = NONE;
 	request.Integrity = OK;
 
@@ -63,7 +68,9 @@ void Server::CheckForConnections() {
 			}
 			client.events = (POLLIN | POLLOUT);
 			connectionMsgs.insert(std::make_pair(client.fd, request));
+			answerMsgs.insert(std::make_pair(client.fd,response));
 			Fds.push_back(client);
+			answerMsgs.find(client.fd)->second.isReady = true;
 			--i;
 		}
 		//reading from connection (reading into buffers, or closing connections
@@ -74,6 +81,7 @@ void Server::CheckForConnections() {
 				if ((it->revents & POLLIN) != 0){
 					bzero(buffer, sizeof(buffer));
 					mt = connectionMsgs.find(it->fd);
+					resps = answerMsgs.find(it->fd);
 					if (recv(it->fd, buffer, 1000, 0) != 0) {
 						mt->second.RequestBuffer.append(buffer);
 
@@ -84,6 +92,11 @@ void Server::CheckForConnections() {
 							std::cerr << e.what() << std::endl;
 							//get error page based on request.integrity!
 						}
+						if (mt->second.Integrity == OK){
+							executor.wrapperRequest(mt->second, resps->second);
+							mt->second.HeaderBuffer.clear();
+							mt->second.RequestBuffer.clear();
+						}
 					} else {
 						//cleanup
 						std::cout << mt->first << " disconnected" << std::endl;
@@ -92,9 +105,11 @@ void Server::CheckForConnections() {
 						--it;
 					}
 				}
-				int b = 0;
-				if ((it->revents & POLLOUT) != 0 && b == 1/* && Answer is ready*/) {
-					send(it->fd,"answer",6,0);
+				//int b = 0;
+				if ((it->revents & POLLOUT) != 0 && answerMsgs.find(it->fd)->second.isReady) {
+					resps = answerMsgs.find(it->fd);
+					send(it->fd, resps->second.responseBuffer.c_str(), resps->second.responseBuffer.length(), 0);
+					resps->second.isReady = false;
 				}
 				++it;
 			}
@@ -107,11 +122,11 @@ void Server::responder(std::map <int, Response>::iterator& response) {
 	int sentAmt = 0;
 
 	std::map <int, Response>::iterator& re = response;
-	sentAmt = send(re->first,re->second.rest.c_str(),re->second.rest.size(),MSG_DONTWAIT);
+	sentAmt = send(re->first,re->second.responseBuffer.c_str(),re->second.responseBuffer.size(),MSG_DONTWAIT);
 	if (sentAmt == -1) {
 		return;
 	}
-		response->second.rest.erase(0,sentAmt);
+		response->second.responseBuffer.erase(0,sentAmt);
 }
 
 	/*
@@ -159,8 +174,6 @@ void Server::responder(std::map <int, Response>::iterator& response) {
 	 *
 	 * header ends with \r\n\r\n
 	*/
-
-
 
 Server::~Server() {
 	freeaddrinfo(serverInfo);
