@@ -15,7 +15,7 @@ MethodExecutor::MethodExecutor(Server *server)
 void	MethodExecutor::wrapperRequest(Request &requ, Response &resp)
 {
 	std::cout << "**** HEADER OF REQUEST: ****\n" << requ.HeaderBuffer << std::endl << "**** END OF HEADER ****" << std::endl;
-	resp.statusCode = OK_HTTP;
+	resp.ResponseIntegrity = OK_HTTP;
 	resp.body.clear();
 	resp.headerBuffer.clear();
 	resp.responseBuffer.clear();
@@ -34,9 +34,9 @@ void	MethodExecutor::wrapperRequest(Request &requ, Response &resp)
 		//	break ;
 		default:
 			std::cerr << "Method type not found\n";
-			resp.statusCode = METHOD_NOT_ALLOWED;
+			resp.ResponseIntegrity = METHOD_NOT_ALLOWED;
 	}
-	if ((int)resp.statusCode >= MIN_CLIENT_ERROR && (int)resp.statusCode <= MAX_SERVER_ERROR)
+	if ((int)resp.ResponseIntegrity >= MIN_CLIENT_ERROR && (int)resp.ResponseIntegrity <= MAX_SERVER_ERROR)
 		_generateErrorBody(resp);
 	_generateHeader(requ, resp);
 
@@ -70,7 +70,7 @@ void    MethodExecutor::_executeGet(Request &requ, Response &resp)
 	{
 		std::cout << "Error while opening requested file: \'" + root
 			+ requ.RequestedPath + "\'"<< std::endl;
-		resp.statusCode = NOT_FOUND;
+		resp.ResponseIntegrity = NOT_FOUND;
 	}
 	ifs.close();
 }
@@ -83,14 +83,14 @@ void	MethodExecutor::_generateHeader(Request &requ, Response &resp)
 
 	// Convert string to int
 	std::stringstream statusCode_str;
-	statusCode_str << resp.statusCode;
+	statusCode_str << resp.ResponseIntegrity;
 	std::stringstream bodyLength;
 	bodyLength << resp.body.length();
 
 	// First line:
 	resp.responseBuffer.append(vProtocol
-		+ " " + statusCode_str.str()
-		+ " " + getStatusCodeMessage(resp.statusCode) + "\n");
+							   + " " + statusCode_str.str()
+							   + " " + getStatusCodeMessage(resp.ResponseIntegrity) + "\n");
 	resp.responseBuffer.append("Content-Length: "
 		+ bodyLength.str());
 	return ;
@@ -101,7 +101,7 @@ void	MethodExecutor::_generateErrorBody(Response &resp)
 	std::ifstream	ifs;
 	std::string		errorBody;
 	std::stringstream statusCode_str;
-	statusCode_str << resp.statusCode;
+	statusCode_str << resp.ResponseIntegrity;
 
 	resp.body.append("<!DOCTYPE html>\n<html lang=\"en\">\n");
 	resp.body.append("<head>\n");
@@ -110,7 +110,7 @@ void	MethodExecutor::_generateErrorBody(Response &resp)
     resp.body.append("	<title>");
 	resp.body.append(statusCode_str.str());
 	resp.body.append(" ");
-	resp.body.append(getStatusCodeMessage(resp.statusCode));
+	resp.body.append(getStatusCodeMessage(resp.ResponseIntegrity));
 	resp.body.append(" </title>\n");
     resp.body.append("	<style>\n");
     resp.body.append("	    body {\n");
@@ -147,10 +147,10 @@ void	MethodExecutor::_generateErrorBody(Response &resp)
 	resp.body.append("        <h1>");
 	resp.body.append(statusCode_str.str());
 	resp.body.append(" ");
-	resp.body.append(getStatusCodeMessage(resp.statusCode));
+	resp.body.append(getStatusCodeMessage(resp.ResponseIntegrity));
 	resp.body.append( + " </h1>\n");
 	resp.body.append("        <p> ");
-	resp.body.append(getStatusCodeDescription(resp.statusCode));
+	resp.body.append(getStatusCodeDescription(resp.ResponseIntegrity));
 	resp.body.append(" </p>\n");
 	resp.body.append("        <p><a href=\"/home/thofting/repos/webserv_creeper\">Go to Homepage</a></p>\n");
 	resp.body.append("    </div>");

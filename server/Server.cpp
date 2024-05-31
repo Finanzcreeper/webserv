@@ -51,7 +51,7 @@ void Server::CheckForConnections() {
 	Response response;
 
 	request.ReqType = NONE;
-	request.Integrity = OK;
+	request.RequestIntegrity = OK_HTTP;
 
 	listening_socket.events = POLLIN;
 	Fds.push_back(listening_socket);
@@ -93,7 +93,7 @@ void Server::CheckForConnections() {
 							std::cerr << e.what() << std::endl;
 							//get error page based on request.integrity!
 						}
-						if (mt->second.Integrity == OK){
+						if (mt->second.RequestIntegrity == OK_HTTP){
 							executor.wrapperRequest(mt->second, resps->second);
 							mt->second.HeaderBuffer.clear();
 							mt->second.RequestBuffer.clear();

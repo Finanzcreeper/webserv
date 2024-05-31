@@ -13,7 +13,7 @@ httpParser::httpParser(std::map<int, Request>::iterator& pair, const t_server& s
 		handleBody(req->second, endOfBlock);
 	}
 	if (req->second.RequestBuffer.empty() == false) {
-		req->second.Integrity = INVALID_HTTP_MESSAGE;
+		req->second.RequestIntegrity = BAD_REQUEST;
 		throw std::runtime_error("Content after Body recieved!");
 	}
 }
@@ -51,9 +51,9 @@ void httpParser::GetRequestType(Request& request) {
 		request.ReqType = INVALID;
 	}
 	if ((request.ReqType & settings.httpMethods) == 0) {
-		request.Integrity = UNSUPPORTED_REQUEST_TYPE;
+		request.RequestIntegrity = METHOD_NOT_ALLOWED;
 	}
-	if (request.Integrity != OK) {
+	if (request.RequestIntegrity != OK_HTTP) {
 		throw std::runtime_error("Unsupported Request type recieved!");
 	}
 }
@@ -115,7 +115,7 @@ void httpParser::handleBody(Request &request, size_t endOfBlock) {
 		request.RequestBuffer.erase(0, endOfBlock + 4);
 	}
 	if (request.Body.size() > settings.client_max_body_size) {
-		this->req->second.Integrity = BODY_TOO_BIG;
+		this->req->second.RequestIntegrity = PAYLOAD_TO_LARGE;
 		throw std::runtime_error("Http request has an oversized Body!");
 	}
 }

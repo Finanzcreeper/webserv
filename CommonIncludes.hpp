@@ -19,15 +19,6 @@ typedef struct s_server
 	std::string							dir_request_default; //default file if the request is a directory
 }t_server;
 
-enum RequestIntegrity {
-	OK,
-	INVALID_HEADER,
-	BODY_TOO_BIG,
-	TIMED_OUT,
-	UNSUPPORTED_REQUEST_TYPE,
-	INVALID_HTTP_MESSAGE
-};
-
 typedef enum Requesttype {
 	NONE = 1 << 0,		//1
 	INVALID = 1 << 1,	//2
@@ -52,7 +43,7 @@ struct Request {
 	std::string HeaderBuffer;
 	std::map<std::string,std::string> HeaderFields;
 	RequestType ReqType;
-	RequestIntegrity Integrity;
+	statusCode RequestIntegrity;
 	std::string RequestedPath;
 	std::string BodyBuffer;
 	std::string Body;
@@ -61,7 +52,7 @@ struct Request {
 struct Response {
 	std::string 	responseBuffer;
 	std::string 	headerBuffer;
-	statusCode		statusCode;
+	statusCode		ResponseIntegrity;
 	std::string 	body;
 	bool			isReady;
 };

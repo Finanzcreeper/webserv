@@ -11,7 +11,7 @@
 #include <sys/types.h>
 #include <netdb.h>
 #include <algorithm>
-#include "../server/Server.hpp"
+//#include "../server/Server.hpp"
 #include "../CommonIncludes.hpp"
 
 //struct Request;

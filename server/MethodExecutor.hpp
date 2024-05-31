@@ -7,10 +7,11 @@
 #include <algorithm>
 #include <fstream>
 #include "Server.hpp"
+#include "../CommonIncludes.hpp"
 
 class Server;
 struct Response;
-struct Request;
+//struct Request;
 
 class MethodExecutor
 {
