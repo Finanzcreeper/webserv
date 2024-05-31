@@ -1,7 +1,10 @@
 #ifndef WEBSERV_COMMONINCLUDES_HPP
 #define WEBSERV_COMMONINCLUDES_HPP
 
+#include <vector>
+#include <map>
 #include"server/statusCodes.h"
+
 
 //going to be saved as a vector to save multiple servers inside of one config file
 typedef struct s_server

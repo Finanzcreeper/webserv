@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigParse.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: siun <siun@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: subpark <subpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/17 22:37:44 by siun              #+#    #+#             */
-/*   Updated: 2024/05/23 18:58:56 by siun             ###   ########.fr       */
+/*   Updated: 2024/05/31 18:27:01 by subpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,23 +88,6 @@ std::string	parseString(const std::vector<std::pair<std::string, int> > chunck, 
 	}
 	return "";
 }
-
-/*
-std::vector<std::string>	parseMethod(const std::vector<std::pair<std::string, int> > chunck)
-{
-	std::vector<std::string> methods;
-	std::string str;
-
-	str = parseString(chunck, "httpMethods");
-	if (str.empty())
-		return std::vector<std::string>();
-	std::istringstream iss(str);
-	std::string method;
-
-	while (iss >> method)
-		methods.push_back(method);
-	return methods;
-}*/
 
 int parseMethod(const std::vector<std::pair<std::string, int> >& chunck) {
 	int methods;
@@ -229,40 +212,40 @@ std::vector <t_server> configParse(std::string configFilePath)
 	return std::vector<t_server>();
 }
 
-// int main()
-// {
-// 	std::vector<t_server> servers = configParse("sampleConfig.conf");
+int main()
+{
+	std::vector<t_server> servers = configParse("sampleConfig.conf");
 
 
-// 	for (const auto& server : servers) {
-// 		std::cout << "Server Configuration:\n";
-// 		std::cout << "Port: " << server.port << "\n";
-// 		std::cout << "Host: " << server.host << "\n";
-// 		std::cout << "Server Name: " << server.server_name << "\n";
-// 		std::cout << "Default Error Page: " << server.default_error_page << "\n";
-// 		std::cout << "Client Max Body Size: " << server.client_max_body_size << "\n";
+	for (const auto& server : servers) {
+		std::cout << "Server Configuration:\n";
+		std::cout << "Port: " << server.port << "\n";
+		std::cout << "Host: " << server.host << "\n";
+		std::cout << "Server Name: " << server.server_name << "\n";
+		std::cout << "Default Error Page: " << server.default_error_page << "\n";
+		std::cout << "Client Max Body Size: " << server.client_max_body_size << "\n";
 		
-// 		std::cout << "HTTP Methods:\n";
-// 		for (const auto& method : server.httpMethods) {
-// 			std::cout << method << "\t";
-// 		}
-// 		std::cout << "\n";
+		std::cout << "HTTP Methods:\n";
+		// for (const auto& method : server.httpMethods) {
+		// 	std::cout << method << "\t";
+		// }
+		std::cout << "\n";
 		
-// 		std::cout << "HTTP Redirection: " << server.httpRedirection << "\n";
+		std::cout << "HTTP Redirection: " << server.httpRedirection << "\n";
 		
-// 		std::cout << "Paths:\n";
-// 		for (const auto& path : server.path) {
-// 			std::cout << path << "\n";
-// 		}
+		std::cout << "Paths:\n";
+		for (const auto& path : server.path) {
+			std::cout << path << "\n";
+		}
 		
-// 		std::cout << "CGI Extensions:\n";
-// 		for (const auto& cgi : server.cgi_extension) {
-// 			std::cout << "Extension: " << cgi.first << ", Path: " << cgi.second << "\n";
-// 		}
+		std::cout << "CGI Extensions:\n";
+		for (const auto& cgi : server.cgi_extension) {
+			std::cout << "Extension: " << cgi.first << ", Path: " << cgi.second << "\n";
+		}
 		
-// 		std::cout << "Directory Listing: " << server.dir_listing << "\n";
-// 		std::cout << "Default Directory Request: " << server.dir_request_default << "\n";
+		std::cout << "Directory Listing: " << server.dir_listing << "\n";
+		std::cout << "Default Directory Request: " << server.dir_request_default << "\n";
 		
-// 		std::cout << "------------------------\n";
-// 	}
-// }
+		std::cout << "------------------------\n";
+	}
+}
