@@ -95,6 +95,7 @@ void httpParser::extractHeaderFields(Request& req) {
 	}
 }
 
+
 void httpParser::handleBody(Request &request, size_t endOfBlock) {
 	std::map<std::string ,std::string>::iterator TransferCoding;
 	int ChunkSize = 0;
