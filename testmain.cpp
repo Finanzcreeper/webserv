@@ -11,6 +11,7 @@ int main() {
 	} catch (std::runtime_error &e) {
 		std::cout <<e.what() << std::endl;
 	}
+		Config[0].host = "127.0.0.1";
 		Server *sock = new Server(Config[0]);
 		sock->CheckForConnections();
 		//servernbr++;

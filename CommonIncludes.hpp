@@ -2,6 +2,7 @@
 #define WEBSERV_COMMONINCLUDES_HPP
 
 #include"server/statusCodes.h"
+#include<vector>
 
 //going to be saved as a vector to save multiple servers inside of one config file
 typedef struct s_server
@@ -50,11 +51,11 @@ struct Request {
 };
 
 struct Response {
-	std::string 	responseBuffer;
-	std::string 	headerBuffer;
-	statusCode		ResponseIntegrity;
-	std::string 	body;
-	bool			isReady;
+	std::string 						responseBuffer;
+	std::map<std::string,std::string>	headerFields;
+	statusCode							httpStatus;
+	std::string 						body;
+	bool								isReady;
 };
 
 #endif //WEBSERV_COMMONINCLUDES_HPP

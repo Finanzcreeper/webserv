@@ -1,31 +1,34 @@
 #include "MethodExecutor.hpp"
+#include "responseGeneration.cpp"
 #include<fstream>
 #include<sstream>
 
 std::string		root = "/home/thofting/repos/webserv_creeper/content";
 std::string		defaultPage = "index.html";
+std::string		vProtocol = "HTTP/1.1";
 
-MethodExecutor::MethodExecutor( void ): _server(0) {};
+MethodExecutor::MethodExecutor( void ): _serverSettings(0) {};
 
-MethodExecutor::MethodExecutor(Server *server)
+MethodExecutor::MethodExecutor(const t_server *serverSettings)
 {
-	_server = server;
+	_serverSettings = serverSettings;
 }
 
 void	MethodExecutor::wrapperRequest(Request &requ, Response &resp)
 {
 	std::cout << "**** HEADER OF REQUEST: ****\n" << requ.HeaderBuffer << std::endl << "**** END OF HEADER ****" << std::endl;
-	resp.ResponseIntegrity = OK_HTTP;
+	resp.httpStatus = OK_HTTP;
 	resp.body.clear();
-	resp.headerBuffer.clear();
 	resp.responseBuffer.clear();
+	resp.headerFields.clear();
+	// t_route location = _findRoute(requ->RequestedPath)
 	switch (requ.ReqType){
 		case (GET):
 			_executeGet(requ, resp);
 			break ;
-		//case (HEAD):
-		//	_executeHead(requ, resp);
-		//	break ;
+		case (HEAD):
+			_executeGet(requ, resp); // Same procedure as for GET, but produced body is not sended to client
+			break ;
 		//case (POST):
 		//	_executePost(requ, resp);
 		//	break ;
@@ -34,15 +37,18 @@ void	MethodExecutor::wrapperRequest(Request &requ, Response &resp)
 		//	break ;
 		default:
 			std::cerr << "Method type not found\n";
-			resp.ResponseIntegrity = METHOD_NOT_ALLOWED;
+			resp.httpStatus = METHOD_NOT_ALLOWED;
+			_setAllowField(resp); //  _setAllowField(resp, location);
 	}
-	if ((int)resp.ResponseIntegrity >= MIN_CLIENT_ERROR && (int)resp.ResponseIntegrity <= MAX_SERVER_ERROR)
+	if ((int)resp.httpStatus >= MIN_CLIENT_ERROR && (int)resp.httpStatus <= MAX_SERVER_ERROR)
 		_generateErrorBody(resp);
-	_generateHeader(requ, resp);
+	_generateCommonHeaderFields(resp);
+	_writeHeader(resp);
 
 	//Body header separation
 	resp.responseBuffer.append("\r\n\r\n");
-	resp.responseBuffer.append(resp.body);
+	if (requ.ReqType != HEAD)
+		resp.responseBuffer.append(resp.body);
 	resp.isReady = true;
 	std::cout << "**** RESPONSE: ****\n" << resp.responseBuffer << "**** END OF RESPONSE ****" << std::endl;
 }
@@ -70,27 +76,23 @@ void    MethodExecutor::_executeGet(Request &requ, Response &resp)
 	{
 		std::cout << "Error while opening requested file: \'" + root
 			+ requ.RequestedPath + "\'"<< std::endl;
-		resp.ResponseIntegrity = NOT_FOUND;
+		resp.httpStatus = NOT_FOUND;
 	}
 	ifs.close();
 }
 
-void	MethodExecutor::_generateHeader(Request &requ, Response &resp)
+void	MethodExecutor::_writeHeader(Response &resp)
 {
-	std::string	vProtocol = "HTTP/1.1";
-	int	temp = requ.Body.length();
-	temp++;
-
 	// Convert string to int
 	std::stringstream statusCode_str;
-	statusCode_str << resp.ResponseIntegrity;
+	statusCode_str << resp.httpStatus;
 	std::stringstream bodyLength;
 	bodyLength << resp.body.length();
 
 	// First line:
 	resp.responseBuffer.append(vProtocol
 							   + " " + statusCode_str.str()
-							   + " " + getStatusCodeMessage(resp.ResponseIntegrity) + "\n");
+							   + " " + getStatusCodeMessage(resp.httpStatus) + "\n");
 	resp.responseBuffer.append("Content-Length: "
 		+ bodyLength.str());
 	return ;
@@ -101,7 +103,7 @@ void	MethodExecutor::_generateErrorBody(Response &resp)
 	std::ifstream	ifs;
 	std::string		errorBody;
 	std::stringstream statusCode_str;
-	statusCode_str << resp.ResponseIntegrity;
+	statusCode_str << resp.httpStatus;
 
 	resp.body.append("<!DOCTYPE html>\n<html lang=\"en\">\n");
 	resp.body.append("<head>\n");
@@ -110,7 +112,7 @@ void	MethodExecutor::_generateErrorBody(Response &resp)
     resp.body.append("	<title>");
 	resp.body.append(statusCode_str.str());
 	resp.body.append(" ");
-	resp.body.append(getStatusCodeMessage(resp.ResponseIntegrity));
+	resp.body.append(getStatusCodeMessage(resp.httpStatus));
 	resp.body.append(" </title>\n");
     resp.body.append("	<style>\n");
     resp.body.append("	    body {\n");
@@ -147,10 +149,10 @@ void	MethodExecutor::_generateErrorBody(Response &resp)
 	resp.body.append("        <h1>");
 	resp.body.append(statusCode_str.str());
 	resp.body.append(" ");
-	resp.body.append(getStatusCodeMessage(resp.ResponseIntegrity));
+	resp.body.append(getStatusCodeMessage(resp.httpStatus));
 	resp.body.append( + " </h1>\n");
 	resp.body.append("        <p> ");
-	resp.body.append(getStatusCodeDescription(resp.ResponseIntegrity));
+	resp.body.append(getStatusCodeDescription(resp.httpStatus));
 	resp.body.append(" </p>\n");
 	resp.body.append("        <p><a href=\"/home/thofting/repos/webserv_creeper\">Go to Homepage</a></p>\n");
 	resp.body.append("    </div>");
