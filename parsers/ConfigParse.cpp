@@ -6,7 +6,7 @@
 /*   By: subpark <subpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/17 22:37:44 by siun              #+#    #+#             */
-/*   Updated: 2024/05/31 18:27:01 by subpark          ###   ########.fr       */
+/*   Updated: 2024/05/31 18:39:46 by subpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -206,7 +206,7 @@ std::vector <t_server> configParse(std::string configFilePath)
 		} catch (const std::runtime_error &e){
 			std::cerr << "Caught exception: " << e.what() << '\n';
 			return std::vector<t_server>();
-		}
+		} //catch block can be removed later to be handled in main
 	}
 	return servers;
 	return std::vector<t_server>();
@@ -214,7 +214,7 @@ std::vector <t_server> configParse(std::string configFilePath)
 
 int main()
 {
-	std::vector<t_server> servers = configParse("sampleConfig.conf");
+	std::vector<t_server> servers = configParse("sampleConfig.onf");
 
 
 	for (const auto& server : servers) {
