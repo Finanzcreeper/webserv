@@ -31,8 +31,12 @@ class location{
 								// default error page(html file), don't have to be included in _index above
 								//if it is empty, copy the server's
 		std::string		_path;//where data from post/get(?) saved/called
-		bool			_dir_listing;// to show it in order(like alphabetic) automatically or not
 
+};
+
+class index: protected location{
+	private:
+		bool			_dir_listing;// to show it in order(like alphabetic) automatically or not
 };
 
 class cgi: protected location{
@@ -50,7 +54,9 @@ typedef struct s_server
 	std::string 						default_error_page;
 	long unsigned int					client_max_body_size;
 	std::string							dir_request_default; //default file if the request is a directory
-	std::vector<location*>				locations;   //shold be free each location when webserv program ended
+	std::map<location*, int>			locations;  //should be free each location when webserv program ended
+													//location pointer for up/down casting, 
+													//int for method specify
 }t_server;
 
 typedef enum Requesttype {
