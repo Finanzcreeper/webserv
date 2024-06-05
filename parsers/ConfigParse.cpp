@@ -6,7 +6,7 @@
 /*   By: subpark <subpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/17 22:37:44 by siun              #+#    #+#             */
-/*   Updated: 2024/05/31 18:39:46 by subpark          ###   ########.fr       */
+/*   Updated: 2024/06/05 17:08:59 by subpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,24 +48,25 @@ std::vector<std::pair<std::string, int> >	findIndent(std::string str)
 	return configs;
 }
 
-std::vector<std::vector<std::pair<std::string, int> > > findChunck(std::vector<std::pair<std::string, int> > indents)
+std::vector<std::vector<std::pair<std::string, int> > > findChunck(std::vector<std::pair<std::string, int> > indents, std::string keyword)
 {
 	std::vector<std::vector<std::pair<std::string, int> > > multiChunck;
 	size_t start = 0;
 	size_t	end = 0;
 	
-	for (size_t i = 0; i < indents.size(); i ++)
+	while (start < indents.size() && strncmp(indents[start].first.c_str(), keyword.c_str(), strlen(keyword.c_str())))
+		++ start;
+	end = start;
+	for (end; end < indents.size(); end ++)
 	{
-		start = i;
-		while (i < indents.size() && indents[i].first != "server") {
-			++i;
-		}
-		end = i;
+		while (end < indents.size() && strncmp(indents[end].first.c_str(), keyword.c_str(), strlen(keyword.c_str())))
+			++ end;
 		if (start != end)
 		{
 			std::vector<std::pair<std::string, int> > chunck(indents.begin() + start, indents.begin() + end);
 			multiChunck.push_back(chunck);
 		}
+		start = end;
 	}
 	return multiChunck;
 }
@@ -122,47 +123,28 @@ int parseMethod(const std::vector<std::pair<std::string, int> >& chunck) {
 	return (methods);
 }
 
-std::vector<std::string>	parsePath(const std::vector<std::pair<std::string, int> > chunck)
+location::location(std::vector<std::pair<std::string, int> > location)
 {
-	std::vector<std::string> paths;
-	std::string				keyword = "path";
-	size_t	i = 0;
 
-	while (i < chunck.size() && chunck[i].first.find(keyword) == std::string::npos) {
-		++i;
-	}
-	int	indent = chunck[i].second;
-	i++;
-	while (i < chunck.size() && chunck[i].second == indent + 1) {
-		std::istringstream iss(chunck[i].first);
-		std::string path;
-		iss >> path;
-		paths.push_back(path);
-		++i;
-	}
-	return paths;
 }
 
-std::map<std::string, std::string> parseCgi(std::vector<std::pair<std::string, int> > chunck)
+std::map<location*, int> parseLocations(const std::vector<std::pair<std::string, int> > chunck)
 {
-	std::map<std::string, std::string> cgi;
-	std::string keyword = "cgi";
-	size_t	i = 0;
+	std::vector<std::vector<std::pair<std::string, int> > > locationChuncks;
 
-	while (i < chunck.size() && chunck[i].first.find(keyword) == std::string::npos) {
-		++i;
+	locationChuncks = findChunck(chunck, "locations");
+	std::string	types[3] = {"/", "/index", "/cgi"};
+	void		*creates[3] = {};
+	for (int i = 0; i < 3; i ++)
+	{
+		std::stringstream ss(locationChuncks[i][0].first);
+		std::string tmp;
+		ss >> tmp;
+		ss >> tmp;//extracting "/cgi" from "location /cgi"
+		if (tmp == types[i])
+		
 	}
-	int	indent = chunck[i].second;
-	i ++;
-	while (i < chunck.size() && chunck[i].second == indent + 1) {
-		std::istringstream iss(chunck[i].first);
-		std::string extension;
-		std::string path;
-		iss >> extension >> path;
-		cgi[extension] = path;
-		++i;
-	}
-	return cgi;
+	
 }
 
 t_server parseServerConfig(const std::vector<std::pair<std::string, int> > chunck) {
@@ -174,12 +156,7 @@ t_server parseServerConfig(const std::vector<std::pair<std::string, int> > chunc
 	server.server_name = parseString(chunck, "server_name");
 	server.default_error_page = parseString(chunck, "default_error_page");
 	server.client_max_body_size = std::atoi(parseString(chunck, "client_max_body_size").c_str());
-	server.httpMethods = parseMethod(chunck);
-	server.httpRedirection = parseString(chunck, "httpRedirection");
-	server.path = parsePath(chunck);
-	server.cgi_extension = parseCgi(chunck);
-	server.dir_listing = std::atoi(parseString(chunck, "dir_listing").c_str());
-	server.dir_request_default = parseString(chunck, "dir_request_default");
+	server.locations = parseLocations(chunck);
 	return server;
 }
 
@@ -198,7 +175,7 @@ std::vector <t_server> configParse(std::string configFilePath)
 		return std::vector<t_server>();
 	}
 	indents = findIndent(config);
-	chuncks = findChunck(indents);
+	chuncks = findChunck(indents, "server");
 	for (size_t i = 0; i < chuncks.size(); i ++)
 	{
 		try {
@@ -212,40 +189,87 @@ std::vector <t_server> configParse(std::string configFilePath)
 	return std::vector<t_server>();
 }
 
-int main()
-{
-	std::vector<t_server> servers = configParse("sampleConfig.onf");
+// int main()
+// {
+// 	std::vector<t_server> servers = configParse("sampleConfig.onf");
 
 
-	for (const auto& server : servers) {
-		std::cout << "Server Configuration:\n";
-		std::cout << "Port: " << server.port << "\n";
-		std::cout << "Host: " << server.host << "\n";
-		std::cout << "Server Name: " << server.server_name << "\n";
-		std::cout << "Default Error Page: " << server.default_error_page << "\n";
-		std::cout << "Client Max Body Size: " << server.client_max_body_size << "\n";
+// 	for (const auto& server : servers) {
+// 		std::cout << "Server Configuration:\n";
+// 		std::cout << "Port: " << server.port << "\n";
+// 		std::cout << "Host: " << server.host << "\n";
+// 		std::cout << "Server Name: " << server.server_name << "\n";
+// 		std::cout << "Default Error Page: " << server.default_error_page << "\n";
+// 		std::cout << "Client Max Body Size: " << server.client_max_body_size << "\n";
 		
-		std::cout << "HTTP Methods:\n";
-		// for (const auto& method : server.httpMethods) {
-		// 	std::cout << method << "\t";
-		// }
-		std::cout << "\n";
+// 		std::cout << "HTTP Methods:\n";
+// 		// for (const auto& method : server.httpMethods) {
+// 		// 	std::cout << method << "\t";
+// 		// }
+// 		std::cout << "\n";
 		
-		std::cout << "HTTP Redirection: " << server.httpRedirection << "\n";
+// 		std::cout << "HTTP Redirection: " << server.httpRedirection << "\n";
 		
-		std::cout << "Paths:\n";
-		for (const auto& path : server.path) {
-			std::cout << path << "\n";
-		}
+// 		std::cout << "Paths:\n";
+// 		for (const auto& path : server.path) {
+// 			std::cout << path << "\n";
+// 		}
 		
-		std::cout << "CGI Extensions:\n";
-		for (const auto& cgi : server.cgi_extension) {
-			std::cout << "Extension: " << cgi.first << ", Path: " << cgi.second << "\n";
-		}
+// 		std::cout << "CGI Extensions:\n";
+// 		for (const auto& cgi : server.cgi_extension) {
+// 			std::cout << "Extension: " << cgi.first << ", Path: " << cgi.second << "\n";
+// 		}
 		
-		std::cout << "Directory Listing: " << server.dir_listing << "\n";
-		std::cout << "Default Directory Request: " << server.dir_request_default << "\n";
+// 		std::cout << "Directory Listing: " << server.dir_listing << "\n";
+// 		std::cout << "Default Directory Request: " << server.dir_request_default << "\n";
 		
-		std::cout << "------------------------\n";
-	}
-}
+// 		std::cout << "------------------------\n";
+// 	}
+// }
+
+
+
+
+
+// std::vector<std::string>	parsePath(const std::vector<std::pair<std::string, int> > chunck)
+// {
+// 	std::vector<std::string> paths;
+// 	std::string				keyword = "location";
+// 	size_t	i = 0;
+
+// 	while (i < chunck.size() && chunck[i].first.find(keyword) == std::string::npos) {
+// 		++i;
+// 	}
+// 	int	indent = chunck[i].second;
+// 	i++;
+// 	while (i < chunck.size() && chunck[i].second == indent + 1) {
+// 		std::istringstream iss(chunck[i].first);
+// 		std::string path;
+// 		iss >> path;
+// 		paths.push_back(path);
+// 		++i;
+// 	}
+// 	return paths;
+// }
+
+// std::map<std::string, std::string> parseCgi(std::vector<std::pair<std::string, int> > chunck)
+// {
+// 	std::map<std::string, std::string> cgi;
+// 	std::string keyword = "cgi";
+// 	size_t	i = 0;
+
+// 	while (i < chunck.size() && chunck[i].first.find(keyword) == std::string::npos) {
+// 		++i;
+// 	}
+// 	int	indent = chunck[i].second;
+// 	i ++;
+// 	while (i < chunck.size() && chunck[i].second == indent + 1) {
+// 		std::istringstream iss(chunck[i].first);
+// 		std::string extension;
+// 		std::string path;
+// 		iss >> extension >> path;
+// 		cgi[extension] = path;
+// 		++i;
+// 	}
+// 	return cgi;
+// }
