@@ -41,7 +41,7 @@ class location{
 class index: public location{
 	public:
 		index(std::vector<std::pair<std::string, int> > location, std::string prefix);
-	protected:
+	private:
 		bool							_dir_listing;// to show it in order(like alphabetic) automatically or not
 		std::vector<std::string>		_index; //I don't get the concept of index yet, but so far I understand
 							  					//list of the files html/cgi/whatever files

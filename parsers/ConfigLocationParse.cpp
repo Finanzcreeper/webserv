@@ -6,7 +6,7 @@
 /*   By: subpark <subpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/06 13:43:52 by subpark           #+#    #+#             */
-/*   Updated: 2024/06/06 14:21:07 by subpark          ###   ########.fr       */
+/*   Updated: 2024/06/06 14:58:47 by subpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,15 +127,19 @@ std::pair<location*, int>createCgi(std::vector<std::pair<std::string, int> > lCh
 std::map<location*, int> parseLocations(const std::vector<std::pair<std::string, int> > chunck)
 {
 	std::vector<std::vector<std::pair<std::string, int> > > locationChuncks;
+	std::map<location*, int> locations;
 
 	locationChuncks = findChunck(chunck, "locations");
 	std::string	types[3] = {"/", "/index", "/cgi"};
-	std::pair<location*, int>	(creates[3])(std::vector<std::pair<std::string, int> >) = {createLocation, createIndex, createCgi};
-	for (int i = 0; i < 3; i ++)
+	std::pair<location*, int>	creates[3](std::vector<std::pair<std::string, int> >) = {createLocation, createIndex, createCgi};
+	for (int j = 0; j < locationChuncks.size(); j ++)
 	{
-		std::string tmp = parseString(locationChuncks[i], "location");
-		if (tmp == types[i])
-
+		for (int i = 0; i < 3; i ++)
+		{
+			std::string tmp = parseString(locationChuncks[j], "location");
+			if (tmp == types[i])
+				locations.insert(creates[i]);
+		}
 	}
-	
+	return (locations);	
 }
