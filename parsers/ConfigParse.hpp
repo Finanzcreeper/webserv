@@ -6,7 +6,7 @@
 /*   By: subpark <subpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/17 22:37:54 by siun              #+#    #+#             */
-/*   Updated: 2024/06/05 17:03:10 by subpark          ###   ########.fr       */
+/*   Updated: 2024/06/06 13:51:44 by subpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,5 +31,7 @@ std::string												openFile(std::string path);
 std::vector<std::pair<std::string, int> >				findIndent(std::string str);
 std::vector<std::vector<std::pair<std::string, int> > >	findChunck(std::vector<std::pair<std::string, int> > indents, std::string keyword);
 std::vector<t_server>									configParse(std::string configFilePath);
+std::string	parseString(const std::vector<std::pair<std::string, int> > chunck, std::string keyword);
+std::map<location*, int> parseLocations(const std::vector<std::pair<std::string, int> > chunck);
 
 # endif

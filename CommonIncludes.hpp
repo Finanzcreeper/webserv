@@ -23,25 +23,34 @@
 class location{
 	public:
 		location(std::vector<std::pair<std::string, int> > location, std::string prefix);
-	private:
-		std::string						_prefix;//used in 
-		int								_httpMethods;
-		std::vector<std::string>		_index;//I don't get the concept of index yet, but so far I understand
-							   //list of the files html/cgi/whatever files
-							   //should be able to be approached from the location
+		std::string		getPrefix(){return _prefix;}
+		int				getMethods(){return _httpMethods;}
+		std::string		getErrPage(){return _errorPage;}
+		std::string		getPath(){return _path;}
+
+	protected:
+		std::string		_prefix;	//like "/" "/cgi", "/index"
+		int				_httpMethods;
 		std::string		_errorPage;
-								// default error page(html file), don't have to be included in _index above
-								//if it is empty, copy the server's
-		std::string		_path;//where data from post/get(?) saved/called
+									// default error page(html file), don't have to be included in _index above
+									//if it is empty, copy the server's
+		std::string		_path;		//where data from post/get(?) saved/called
 
 };
 
-class index: protected location{
-	private:
-		bool			_dir_listing;// to show it in order(like alphabetic) automatically or not
+class index: public location{
+	public:
+		index(std::vector<std::pair<std::string, int> > location, std::string prefix);
+	protected:
+		bool							_dir_listing;// to show it in order(like alphabetic) automatically or not
+		std::vector<std::string>		_index; //I don't get the concept of index yet, but so far I understand
+							  					//list of the files html/cgi/whatever files
+							  					//should be able to be approached from the location
 };
 
-class cgi: protected location{
+class cgi: public location{
+	public:
+		cgi(std::vector<std::pair<std::string, int> > location, std::string prefix);
 	private:
 		std::map<std::string, std::string>	cgi_extension;
 };
@@ -52,7 +61,7 @@ typedef struct s_server
 	std::string	 						port;
 	std::string 						host;
 	std::string							server_name;
-	std::string							root; //where webserver html/db/cgi/everything files are saved
+	std::string							root;		//where webserver html/db/cgi/everything files are saved
 	std::string 						default_error_page;
 	long unsigned int					client_max_body_size;
 	std::string							dir_request_default; //default file if the request is a directory

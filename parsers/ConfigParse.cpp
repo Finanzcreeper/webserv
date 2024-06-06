@@ -6,7 +6,7 @@
 /*   By: subpark <subpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/17 22:37:44 by siun              #+#    #+#             */
-/*   Updated: 2024/06/05 17:08:59 by subpark          ###   ########.fr       */
+/*   Updated: 2024/06/06 14:00:56 by subpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,63 +90,6 @@ std::string	parseString(const std::vector<std::pair<std::string, int> > chunck, 
 	return "";
 }
 
-int parseMethod(const std::vector<std::pair<std::string, int> >& chunck) {
-	int methods;
-	std::string str;
-	std::string method;
-
-	str = parseString(chunck,"httpMethods");
-	std::istringstream stream(str);
-	while(stream >> method) {
-		if (method.find("GET") == 0) {
-			methods = methods | GET;
-		} else if (method == "HEAD") {
-			methods = methods | HEAD;
-		} else if (method == "POST") {
-			methods = methods | POST;
-		} else if (method == "PUT") {
-			methods = methods | PUT;
-		} else if (method == "DELETE") {
-			methods = methods | DELETE;
-		} else if (method == "CONNECT") {
-			methods = methods | CONNECT;
-		} else if (method == "OPTIONS") {
-			methods = methods | OPTIONS;
-		} else if (method == "TRACE") {
-			methods = methods | TRACE;
-		} else if (method == "PATCH") {
-			methods = methods | PATCH;
-		} else {
-			methods = methods | INVALID;
-		}
-	}
-	return (methods);
-}
-
-location::location(std::vector<std::pair<std::string, int> > location)
-{
-
-}
-
-std::map<location*, int> parseLocations(const std::vector<std::pair<std::string, int> > chunck)
-{
-	std::vector<std::vector<std::pair<std::string, int> > > locationChuncks;
-
-	locationChuncks = findChunck(chunck, "locations");
-	std::string	types[3] = {"/", "/index", "/cgi"};
-	void		*creates[3] = {};
-	for (int i = 0; i < 3; i ++)
-	{
-		std::stringstream ss(locationChuncks[i][0].first);
-		std::string tmp;
-		ss >> tmp;
-		ss >> tmp;//extracting "/cgi" from "location /cgi"
-		if (tmp == types[i])
-		
-	}
-	
-}
-
 t_server parseServerConfig(const std::vector<std::pair<std::string, int> > chunck) {
 
 	t_server server;
@@ -163,9 +106,9 @@ t_server parseServerConfig(const std::vector<std::pair<std::string, int> > chunc
 //have to make loop until configPa
 std::vector <t_server> configParse(std::string configFilePath)
 {
-	std::string				config;
-	std::vector <t_server>	servers;
-	std::vector<std::pair<std::string, int> > indents;
+	std::string									config;
+	std::vector <t_server>						servers;
+	std::vector<std::pair<std::string, int> >	indents;
 	std::vector<std::vector<std::pair<std::string, int> > > chuncks;
 
 	try{
