@@ -2,7 +2,6 @@ CMakeLists.txt
 cmake-build-debug
 .idea
 a.out
-
 *.o
 
 Settings.hpp
