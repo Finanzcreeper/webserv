@@ -10,16 +10,19 @@ void checkIfMethodIsAllowedOnRoute(Request& request, t_server& settings) {
 	std::map<std::string,route>::iterator RouteIterator;
 
 	RouteIterator = settings.routes.find(request.RequestedPath);
-	if (RouteIterator == settings.routes.end()) {
-		request.RequestIntegrity = METHOD_NOT_ALLOWED;
+	if (RouteIterator != settings.routes.end()) {
+		if ((request.ReqType &  RouteIterator->second.methods) == 0) {
+			request.RequestIntegrity = METHOD_NOT_ALLOWED;
+		}
+		return;
 	} else {
 		RouteIterator = settings.routes.begin();
 		while (RouteIterator != settings.routes.end()) {
 			if (request.RequestedPath.substr(0,RouteIterator->first.size()) == RouteIterator->first){
 				if ((request.ReqType &  RouteIterator->second.methods) == 0) {
 					request.RequestIntegrity = METHOD_NOT_ALLOWED;
-					return;
 				}
+				return;
 			}
 			++RouteIterator;
 		}
