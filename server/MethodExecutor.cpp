@@ -1,7 +1,8 @@
 #include "MethodExecutor.hpp"
-#include "responseGeneration.cpp"
 #include<fstream>
 #include<sstream>
+#include <ctime>
+#include <string>
 
 std::string		root = "/home/thofting/repos/webserv_creeper/content";
 std::string		defaultPage = "index.html";
@@ -9,47 +10,80 @@ std::string		vProtocol = "HTTP/1.1";
 
 MethodExecutor::MethodExecutor( void ): _serverSettings(0) {};
 
-MethodExecutor::MethodExecutor(const t_server *serverSettings)
+MethodExecutor::MethodExecutor(const t_server *serverSettings): _serverSettings(serverSettings) {}
+
+void	MethodExecutor::_generateCommonHeaderFields(Response &resp)
 {
-	_serverSettings = serverSettings;
+	resp.headerFields["Server"] = "webserv";
+
+	// date
+	std::time_t now = std::time(0);
+    std::tm* gmt = std::gmtime(&now);
+    char buffer[100];
+    std::strftime(buffer, sizeof(buffer), "%a, %d %b %Y %H:%M:%S GMT", gmt);
+	resp.headerFields["Date"] = std::string(buffer);
+
+	resp.headerFields["Accept-Ranges"] = "none"; // Indicated that range requests are not allowed
+	resp.headerFields["Accept-Ranges"] = "0";
+
+	// entity fields
+	std::stringstream bodyLength;
+	bodyLength << resp.body.length();
+	resp.headerFields["Content-Length"] = bodyLength.str();
+}
+
+void	MethodExecutor::_generateSpecialErrorFields(Request &requ, Response &resp)
+{
+	if (requ.RequestIntegrity == METHOD_NOT_ALLOWED)
+		resp.headerFields["Allow"] = "Hardcoded GET PUT DELETE";
 }
 
 void	MethodExecutor::wrapperRequest(Request &requ, Response &resp)
 {
 	std::cout << "**** HEADER OF REQUEST: ****\n" << requ.HeaderBuffer << std::endl << "**** END OF HEADER ****" << std::endl;
-	resp.httpStatus = OK_HTTP;
 	resp.body.clear();
 	resp.responseBuffer.clear();
 	resp.headerFields.clear();
-	// t_route location = _findRoute(requ->RequestedPath)
-	switch (requ.ReqType){
-		case (GET):
-			_executeGet(requ, resp);
-			break ;
-		case (HEAD):
-			_executeGet(requ, resp); // Same procedure as for GET, but produced body is not sended to client
-			break ;
-		//case (POST):
-		//	_executePost(requ, resp);
-		//	break ;
-		//case (DELETE):
-		//	_executeDelete(requ, resp);
-		//	break ;
-		default:
-			std::cerr << "Method type not found\n";
-			resp.httpStatus = METHOD_NOT_ALLOWED;
-			_setAllowField(resp); //  _setAllowField(resp, location);
+	resp.httpStatus = requ.RequestIntegrity;
+	if (resp.httpStatus == MOVED_PERMANENTLY)
+		resp.headerFields["Location"] = _serverSettings->httpMethods;//"tbd: Redirection location as defined in routing struct";
+	else if (resp.httpStatus == OK_HTTP)
+	{
+		switch (requ.ReqType){
+			case (GET):
+				_executeGet(requ, resp);
+				break ;
+			case (HEAD):
+				_executeGet(requ, resp); // Same procedure as for GET, but produced body is not sended to client
+				break ;
+			//case (POST):
+			//	_executePost(requ, resp);
+			//	break ;
+			//case (DELETE):
+			//	_executeDelete(requ, resp);
+			//	break ;
+			default:
+				std::cerr << "Method type not found\n";
+		}
 	}
-	if ((int)resp.httpStatus >= MIN_CLIENT_ERROR && (int)resp.httpStatus <= MAX_SERVER_ERROR)
-		_generateErrorBody(resp);
-	_generateCommonHeaderFields(resp);
-	_writeHeader(resp);
 
-	//Body header separation
-	resp.responseBuffer.append("\r\n\r\n");
+	if ((int)resp.httpStatus >= MIN_CLIENT_ERROR && (int)resp.httpStatus <= MAX_SERVER_ERROR)
+	{
+		_generateSpecialErrorFields(requ, resp);
+		_generateErrorBody(resp);
+	}
+
+	_generateCommonHeaderFields(resp);
+
+	// Append header to response
+	_writeStatusLine(resp);
+	_writeHeaderFields(resp);
+
+	// Append body to response
 	if (requ.ReqType != HEAD)
 		resp.responseBuffer.append(resp.body);
 	resp.isReady = true;
+
 	std::cout << "**** RESPONSE: ****\n" << resp.responseBuffer << "**** END OF RESPONSE ****" << std::endl;
 }
 
@@ -81,20 +115,22 @@ void    MethodExecutor::_executeGet(Request &requ, Response &resp)
 	ifs.close();
 }
 
-void	MethodExecutor::_writeHeader(Response &resp)
+void	MethodExecutor::_writeStatusLine(Response &resp)
 {
-	// Convert string to int
 	std::stringstream statusCode_str;
 	statusCode_str << resp.httpStatus;
-	std::stringstream bodyLength;
-	bodyLength << resp.body.length();
 
-	// First line:
 	resp.responseBuffer.append(vProtocol
 							   + " " + statusCode_str.str()
 							   + " " + getStatusCodeMessage(resp.httpStatus) + "\n");
-	resp.responseBuffer.append("Content-Length: "
-		+ bodyLength.str());
+}
+
+void	MethodExecutor::_writeHeaderFields(Response &resp)
+{
+	std::map<std::string,std::string>::iterator iter;
+	for(iter = resp.headerFields.begin(); iter != resp.headerFields.end(); ++iter)
+		resp.responseBuffer.append(iter->first + ": " + iter->second + "\n");
+	resp.responseBuffer.append("\r\n\r\n");
 	return ;
 }
 
@@ -105,6 +141,7 @@ void	MethodExecutor::_generateErrorBody(Response &resp)
 	std::stringstream statusCode_str;
 	statusCode_str << resp.httpStatus;
 
+	resp.body.clear();
 	resp.body.append("<!DOCTYPE html>\n<html lang=\"en\">\n");
 	resp.body.append("<head>\n");
 	resp.body.append("	<meta charset=\"UTF-8\">\n");

@@ -1,5 +1,4 @@
 SRCS =	server/MethodExecutor.cpp server/statusCodes.cpp server/Server.cpp \
-		server/responseGeneration.cpp \
 		parsers/ConfigParse.cpp parsers/httpParser.cpp\
 		testmain.cpp
 

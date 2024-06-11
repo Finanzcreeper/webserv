@@ -85,7 +85,6 @@ void Server::CheckForConnections() {
 					resps = answerMsgs.find(it->fd);
 					if (recv(it->fd, buffer, 1000, 0) != 0) {
 						mt->second.RequestBuffer.append(buffer);
-
 						try {
 							httpParser test(mt,this->settings);
 						}

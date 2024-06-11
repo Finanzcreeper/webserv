@@ -14,14 +14,14 @@ class MethodExecutor
 	private:
 		const t_server*	_serverSettings;
 		void			_executeGet(Request &requ, Response &resp);
-		void			_executePost(Request &requ, Response &resp);
-		void			_executeDelete(Request &requ, Response &resp);
-		void			_writeHeader(Response &resp);
+		//void			_executePost(Request &requ, Response &resp);
+		//void			_executeDelete(Request &requ, Response &resp);
+		void			_writeStatusLine(Response &resp);
+		void			_writeHeaderFields(Response &resp);
 		void			_generateCommonHeaderFields(Response &resp);
+		void			_generateSpecialErrorFields(Request &req, Response &resp);
 		void			_generateErrorBody(Response &resp);
 
-		// Header field generation
-		void			_setAllowField(Response &resp);
 	public:
 		MethodExecutor( void );
 		MethodExecutor(const t_server *serverSettings);
