@@ -101,7 +101,7 @@ void httpParser::handleBody(Request &request, size_t endOfBlock) {
 	int ChunkSize = 0;
 	TransferCoding = request.HeaderFields.find("transfer-encoding");
 	if (TransferCoding->second == "chunked") {
-		while (request.RequestBuffer.empty() == false) {
+		while (TransferCoding != request.HeaderFields.end() && request.RequestBuffer.empty() == false) {
 			std::string ChunkHexSize = request.RequestBuffer.substr(
 				0, request.RequestBuffer.find_first_of("\r\n"));
 			request.RequestBuffer.erase(0, request.RequestBuffer.find("\r\n", 0) + 2);
