@@ -87,7 +87,7 @@ void Server::CheckForConnections() {
 						mt->second.RequestBuffer.append(buffer);
 
 						try {
-							httpParser test(mt,this->settings);
+							httpParser test(mt);
 						}
 						catch (const std::runtime_error &e){
 							std::cerr << e.what() << std::endl;

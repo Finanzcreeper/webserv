@@ -1,5 +1,6 @@
 SRCS =	server/MethodExecutor.cpp server/statusCodes.cpp server/Server.cpp \
 		parsers/ConfigParse.cpp parsers/httpParser.cpp\
+		interpreters/httpInterpreter.cpp\
 		testmain.cpp
 
 OBJS = ${SRCS:.cpp=.o}

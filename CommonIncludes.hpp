@@ -2,8 +2,15 @@
 #define WEBSERV_COMMONINCLUDES_HPP
 
 #include"server/statusCodes.h"
-
+#include <map>
+#include <vector>
 //going to be saved as a vector to save multiple servers inside of one config file
+
+struct route{
+	int			methods;
+	std::string	httpRedirection;
+};
+
 typedef struct s_server
 {
 	std::string	 						port;
@@ -11,8 +18,8 @@ typedef struct s_server
 	std::string							server_name;
 	std::string 						default_error_page;
 	long unsigned int					client_max_body_size;
+	std::map<std::string,route>			routes;
 	int									httpMethods;
-	std::string							httpRedirection;
 	std::vector<std::string>			path;
 	std::map<std::string, std::string>	cgi_extension;
 	bool								dir_listing;

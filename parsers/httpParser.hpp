@@ -19,7 +19,6 @@
 class httpParser {
 private:
 	std::map<int,Request>::iterator& req;
-	const t_server settings;
 
 	void GetRequestedPath(Request& request);
 	void GetRequestType(Request& request);
@@ -28,7 +27,7 @@ private:
 	void handleHeader(Request &request, size_t endOfBlock);
 	void handleBody(Request &request, size_t endOfBlock);
 public:
-		httpParser(std::map<int, Request>::iterator& req, const t_server& sett);
+		httpParser(std::map<int, Request>::iterator& req);
 
 	//httpParser(std::map<int, Request>::iterator& req, const t_server sett);
 };
