@@ -6,7 +6,7 @@
 /*   By: subpark <subpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/06 13:43:52 by subpark           #+#    #+#             */
-/*   Updated: 2024/06/06 14:58:47 by subpark          ###   ########.fr       */
+/*   Updated: 2024/06/12 15:32:21 by subpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,56 +90,24 @@ std::map<std::string, std::string> parseCgi(std::vector<std::pair<std::string, i
 	return cgi;
 }
 
-location::location(std::vector<std::pair<std::string, int> > location, std::string prefix)
+std::map<std::string, location> parseLocations(std::vector<std::pair<std::string, int> > chunck)
 {
-	_prefix = prefix;
-	_httpMethods = parseMethod(location);
-}
-
-index::index(std::vector<std::pair<std::string, int> > location, std::string prefix):location(location, prefix)
-{
-	_index = parseIndex(location);
-}
-
-cgi::cgi(std::vector<std::pair<std::string, int> > location, std::string prefix):location(location, prefix)
-{
-	cgi_extension = parseCgi(location);
-}
-
-std::pair<location*, int>createLocation(std::vector<std::pair<std::string, int> > lChunck)
-{
-	location *tmp = new location(lChunck, "/");
-	return (std::pair<location*, int>(tmp, tmp->getMethods()));
-}
-
-std::pair<location*, int>createIndex(std::vector<std::pair<std::string, int> > lChunck)
-{
-	location *tmp = new index(lChunck, "/index");
-	return (std::pair<location*, int>(tmp, tmp->getMethods()));
-}
-
-std::pair<location*, int>createCgi(std::vector<std::pair<std::string, int> > lChunck)
-{
-	location *tmp = new cgi(lChunck, "/cgi");
-	return (std::pair<location*, int>(tmp, tmp->getMethods()));
-}
-
-std::map<location*, int> parseLocations(const std::vector<std::pair<std::string, int> > chunck)
-{
+	std::map<std::string, location>	locations;
+	location						loc;
 	std::vector<std::vector<std::pair<std::string, int> > > locationChuncks;
-	std::map<location*, int> locations;
 
-	locationChuncks = findChunck(chunck, "locations");
-	std::string	types[3] = {"/", "/index", "/cgi"};
-	std::pair<location*, int>	creates[3](std::vector<std::pair<std::string, int> >) = {createLocation, createIndex, createCgi};
-	for (int j = 0; j < locationChuncks.size(); j ++)
+	locationChuncks = findChunck(chunck, "location");
+	for (int i = 0; i < locationChuncks.size(); i ++)
 	{
-		for (int i = 0; i < 3; i ++)
-		{
-			std::string tmp = parseString(locationChuncks[j], "location");
-			if (tmp == types[i])
-				locations.insert(creates[i]);
-		}
+		std::string tmp = parseString(locationChuncks[i], "location");
+		loc._httpMethods = parseMethod(locationChuncks[i]);
+		loc._dir_listing = !strcmp("ON", parseString(locationChuncks[i], "dirlisting").c_str());
+		loc._errorPage = parseString(locationChuncks[i], "errorPage");
+		loc._index = parseIndex(locationChuncks[i]);
+		loc._redirect = parseString(locationChuncks[i], "redirect");
+		loc.cgi_extension = parseCgi(locationChuncks[i]);
+		loc._path = parseString(locationChuncks[i],  "path");
+		locations.insert(std::pair<std::string, location>(tmp, loc));
 	}
-	return (locations);	
+	return locations;
 }

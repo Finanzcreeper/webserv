@@ -20,54 +20,35 @@
 //				>> leads to ultimate default html of the server
 // if there is no index in request
 //				>> leads to default html of the location  
-class location{
-	public:
-		location(std::vector<std::pair<std::string, int> > location, std::string prefix);
-		std::string		getPrefix(){return _prefix;}
-		int				getMethods(){return _httpMethods;}
-		std::string		getErrPage(){return _errorPage;}
-		std::string		getPath(){return _path;}
+struct location{
 
-	protected:
-		std::string		_prefix;	//like "/" "/cgi", "/index"
+//data requested for general
+		//std::string		_prefix;	//like "/" "/cgi", "/index"
 		int				_httpMethods;
 		std::string		_errorPage;
 									// default error page(html file), don't have to be included in _index above
 									//if it is empty, copy the server's
 		std::string		_path;		//where data from post/get(?) saved/called
-
-};
-
-class index: public location{
-	public:
-		index(std::vector<std::pair<std::string, int> > location, std::string prefix);
-	private:
+		std::string		_redirect;
+//data requested for index page
 		bool							_dir_listing;// to show it in order(like alphabetic) automatically or not
-		std::vector<std::string>		_index; //I don't get the concept of index yet, but so far I understand
-							  					//list of the files html/cgi/whatever files
-							  					//should be able to be approached from the location
-};
+		std::vector<std::string>		_index;
 
-class cgi: public location{
-	public:
-		cgi(std::vector<std::pair<std::string, int> > location, std::string prefix);
-	private:
+//data requested for cgi
 		std::map<std::string, std::string>	cgi_extension;
-};
 
+};
 
 typedef struct s_server
 {
 	std::string	 						port;
 	std::string 						host;
 	std::string							server_name;
-	std::string							root;		//where webserver html/db/cgi/everything files are saved
+	std::string							root;				//where webserver html/db/cgi/everything files are saved
 	std::string 						default_error_page;
 	long unsigned int					client_max_body_size;
 	std::string							dir_request_default; //default file if the request is a directory
-	std::map<location*, int>			locations;  //should be free each location when webserv program ended
-													//location pointer for up/down casting, 
-													//int for method specify
+	std::map<std::string, location>		locations;			 //string will be the prefix, location is just a location
 }t_server;
 
 typedef enum Requesttype {
