@@ -6,7 +6,7 @@
 /*   By: subpark <subpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/06 13:43:52 by subpark           #+#    #+#             */
-/*   Updated: 2024/06/12 15:32:21 by subpark          ###   ########.fr       */
+/*   Updated: 2024/06/12 16:14:43 by subpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ int parseMethod(const std::vector<std::pair<std::string, int> >& chunck) {
 			methods = methods | TRACE;
 		} else if (method == "PATCH") {
 			methods = methods | PATCH;
-		} else {
+		}else {
 			methods = methods | INVALID;
 		}
 	}
@@ -105,7 +105,7 @@ std::map<std::string, location> parseLocations(std::vector<std::pair<std::string
 		loc._errorPage = parseString(locationChuncks[i], "errorPage");
 		loc._index = parseIndex(locationChuncks[i]);
 		loc._redirect = parseString(locationChuncks[i], "redirect");
-		loc.cgi_extension = parseCgi(locationChuncks[i]);
+		loc._cgi = parseCgi(locationChuncks[i]);
 		loc._path = parseString(locationChuncks[i],  "path");
 		locations.insert(std::pair<std::string, location>(tmp, loc));
 	}

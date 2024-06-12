@@ -6,7 +6,7 @@
 /*   By: subpark <subpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/17 22:37:44 by siun              #+#    #+#             */
-/*   Updated: 2024/06/12 15:32:31 by subpark          ###   ########.fr       */
+/*   Updated: 2024/06/12 16:23:22 by subpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ std::vector<std::vector<std::pair<std::string, int> > > findChunck(std::vector<s
 	while (start < indents.size() && strncmp(indents[start].first.c_str(), keyword.c_str(), strlen(keyword.c_str())))
 		++ start;
 	end = start;
-	for (end; end < indents.size(); end ++)
+	while (end < indents.size())
 	{
 		while (end < indents.size() && strncmp(indents[end].first.c_str(), keyword.c_str(), strlen(keyword.c_str())))
 			++ end;
@@ -67,6 +67,7 @@ std::vector<std::vector<std::pair<std::string, int> > > findChunck(std::vector<s
 			multiChunck.push_back(chunck);
 		}
 		start = end;
+		++ end;
 	}
 	return multiChunck;
 }
@@ -103,7 +104,6 @@ t_server parseServerConfig(const std::vector<std::pair<std::string, int> > chunc
 	return server;
 }
 
-//have to make loop until configPa
 std::vector <t_server> configParse(std::string configFilePath)
 {
 	std::string									config;
@@ -130,4 +130,37 @@ std::vector <t_server> configParse(std::string configFilePath)
 	}
 	return servers;
 	return std::vector<t_server>();
+}
+
+int main()
+{
+	std::vector<t_server> servers = configParse("parsers/sampleConfig.conf");
+	for (size_t i = 0; i < servers.size(); i ++)
+	{
+		std::cout << "Server " << i << ":\n";
+		std::cout << "port: " << servers[i].port << std::endl;
+		std::cout << "host: " << servers[i].host << std::endl;
+		std::cout << "server_name: " << servers[i].server_name << std::endl;
+		std::cout << "default_error_page: " << servers[i].default_error_page << std::endl;
+		std::cout << "client_max_body_size: " << servers[i].client_max_body_size << std::endl;
+		std::cout << "locations:\n";
+		for (std::map<std::string, location>::iterator it = servers[i].locations.begin(); it != servers[i].locations.end(); it ++)
+		{
+			std::cout << "--------------------------------------------------\n";
+			std::cout << "location: " << it->first << std::endl;
+			std::cout << "dir_listing: " << it->second._dir_listing << std::endl;
+			std::cout << "httpMethods: " << it->second._httpMethods << std::endl;
+			std::cout << "index:\n";
+			for (size_t j = 0; j < it->second._index.size(); j ++)
+			{
+				std::cout << it->second._index[j] << std::endl;
+			}
+			std::cout << "cgi:\n";
+			for (std::map<std::string, std::string>::iterator it2 = it->second._cgi.begin(); it2 != it->second._cgi.end(); it2 ++)
+			{
+				std::cout << it2->first << " " << it2->second << std::endl;
+			}
+		}
+	}
+	return 0;
 }
