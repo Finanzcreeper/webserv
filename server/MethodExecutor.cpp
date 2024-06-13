@@ -46,7 +46,7 @@ void	MethodExecutor::wrapperRequest(Request &requ, Response &resp)
 	resp.headerFields.clear();
 	resp.httpStatus = requ.RequestIntegrity;
 	if (resp.httpStatus == MOVED_PERMANENTLY)
-		resp.headerFields["Location"] = _serverSettings->httpMethods;//"tbd: Redirection location as defined in routing struct";
+		resp.headerFields["Location"] = requ.UsedRoute._redirect;//"tbd: Redirection location as defined in routing struct";
 	else if (resp.httpStatus == OK_HTTP)
 	{
 		switch (requ.ReqType){
@@ -66,7 +66,6 @@ void	MethodExecutor::wrapperRequest(Request &requ, Response &resp)
 				std::cerr << "Method type not found\n";
 		}
 	}
-
 	if ((int)resp.httpStatus >= MIN_CLIENT_ERROR && (int)resp.httpStatus <= MAX_SERVER_ERROR)
 	{
 		_generateSpecialErrorFields(requ, resp);

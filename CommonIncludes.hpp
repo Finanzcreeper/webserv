@@ -77,6 +77,7 @@ struct Request {
 	statusCode RequestIntegrity;
 	std::string RequestedPath;
 	std::string BodyBuffer;
+	location	UsedRoute;
 	std::string Body;
 };
 
