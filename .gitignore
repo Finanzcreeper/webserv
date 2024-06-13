@@ -4,4 +4,6 @@ cmake-build-debug
 a.out
 *.o
 
+Settings.hpp
+
 webserv
