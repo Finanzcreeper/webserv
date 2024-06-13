@@ -3,6 +3,7 @@
 #include <cerrno>
 #include <cstring>
 #include "../parsers/httpParser.hpp"
+#include "../interpreters/httpInterpreter.hpp"
 #include <unistd.h>
 #include "MethodExecutor.hpp"
 
@@ -93,6 +94,7 @@ void Server::CheckForConnections() {
 							std::cerr << e.what() << std::endl;
 							//get error page based on request.integrity!
 						}
+						InterpretRequest(mt->second, settings);
 						if (mt->second.RequestIntegrity == OK_HTTP){
 							executor.wrapperRequest(mt->second, resps->second);
 							mt->second.HeaderBuffer.clear();

@@ -4,6 +4,8 @@
 #include "../CommonIncludes.hpp"
 #include <map>
 
+void InterpretRequest(Request& request, const t_server& settings);
+
 void checkIfMethodIsAllowedOnRoute(Request& request, const t_server& settings);
 
 void checkBodySize(Request& request, const t_server& settings);
