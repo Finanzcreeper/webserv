@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigLocationParse.cpp                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: subpark <subpark@student.42.fr>            +#+  +:+       +#+        */
+/*   By: siun <siun@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/06 13:43:52 by subpark           #+#    #+#             */
-/*   Updated: 2024/06/12 16:14:43 by subpark          ###   ########.fr       */
+/*   Updated: 2024/06/13 16:51:39 by siun             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,6 +97,17 @@ std::map<std::string, location> parseLocations(std::vector<std::pair<std::string
 	std::vector<std::vector<std::pair<std::string, int> > > locationChuncks;
 
 	locationChuncks = findChunck(chunck, "location");
+
+	for (int i = 0; i < locationChuncks.size(); i++)
+	{
+		std::cout << "Location Chunk " << i << ":" << std::endl;
+		for (const auto& pair : locationChuncks[i])
+		{
+			std::cout << pair.first << " : " << pair.second << std::endl;
+		}
+		std::cout << std::endl;
+	}
+	
 	for (int i = 0; i < locationChuncks.size(); i ++)
 	{
 		std::string tmp = parseString(locationChuncks[i], "location");
