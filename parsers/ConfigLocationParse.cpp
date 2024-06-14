@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigLocationParse.cpp                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: siun <siun@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: subpark <subpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/06 13:43:52 by subpark           #+#    #+#             */
-/*   Updated: 2024/06/13 16:51:39 by siun             ###   ########.fr       */
+/*   Updated: 2024/06/14 19:00:20 by subpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,15 +98,15 @@ std::map<std::string, location> parseLocations(std::vector<std::pair<std::string
 
 	locationChuncks = findChunck(chunck, "location");
 
-	for (int i = 0; i < locationChuncks.size(); i++)
-	{
-		std::cout << "Location Chunk " << i << ":" << std::endl;
-		for (const auto& pair : locationChuncks[i])
-		{
-			std::cout << pair.first << " : " << pair.second << std::endl;
-		}
-		std::cout << std::endl;
-	}
+	// for (int i = 0; i < locationChuncks.size(); i++)
+	// {
+	// 	std::cout << "Location Chunk " << i << ":" << std::endl;
+	// 	for (const auto& pair : locationChuncks[i])
+	// 	{
+	// 		std::cout << pair.first << " : " << pair.second << std::endl;
+	// 	}
+	// 	std::cout << std::endl;
+	// }
 	
 	for (int i = 0; i < locationChuncks.size(); i ++)
 	{
@@ -114,7 +114,7 @@ std::map<std::string, location> parseLocations(std::vector<std::pair<std::string
 		loc._httpMethods = parseMethod(locationChuncks[i]);
 		loc._dir_listing = !strcmp("ON", parseString(locationChuncks[i], "dirlisting").c_str());
 		loc._errorPage = parseString(locationChuncks[i], "errorPage");
-		loc._index = parseIndex(locationChuncks[i]);
+		loc._index = parseString(locationChuncks[i], "index");
 		loc._redirect = parseString(locationChuncks[i], "redirect");
 		loc._cgi = parseCgi(locationChuncks[i]);
 		loc._path = parseString(locationChuncks[i],  "path");

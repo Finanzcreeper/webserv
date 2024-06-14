@@ -29,7 +29,7 @@ struct location{
 		std::string		_redirect;
 //data requested for index page
 		bool							_dir_listing;// to show it in order(like alphabetic) automatically or not
-		std::vector<std::string>		_index;
+		std::string		_index;
 
 //data requested for cgi
 		std::map<std::string, std::string>	_cgi;
