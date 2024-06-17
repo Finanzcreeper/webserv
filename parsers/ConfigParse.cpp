@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigParse.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: subpark <subpark@student.42.fr>            +#+  +:+       +#+        */
+/*   By: siun <siun@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/17 22:37:44 by siun              #+#    #+#             */
-/*   Updated: 2024/06/14 19:50:39 by subpark          ###   ########.fr       */
+/*   Updated: 2024/06/17 15:50:27 by siun             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,7 @@ std::vector<std::vector<std::pair<std::string, int> > > findChunck(std::vector<s
 	
 	while (end < indents.size())
 	{
-		while (start < indents.size() && nth_word(indents[start].first, 1) !=keyword)
+		while (start < indents.size() && nth_word(indents[start].first, 1) != keyword)
 			++ start;
 		end = start;
 		while (end + 1 < indents.size() && indents[end + 1].second > indents[start].second)

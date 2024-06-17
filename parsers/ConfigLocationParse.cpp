@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigLocationParse.cpp                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: subpark <subpark@student.42.fr>            +#+  +:+       +#+        */
+/*   By: siun <siun@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/06 13:43:52 by subpark           #+#    #+#             */
-/*   Updated: 2024/06/14 19:00:20 by subpark          ###   ########.fr       */
+/*   Updated: 2024/06/17 16:15:17 by siun             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,14 +15,14 @@
 
 
 int parseMethod(const std::vector<std::pair<std::string, int> >& chunck) {
-	int methods;
+	int methods = 0;
 	std::string str;
 	std::string method;
 
-	str = parseString(chunck,"httpMethods");
+	str = parseString(chunck,"method");
 	std::istringstream stream(str);
 	while(stream >> method) {
-		if (method.find("GET") == 0) {
+		if (method == "GET") {
 			methods = methods | GET;
 		} else if (method == "HEAD") {
 			methods = methods | HEAD;
