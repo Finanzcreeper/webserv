@@ -6,7 +6,7 @@
 /*   By: siun <siun@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/06 13:43:52 by subpark           #+#    #+#             */
-/*   Updated: 2024/06/18 15:35:06 by siun             ###   ########.fr       */
+/*   Updated: 2024/06/18 16:33:34 by siun             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,7 @@ std::map<std::string, location> parseLocations(std::vector<std::pair<std::string
 		loc._redirect = parseString(locationChuncks[i], "redirect");
 		loc._cgi = parseCgi(locationChuncks[i]);
 		loc._path = parseString(locationChuncks[i],  "path");
+		loc._root = parseString(locationChuncks[i], "root");
 		locations.insert(std::pair<std::string, location>(tmp, loc));
 	}
 	return locations;

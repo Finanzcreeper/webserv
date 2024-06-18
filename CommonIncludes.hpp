@@ -33,6 +33,7 @@ struct location{
 
 //data requested for cgi
 		std::map<std::string, std::string>	_cgi;
+		std::string		_root;
 
 };
 
@@ -41,7 +42,6 @@ typedef struct s_server
 	std::string	 						port;
 	std::string 						host;
 	std::string							server_name;
-	std::string							root;				 //where webserver html/db/cgi/everything files are saved
 	std::string 						default_error_page;
 	long unsigned int					client_max_body_size;
 	std::string							dir_request_default; //default file if the request is a directory
