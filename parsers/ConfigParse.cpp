@@ -6,7 +6,7 @@
 /*   By: siun <siun@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/17 22:37:44 by siun              #+#    #+#             */
-/*   Updated: 2024/06/18 14:07:15 by siun             ###   ########.fr       */
+/*   Updated: 2024/06/18 15:35:19 by siun             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,19 +106,6 @@ std::string	parseString(const std::vector<std::pair<std::string, int> > chunck, 
 
 	while (i < chunck.size() && nth_word(chunck[i].first, 1) != keyword)
 		i ++;
-	// if (keyword == "dirlisting")
-	// {
-	// 	std::cout << "dirlisting i:  " << i << std::endl;
-	// 	std::cout << "size: " << chunck.size() << "\n";
-	// 	for (size_t i = 0; i < chunck.size(); i++)
-	// 	{
-	// 		std::cout << "Chunk " << i << ":\n";
-	// 		std::cout << "Indent: " << chunck[i].second << std::endl;
-	// 		std::cout << "Content: " << chunck[i].first << std::endl;
-	// 		std::cout << "------------------------\n";
-	// 	}
-	// std::cout << "=========================================\n";
-	// }
 	if (i == chunck.size())
 		return "";
 	return nth_word(chunck[i].first, 2);

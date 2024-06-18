@@ -6,7 +6,7 @@
 /*   By: siun <siun@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/06 13:43:52 by subpark           #+#    #+#             */
-/*   Updated: 2024/06/18 14:15:58 by siun             ###   ########.fr       */
+/*   Updated: 2024/06/18 15:35:06 by siun             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,13 @@ int parseMethod(const std::vector<std::pair<std::string, int> >& chunck) {
 	std::string str;
 	std::string method;
 
-	str = parseString(chunck,"method");
+	int i = 0;
+	while (i < chunck.size() && nth_word(chunck[i].first, 1) != "method")
+		++i;
+	str = chunck[i].first;
+	std::cout << "str: " << str << std::endl;
 	std::istringstream stream(str);
+	stream >> method;
 	while(stream >> method) {
 		if (method == "GET") {
 			methods = methods | GET;
@@ -40,7 +45,7 @@ int parseMethod(const std::vector<std::pair<std::string, int> >& chunck) {
 			methods = methods | TRACE;
 		} else if (method == "PATCH") {
 			methods = methods | PATCH;
-		}else {
+		} else {
 			methods = methods | INVALID;
 		}
 	}
@@ -67,17 +72,6 @@ std::map<std::string, location> parseLocations(std::vector<std::pair<std::string
 	std::vector<std::vector<std::pair<std::string, int> > > locationChuncks;
 
 	locationChuncks = findChunck(chunck, "location");
-
-	// for (int i = 0; i < locationChuncks.size(); i++)
-	// {
-	// 	std::cout << "Location Chunk " << i << ":" << std::endl;
-	// 	for (const auto& pair : locationChuncks[i])
-	// 	{
-	// 		std::cout << pair.first << " : " << pair.second << std::endl;
-	// 	}
-	// 	std::cout << std::endl;
-	// }
-	
 	for (int i = 0; i < locationChuncks.size(); i ++)
 	{
 		std::string tmp = parseString(locationChuncks[i], "location");
