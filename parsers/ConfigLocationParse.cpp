@@ -6,7 +6,7 @@
 /*   By: siun <siun@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/06 13:43:52 by subpark           #+#    #+#             */
-/*   Updated: 2024/06/17 16:15:17 by siun             ###   ########.fr       */
+/*   Updated: 2024/06/17 23:43:54 by siun             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,36 +47,14 @@ int parseMethod(const std::vector<std::pair<std::string, int> >& chunck) {
 	return (methods);
 }
 
-std::vector<std::string>	parseIndex(const std::vector<std::pair<std::string, int> > chunck)
-{
-	std::vector<std::string> indexs;
-	std::string				keyword = "index";
-	size_t	i = 0;
-
-	while (i < chunck.size() && chunck[i].first.find(keyword) == std::string::npos) {
-		++i;
-	}
-	int	indent = chunck[i].second;
-	i++;
-	while (i < chunck.size() && chunck[i].second == indent + 1) {
-		std::istringstream iss(chunck[i].first);
-		std::string index;
-		iss >> index;
-		indexs.push_back(index);
-		++i;
-	}
-	return indexs;
-}
-
 std::map<std::string, std::string> parseCgi(std::vector<std::pair<std::string, int> > chunck)
 {
 	std::map<std::string, std::string> cgi;
 	std::string keyword = "cgi";
 	size_t	i = 0;
 
-	while (i < chunck.size() && chunck[i].first.find(keyword) == std::string::npos) {
+	while (i < chunck.size() && nth_word(chunck[i].first, 1) != keyword)
 		++i;
-	}
 	int	indent = chunck[i].second;
 	i ++;
 	while (i < chunck.size() && chunck[i].second == indent + 1) {
@@ -112,6 +90,7 @@ std::map<std::string, location> parseLocations(std::vector<std::pair<std::string
 	{
 		std::string tmp = parseString(locationChuncks[i], "location");
 		loc._httpMethods = parseMethod(locationChuncks[i]);
+		std::cout << "dirlisting: " << parseString(locationChuncks[i], "dirlisting") << std::endl;
 		loc._dir_listing = !strcmp("ON", parseString(locationChuncks[i], "dirlisting").c_str());
 		loc._errorPage = parseString(locationChuncks[i], "errorPage");
 		loc._index = parseString(locationChuncks[i], "index");

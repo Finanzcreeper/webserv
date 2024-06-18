@@ -6,7 +6,7 @@
 /*   By: siun <siun@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/17 22:37:44 by siun              #+#    #+#             */
-/*   Updated: 2024/06/17 15:50:27 by siun             ###   ########.fr       */
+/*   Updated: 2024/06/18 00:33:08 by siun             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,8 +29,12 @@ std::string openFile(std::string path)
 
 std::string nth_word(std::string str, int n)
 {
+	if (str.empty())
+		return "";
+
 	std::istringstream stream(str);
 	std::string word;
+	
 	for (int i = 0; i < n; i ++)
 	{
 		stream >> word;
@@ -41,6 +45,7 @@ std::string nth_word(std::string str, int n)
 std::vector<std::pair<std::string, int> >	findIndent(std::string str)
 {
 	std::vector<std::pair<std::string, int> > configs;
+
 	for (size_t i = 0; i < str.size(); i ++) {
 		int start = i;
 		while (str[start] == '\t') {
@@ -62,14 +67,8 @@ std::vector<std::pair<std::string, int> >	findIndent(std::string str)
 std::vector<std::vector<std::pair<std::string, int> > > findChunck(std::vector<std::pair<std::string, int> > indents, std::string keyword)
 {
 	std::vector<std::vector<std::pair<std::string, int> > > multiChunck;
-	//size_t start_indents = 0;
 	size_t start = 0;
 	size_t	end = 0;
-
-	// for (int i = 0; i < indents.size(); i ++)
-	// {
-	// 	std::cout << indents[i].first << " indents:		" << indents[i].second << std::endl;
-	// }
 	
 	while (end < indents.size())
 	{
@@ -90,26 +89,30 @@ std::vector<std::vector<std::pair<std::string, int> > > findChunck(std::vector<s
 	}
 	return multiChunck;
 }
+//last line of the each chunck is not added...HAVE TO FIX
 
 std::string	parseString(const std::vector<std::pair<std::string, int> > chunck, std::string keyword)
 {
-	for (size_t i = 0; i < chunck.size(); i ++)
-	{
-		// if (keyword == "index")
-		// 	std::cout << chunck[i].first << std::endl;
-		if (nth_word(chunck[i].first, 1) == keyword)
-		{
-			std::string str = chunck[i].first;
-			std::string::iterator start = str.begin() + keyword.size() + 1;
-			while(start != str.end() && std::isspace(*start))
-				++ start;
-			std::string::iterator end = str.end();
-			while (end != start && std::isspace(*end))
-				-- end;
-			return (std::string(start, end + 1));
-		}
-	}
-	return "";
+	size_t	i = 0;
+
+	while (i < chunck.size() && nth_word(chunck[i].first, 1) != keyword)
+		i ++;
+	// if (keyword == "dirlisting")
+	// {
+	// 	std::cout << "dirlisting i:  " << i << std::endl;
+	// 	std::cout << "size: " << chunck.size() << "\n";
+	// 	for (size_t i = 0; i < chunck.size(); i++)
+	// 	{
+	// 		std::cout << "Chunk " << i << ":\n";
+	// 		std::cout << "Indent: " << chunck[i].second << std::endl;
+	// 		std::cout << "Content: " << chunck[i].first << std::endl;
+	// 		std::cout << "------------------------\n";
+	// 	}
+	// std::cout << "=========================================\n";
+	// }
+	if (i == chunck.size())
+		return "";
+	return nth_word(chunck[i].first, 2);
 }
 
 t_server parseServerConfig(const std::vector<std::pair<std::string, int> > chunck) {
@@ -147,7 +150,7 @@ std::vector <t_server> configParse(std::string configFilePath)
 		} catch (const std::runtime_error &e){
 			std::cerr << "Caught exception: " << e.what() << '\n';
 			return std::vector<t_server>();
-		} //catch block can be removed later to be handled in main
+		}
 	}
 	return servers;
 	return std::vector<t_server>();
