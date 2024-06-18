@@ -6,7 +6,7 @@
 /*   By: siun <siun@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/17 22:37:44 by siun              #+#    #+#             */
-/*   Updated: 2024/06/18 00:33:08 by siun             ###   ########.fr       */
+/*   Updated: 2024/06/18 14:07:15 by siun             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,17 +76,26 @@ std::vector<std::vector<std::pair<std::string, int> > > findChunck(std::vector<s
 			++ start;
 		end = start;
 		while (end + 1 < indents.size() && indents[end + 1].second > indents[start].second)
-		{
 			++ end;
-		}
-		if (start != end)
-		{
-			std::vector<std::pair<std::string, int> > chunck(indents.begin() + start, indents.begin() + end);
-			multiChunck.push_back(chunck);
-		}
+		std::vector<std::pair<std::string, int> > chunck(indents.begin() + start, indents.begin() + end + 1);
+		multiChunck.push_back(chunck);
+		if (end == indents.size())
+			break;
 		++ end;
 		start = end;
 	}
+
+	// for (size_t i = 0; i < multiChunck.size(); i++)
+	// {
+	// 	std::cout << "Chunk " << i << ":\n";
+	// 	for (size_t j = 0; j < multiChunck[i].size(); j++)
+	// 	{
+	// 		std::cout << "Indent: " << multiChunck[i][j].second << std::endl;
+	// 		std::cout << "Content: " << multiChunck[i][j].first << std::endl;
+	// 		std::cout << "------------------------\n";
+	// 	}
+	// 	std::cout << "=========================================\n";
+	// }
 	return multiChunck;
 }
 //last line of the each chunck is not added...HAVE TO FIX
