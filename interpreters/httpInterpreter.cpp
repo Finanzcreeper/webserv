@@ -1,6 +1,10 @@
 #include "httpInterpreter.hpp"
 
 void InterpretRequest(Request& request, const t_server& settings) {
+	findRoute(request,settings);
+	if (request.RequestIntegrity != OK_HTTP) {
+		return;
+	}
 	checkIfMethodIsAllowedOnRoute(request, settings);
 	if (request.RequestIntegrity != OK_HTTP) {
 		return;
@@ -15,28 +19,35 @@ void InterpretRequest(Request& request, const t_server& settings) {
 	}
 }
 
-void checkIfMethodIsAllowedOnRoute(Request& request, t_server& settings) {
+void findRoute(Request& request, t_server& settings) {
 	std::map<std::string,route>::iterator RouteIterator;
+	bool routeSet = false;
 
 	RouteIterator = settings.routes.find(request.RequestedPath);
 	if (RouteIterator != settings.routes.end()) {
 		request.UsedRoute = RouteIterator->second;
-		if ((request.ReqType &  RouteIterator->second.methods) == 0) {
-			request.RequestIntegrity = METHOD_NOT_ALLOWED;
-		}
+		routeSet = true;
 		return;
 	} else {
 		RouteIterator = settings.routes.begin();
 		while (RouteIterator != settings.routes.end()) {
-			if (request.RequestedPath.substr(0,RouteIterator->first.size()) == RouteIterator->first){
+			if (request.RequestedPath.substr(0,RouteIterator->first.size()) == RouteIterator->first && request.UsedRoute.location.size() < RouteIterator->first.size()){
 				request.UsedRoute = RouteIterator->second;
-				if ((request.ReqType &  RouteIterator->second.methods) == 0) {
-					request.RequestIntegrity = METHOD_NOT_ALLOWED;
-				}
-				return;
+				routeSet = true;
 			}
 			++RouteIterator;
 		}
+	}
+	if (routeSet == false) {
+		request.RequestIntegrity = NOT_FOUND;
+	} else {
+		request.RoutedPath = request.RequestedPath.replace(0,request.UsedRoute.location.size(),request.UsedRoute.root);
+	}
+}
+
+void checkIfMethodIsAllowedOnRoute(Request& request, t_server& settings) {
+	if ((request.ReqType &  request.UsedRoute.methods) == 0) {
+		request.RequestIntegrity = METHOD_NOT_ALLOWED;
 	}
 }
 
@@ -49,14 +60,5 @@ void checkBodySize(Request& request, const t_server& settings) {
 void redirectionChecker(Request& request, const t_server& settings) {
 	if (request.UsedRoute.httpRedirection.empty() == false) {
 		request.RequestIntegrity = MOVED_PERMANENTLY;
-	}
-}
-
-void checkAndApplyRoot(Request& request, const t_server& settings) {
-	std::string startOfPath;
-
-	startOfPath =request.RequestedPath.substr(0, request.UsedRoute.root.first.size());
-	if (startOfPath == request.UsedRoute.root.first) {
-	request.RequestedPath.replace(0,startOfPath.size(), request.UsedRoute.root.second);
 	}
 }

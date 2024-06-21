@@ -7,13 +7,13 @@
 //going to be saved as a vector to save multiple servers inside of one config file
 
 struct route {
+	std::string	location;
 	int			methods;
 	std::string	httpRedirection;
-	std::pair<std::string, std::string>	root;
+	std::string root;
 	std::string	Index;
 	bool		dirListing;
 	std::map<std::string, std::string>	cgi;
-
 };
 
 typedef struct s_server {
@@ -56,6 +56,7 @@ struct Request {
 	RequestType ReqType;
 	statusCode RequestIntegrity;
 	std::string RequestedPath;
+	std::string RoutedPath;
 	route UsedRoute;
 	std::string BodyBuffer;
 	std::string Body;
