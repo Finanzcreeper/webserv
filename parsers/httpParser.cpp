@@ -1,19 +1,19 @@
 #include "httpParser.hpp"
 #include <sstream>
 
-httpParser::httpParser(std::map<int, Request>::iterator& pair): req(pair) {
-	size_t endOfBlock = req->second.RequestBuffer.find("\r\n\r\n");
+httpParser::httpParser(std::map<int, connection>::iterator& pair): req(pair) {
+	size_t endOfBlock = req->second.r.RequestBuffer.find("\r\n\r\n");
 	if ( endOfBlock == std::string::npos) {
 		return;
 	}
-	if (req->second.HeaderBuffer.empty() == true) {
-		handleHeader(req->second, endOfBlock);
+	if (req->second.r.HeaderBuffer.empty() == true) {
+		handleHeader(req->second.r, endOfBlock);
 	}
-	if (req->second.Body.empty() == true) {
-		handleBody(req->second, endOfBlock);
+	if (req->second.r.Body.empty() == true) {
+		handleBody(req->second.r, endOfBlock);
 	}
-	if (req->second.RequestBuffer.empty() == false) {
-		req->second.RequestIntegrity = BAD_REQUEST;
+	if (req->second.r.RequestBuffer.empty() == false) {
+		req->second.r.RequestIntegrity = BAD_REQUEST;
 		throw std::runtime_error("Content after Body recieved!");
 	}
 }

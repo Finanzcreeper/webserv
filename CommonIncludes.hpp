@@ -17,6 +17,8 @@ struct route {
 };
 
 typedef struct s_server {
+	int									timeoutTime;
+	int									timeoutReads;
 	std::string	 						port;
 	std::string 						host;
 	std::string							server_name;
@@ -49,6 +51,7 @@ enum sockoption{
 	ON,
 };
 
+
 struct Request {
 	std::string RequestBuffer;
 	std::string HeaderBuffer;
@@ -68,6 +71,17 @@ struct Response {
 	statusCode		ResponseIntegrity;
 	std::string 	body;
 	bool			isReady;
+};
+
+struct timeoutHandler {
+	int fd;
+	time_t lastMsg;
+	unsigned int msgAmt;
+};
+
+struct connection {
+	timeoutHandler t;
+	Request r;
 };
 
 #endif //WEBSERV_COMMONINCLUDES_HPP
