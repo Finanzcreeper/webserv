@@ -5,36 +5,22 @@
 #include <map>
 #include"server/statusCodes.h"
 
-
-//going to be saved as a vector to save multiple servers inside of one config file
-
-// url would be looked like this
-// {ip/servername}:{port}{_prefix}/{_index}
-// prefix would include "/", like "/cgi-bin", "/index"
-// index will be just name of the file like "index.html"
-// so example of url
-//		192.168.0.1:80/index/index.html
-//		192.168.0.1:80/index/error.html
-//
-// if there is no prefix, index in request
-//				>> leads to ultimate default html of the server
-// if there is no index in request
-//				>> leads to default html of the location  
 struct location{
 
 //data requested for general
 		int				_httpMethods;
-		std::string		_errorPage;
-		std::string		_path;						 //where data from post/get(?) saved/called
 		std::string		_redirect;
 //data requested for index page
-		bool							_dir_listing;// to show it in order(like alphabetic) automatically or not
+		bool			_dir_listing;// to show it in order(like alphabetic) automatically or not
 		std::string		_index;
 
 //data requested for cgi
 		std::map<std::string, std::string>	_cgi;
-		std::string		_root;
+		std::string							_root;
 
+		std::string				 			locationName;
+
+	//	std::string		_path;						 //where data from post/get(?) saved/called
 };
 
 typedef struct s_server
@@ -42,9 +28,10 @@ typedef struct s_server
 	std::string	 						port;
 	std::string 						host;
 	std::string							server_name;
-	std::string 						default_error_page;
+	std::map<int, std::string>			error_pages;
 	long unsigned int					client_max_body_size;
-	std::string							dir_request_default; //default file if the request is a directory
+	int									timeoutTime;
+	int									timeoutReads;
 	std::map<std::string, location>		locations;			 //string will be the prefix, location is just a location
 															//std::string		_prefix;	//like "/" "/cgi", "/index"
 

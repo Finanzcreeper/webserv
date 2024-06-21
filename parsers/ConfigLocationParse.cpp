@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigLocationParse.cpp                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: siun <siun@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: subpark <subpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/06 13:43:52 by subpark           #+#    #+#             */
-/*   Updated: 2024/06/18 16:33:34 by siun             ###   ########.fr       */
+/*   Updated: 2024/06/21 20:07:32 by subpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,6 @@ int parseMethod(const std::vector<std::pair<std::string, int> >& chunck) {
 	while (i < chunck.size() && nth_word(chunck[i].first, 1) != "method")
 		++i;
 	str = chunck[i].first;
-	std::cout << "str: " << str << std::endl;
 	std::istringstream stream(str);
 	stream >> method;
 	while(stream >> method) {
@@ -75,13 +74,12 @@ std::map<std::string, location> parseLocations(std::vector<std::pair<std::string
 	for (int i = 0; i < locationChuncks.size(); i ++)
 	{
 		std::string tmp = parseString(locationChuncks[i], "location");
+		loc.locationName = tmp;
 		loc._httpMethods = parseMethod(locationChuncks[i]);
 		loc._dir_listing = !strcmp("ON", parseString(locationChuncks[i], "dirlisting").c_str());
-		loc._errorPage = parseString(locationChuncks[i], "errorPage");
 		loc._index = parseString(locationChuncks[i], "index");
 		loc._redirect = parseString(locationChuncks[i], "redirect");
 		loc._cgi = parseCgi(locationChuncks[i]);
-		loc._path = parseString(locationChuncks[i],  "path");
 		loc._root = parseString(locationChuncks[i], "root");
 		locations.insert(std::pair<std::string, location>(tmp, loc));
 	}

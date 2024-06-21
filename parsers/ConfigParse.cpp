@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigParse.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: siun <siun@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: subpark <subpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/17 22:37:44 by siun              #+#    #+#             */
-/*   Updated: 2024/06/18 15:40:01 by siun             ###   ########.fr       */
+/*   Updated: 2024/06/21 20:59:16 by subpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,13 +48,13 @@ std::vector<std::pair<std::string, int> >	findIndent(std::string str)
 
 	for (size_t i = 0; i < str.size(); i ++) {
 		int start = i;
-		while (str[start] == '\t') {
+		while (str[start] && (str[start] == '\t' || str[start] == ' ')) {
 			++start;
 		}
 		int indent = start - i;
 		i = start;
 		int end = i;
-		while (str[end] != '\n') {
+		while (str[end] && str[end] != '\n') {
 			++end;
 		}
 		i = end;
@@ -84,21 +84,8 @@ std::vector<std::vector<std::pair<std::string, int> > > findChunck(std::vector<s
 		++ end;
 		start = end;
 	}
-
-	// for (size_t i = 0; i < multiChunck.size(); i++)
-	// {
-	// 	std::cout << "Chunk " << i << ":\n";
-	// 	for (size_t j = 0; j < multiChunck[i].size(); j++)
-	// 	{
-	// 		std::cout << "Indent: " << multiChunck[i][j].second << std::endl;
-	// 		std::cout << "Content: " << multiChunck[i][j].first << std::endl;
-	// 		std::cout << "------------------------\n";
-	// 	}
-	// 	std::cout << "=========================================\n";
-	// }
 	return multiChunck;
 }
-//last line of the each chunck is not added...HAVE TO FIX
 
 std::string	parseString(const std::vector<std::pair<std::string, int> > chunck, std::string keyword)
 {
@@ -111,6 +98,18 @@ std::string	parseString(const std::vector<std::pair<std::string, int> > chunck, 
 	return nth_word(chunck[i].first, 2);
 }
 
+std::map<int, std::string> parseErrorPages(const std::vector<std::pair<std::string, int> > chunck)
+{
+	std::map<int, std::string> error_pages;
+	std::vector<std::pair<std::string, int> > errorChunck;
+	std::string keyword = "errorPages";
+
+	errorChunck = findChunck(chunck, keyword)[0];
+	for (size_t i = 1; i < errorChunck.size(); i ++)
+		error_pages[std::atoi(nth_word(errorChunck[i].first, 1).c_str())] = nth_word(errorChunck[i].first, 2);
+	return error_pages;
+}
+
 t_server parseServerConfig(const std::vector<std::pair<std::string, int> > chunck) {
 
 	t_server server;
@@ -118,8 +117,10 @@ t_server parseServerConfig(const std::vector<std::pair<std::string, int> > chunc
 	server.port = parseString(chunck, "port");
 	server.host = parseString(chunck, "host");
 	server.server_name = parseString(chunck, "server_name");
-	server.default_error_page = parseString(chunck, "default_error_page");
 	server.client_max_body_size = std::atoi(parseString(chunck, "client_max_body_size").c_str());
+	server.timeoutTime = std::atoi(parseString(chunck, "timeoutTime").c_str());
+	server.timeoutReads = std::atoi(parseString(chunck, "timeoutReads").c_str());
+	server.error_pages = parseErrorPages(chunck);
 	server.locations = parseLocations(chunck);
 	return server;
 }
@@ -152,33 +153,42 @@ std::vector <t_server> configParse(std::string configFilePath)
 	return std::vector<t_server>();
 }
 
-int main()
-{
-	std::vector<t_server> servers = configParse("parsers/sampleConfig.conf");
-	for (size_t i = 0; i < servers.size(); i ++)
-	{
-		std::cout << "Server " << i << ":\n";
-		std::cout << "port: " << servers[i].port << std::endl;
-		std::cout << "host: " << servers[i].host << std::endl;
-		std::cout << "server_name: " << servers[i].server_name << std::endl;
-		std::cout << "default_error_page: " << servers[i].default_error_page << std::endl;
-		std::cout << "client_max_body_size: " << servers[i].client_max_body_size << std::endl;
-		for (std::map<std::string, location>::iterator it = servers[i].locations.begin(); it != servers[i].locations.end(); it ++)
-		{
-			std::cout << "--------------------------------------------------\n";
-			std::cout << "location: " << it->first << std::endl;
-			std::cout << "dir_listing: " << it->second._dir_listing << std::endl;
-			std::cout << "httpMethods: " << it->second._httpMethods << std::endl;
-			std::cout << "index: " << it->second._index << std::endl;
-			std::cout << "cgi:\n";
-			for (std::map<std::string, std::string>::iterator it2 = it->second._cgi.begin(); it2 != it->second._cgi.end(); it2 ++)
-			{
-				std::cout << it2->first << " " << it2->second << std::endl;
-			}
-			std::cout << "redirect:  "<< it->second._redirect << std::endl;
-		}
-							std::cout << "=========================================================\n";
-
+int main() {
+	std::string configFilePath = "parsers/sampleConfig.conf";
+	std::vector<t_server> servers = configParse(configFilePath);
+	
+	if (servers.empty()) {
+		std::cout << "Failed to parse the configuration file." << std::endl;
+		return 1;
 	}
+	
+	// Print the parsed server configurations
+	for (const auto& server : servers) {
+		std::cout << "Server Configuration:" << std::endl;
+		std::cout << "Port: " << server.port << std::endl;
+		std::cout << "Host: " << server.host << std::endl;
+		std::cout << "Server Name: " << server.server_name << std::endl;
+		std::cout << "Client Max Body Size: " << server.client_max_body_size << std::endl;
+		std::cout << "Timeout Time: " << server.timeoutTime << std::endl;
+		std::cout << "Timeout Reads: " << server.timeoutReads << std::endl;
+		
+		std::cout << "Error Pages:" << std::endl;
+		for (const auto& errorPage : server.error_pages) {
+			std::cout << "Error Code: " << errorPage.first << ", Page: " << errorPage.second << std::endl;
+		}
+		
+		std::cout << "Locations:" << std::endl;
+		for (const auto& location : server.locations) {
+			//std::cout << "Location Path: " << location.path << std::endl;
+			std::cout << "Location Root: " << location.second._root << std::endl;
+			std::cout << "Location Index: " << location.second._index << std::endl;
+			std::cout << "Location Methods: ";
+			std::cout << location.second._httpMethods << std::endl;
+			std::cout << std::endl;
+		}
+		
+		std::cout << std::endl;
+	}
+	
 	return 0;
 }
