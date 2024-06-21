@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigParse.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: siun <siun@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: subpark <subpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/17 22:37:44 by siun              #+#    #+#             */
-/*   Updated: 2024/05/23 18:58:56 by siun             ###   ########.fr       */
+/*   Updated: 2024/06/12 16:23:22 by subpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,24 +48,26 @@ std::vector<std::pair<std::string, int> >	findIndent(std::string str)
 	return configs;
 }
 
-std::vector<std::vector<std::pair<std::string, int> > > findChunck(std::vector<std::pair<std::string, int> > indents)
+std::vector<std::vector<std::pair<std::string, int> > > findChunck(std::vector<std::pair<std::string, int> > indents, std::string keyword)
 {
 	std::vector<std::vector<std::pair<std::string, int> > > multiChunck;
 	size_t start = 0;
 	size_t	end = 0;
 	
-	for (size_t i = 0; i < indents.size(); i ++)
+	while (start < indents.size() && strncmp(indents[start].first.c_str(), keyword.c_str(), strlen(keyword.c_str())))
+		++ start;
+	end = start;
+	while (end < indents.size())
 	{
-		start = i;
-		while (i < indents.size() && indents[i].first != "server") {
-			++i;
-		}
-		end = i;
+		while (end < indents.size() && strncmp(indents[end].first.c_str(), keyword.c_str(), strlen(keyword.c_str())))
+			++ end;
 		if (start != end)
 		{
 			std::vector<std::pair<std::string, int> > chunck(indents.begin() + start, indents.begin() + end);
 			multiChunck.push_back(chunck);
 		}
+		start = end;
+		++ end;
 	}
 	return multiChunck;
 }
@@ -89,99 +91,6 @@ std::string	parseString(const std::vector<std::pair<std::string, int> > chunck, 
 	return "";
 }
 
-/*
-std::vector<std::string>	parseMethod(const std::vector<std::pair<std::string, int> > chunck)
-{
-	std::vector<std::string> methods;
-	std::string str;
-
-	str = parseString(chunck, "httpMethods");
-	if (str.empty())
-		return std::vector<std::string>();
-	std::istringstream iss(str);
-	std::string method;
-
-	while (iss >> method)
-		methods.push_back(method);
-	return methods;
-}*/
-
-int parseMethod(const std::vector<std::pair<std::string, int> >& chunck) {
-	int methods;
-	std::string str;
-	std::string method;
-
-	str = parseString(chunck,"httpMethods");
-	std::istringstream stream(str);
-	while(stream >> method) {
-		if (method.find("GET") == 0) {
-			methods = methods | GET;
-		} else if (method == "HEAD") {
-			methods = methods | HEAD;
-		} else if (method == "POST") {
-			methods = methods | POST;
-		} else if (method == "PUT") {
-			methods = methods | PUT;
-		} else if (method == "DELETE") {
-			methods = methods | DELETE;
-		} else if (method == "CONNECT") {
-			methods = methods | CONNECT;
-		} else if (method == "OPTIONS") {
-			methods = methods | OPTIONS;
-		} else if (method == "TRACE") {
-			methods = methods | TRACE;
-		} else if (method == "PATCH") {
-			methods = methods | PATCH;
-		} else {
-			methods = methods | INVALID;
-		}
-	}
-	return (methods);
-}
-
-std::vector<std::string>	parsePath(const std::vector<std::pair<std::string, int> > chunck)
-{
-	std::vector<std::string> paths;
-	std::string				keyword = "path";
-	size_t	i = 0;
-
-	while (i < chunck.size() && chunck[i].first.find(keyword) == std::string::npos) {
-		++i;
-	}
-	int	indent = chunck[i].second;
-	i++;
-	while (i < chunck.size() && chunck[i].second == indent + 1) {
-		std::istringstream iss(chunck[i].first);
-		std::string path;
-		iss >> path;
-		paths.push_back(path);
-		++i;
-	}
-	return paths;
-}
-
-std::map<std::string, std::string> parseCgi(std::vector<std::pair<std::string, int> > chunck)
-{
-	std::map<std::string, std::string> cgi;
-	std::string keyword = "cgi";
-	size_t	i = 0;
-
-	while (i < chunck.size() && chunck[i].first.find(keyword) == std::string::npos) {
-		++i;
-	}
-	int	indent = chunck[i].second;
-	i ++;
-	while (i < chunck.size() && chunck[i].second == indent + 1) {
-		std::istringstream iss(chunck[i].first);
-		std::string extension;
-		std::string path;
-		iss >> extension >> path;
-		cgi[extension] = path;
-		++i;
-	}
-	return cgi;
-}
-
 t_server parseServerConfig(const std::vector<std::pair<std::string, int> > chunck) {
 
 	t_server server;
@@ -191,21 +100,15 @@ t_server parseServerConfig(const std::vector<std::pair<std::string, int> > chunc
 	server.server_name = parseString(chunck, "server_name");
 	server.default_error_page = parseString(chunck, "default_error_page");
 	server.client_max_body_size = std::atoi(parseString(chunck, "client_max_body_size").c_str());
-	server.httpMethods = parseMethod(chunck);
-	server.httpRedirection = parseString(chunck, "httpRedirection");
-	server.path = parsePath(chunck);
-	server.cgi_extension = parseCgi(chunck);
-	server.dir_listing = std::atoi(parseString(chunck, "dir_listing").c_str());
-	server.dir_request_default = parseString(chunck, "dir_request_default");
+	server.locations = parseLocations(chunck);
 	return server;
 }
 
-//have to make loop until configPa
 std::vector <t_server> configParse(std::string configFilePath)
 {
-	std::string				config;
-	std::vector <t_server>	servers;
-	std::vector<std::pair<std::string, int> > indents;
+	std::string									config;
+	std::vector <t_server>						servers;
+	std::vector<std::pair<std::string, int> >	indents;
 	std::vector<std::vector<std::pair<std::string, int> > > chuncks;
 
 	try{
@@ -215,7 +118,7 @@ std::vector <t_server> configParse(std::string configFilePath)
 		return std::vector<t_server>();
 	}
 	indents = findIndent(config);
-	chuncks = findChunck(indents);
+	chuncks = findChunck(indents, "server");
 	for (size_t i = 0; i < chuncks.size(); i ++)
 	{
 		try {
@@ -223,46 +126,41 @@ std::vector <t_server> configParse(std::string configFilePath)
 		} catch (const std::runtime_error &e){
 			std::cerr << "Caught exception: " << e.what() << '\n';
 			return std::vector<t_server>();
-		}
+		} //catch block can be removed later to be handled in main
 	}
 	return servers;
 	return std::vector<t_server>();
 }
 
-// int main()
-// {
-// 	std::vector<t_server> servers = configParse("sampleConfig.conf");
-
-
-// 	for (const auto& server : servers) {
-// 		std::cout << "Server Configuration:\n";
-// 		std::cout << "Port: " << server.port << "\n";
-// 		std::cout << "Host: " << server.host << "\n";
-// 		std::cout << "Server Name: " << server.server_name << "\n";
-// 		std::cout << "Default Error Page: " << server.default_error_page << "\n";
-// 		std::cout << "Client Max Body Size: " << server.client_max_body_size << "\n";
-		
-// 		std::cout << "HTTP Methods:\n";
-// 		for (const auto& method : server.httpMethods) {
-// 			std::cout << method << "\t";
-// 		}
-// 		std::cout << "\n";
-		
-// 		std::cout << "HTTP Redirection: " << server.httpRedirection << "\n";
-		
-// 		std::cout << "Paths:\n";
-// 		for (const auto& path : server.path) {
-// 			std::cout << path << "\n";
-// 		}
-		
-// 		std::cout << "CGI Extensions:\n";
-// 		for (const auto& cgi : server.cgi_extension) {
-// 			std::cout << "Extension: " << cgi.first << ", Path: " << cgi.second << "\n";
-// 		}
-		
-// 		std::cout << "Directory Listing: " << server.dir_listing << "\n";
-// 		std::cout << "Default Directory Request: " << server.dir_request_default << "\n";
-		
-// 		std::cout << "------------------------\n";
-// 	}
-// }
+int main()
+{
+	std::vector<t_server> servers = configParse("parsers/sampleConfig.conf");
+	for (size_t i = 0; i < servers.size(); i ++)
+	{
+		std::cout << "Server " << i << ":\n";
+		std::cout << "port: " << servers[i].port << std::endl;
+		std::cout << "host: " << servers[i].host << std::endl;
+		std::cout << "server_name: " << servers[i].server_name << std::endl;
+		std::cout << "default_error_page: " << servers[i].default_error_page << std::endl;
+		std::cout << "client_max_body_size: " << servers[i].client_max_body_size << std::endl;
+		std::cout << "locations:\n";
+		for (std::map<std::string, location>::iterator it = servers[i].locations.begin(); it != servers[i].locations.end(); it ++)
+		{
+			std::cout << "--------------------------------------------------\n";
+			std::cout << "location: " << it->first << std::endl;
+			std::cout << "dir_listing: " << it->second._dir_listing << std::endl;
+			std::cout << "httpMethods: " << it->second._httpMethods << std::endl;
+			std::cout << "index:\n";
+			for (size_t j = 0; j < it->second._index.size(); j ++)
+			{
+				std::cout << it->second._index[j] << std::endl;
+			}
+			std::cout << "cgi:\n";
+			for (std::map<std::string, std::string>::iterator it2 = it->second._cgi.begin(); it2 != it->second._cgi.end(); it2 ++)
+			{
+				std::cout << it2->first << " " << it2->second << std::endl;
+			}
+		}
+	}
+	return 0;
+}
