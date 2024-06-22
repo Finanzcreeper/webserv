@@ -87,8 +87,6 @@ void Server::CheckForConnections() {
 						mt->second.RequestBuffer.append(buffer);
 						try {
 							httpParser test(mt,this->settings);
-							// Only for my code to work with the dummy location
-							mt->second.UsedRoute = settings.locations.find("/")->second;
 						}
 						catch (const std::runtime_error &e){
 							std::cerr << e.what() << std::endl;

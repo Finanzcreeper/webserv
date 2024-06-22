@@ -50,9 +50,9 @@ void httpParser::GetRequestType(Request& request) {
 	} else {
 		request.ReqType = INVALID;
 	}
-	if ((request.ReqType & settings.httpMethods) == 0) {
-		request.RequestIntegrity = METHOD_NOT_ALLOWED;
-	}
+	//if ((request.ReqType & settings.httpMethods) == 0) {
+	//	request.RequestIntegrity = METHOD_NOT_ALLOWED;
+	//}
 	if (request.RequestIntegrity != OK_HTTP) {
 		throw std::runtime_error("Unsupported Request type recieved!");
 	}

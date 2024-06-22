@@ -100,7 +100,7 @@ t_server parseServerConfig(const std::vector<std::pair<std::string, int> > chunc
 	server.server_name = parseString(chunck, "server_name");
 	server.default_error_page = parseString(chunck, "default_error_page");
 	server.client_max_body_size = std::atoi(parseString(chunck, "client_max_body_size").c_str());
-	server.locations = parseLocations(chunck);
+	// server.locations = parseLocations(chunck);
 	return server;
 }
 
@@ -132,6 +132,7 @@ std::vector <t_server> configParse(std::string configFilePath)
 	return std::vector<t_server>();
 }
 
+/*
 int main()
 {
 	std::vector<t_server> servers = configParse("parsers/sampleConfig.conf");
@@ -164,3 +165,5 @@ int main()
 	}
 	return 0;
 }
+
+*/

@@ -97,7 +97,7 @@ std::map<std::string, location> parseLocations(std::vector<std::pair<std::string
 	std::vector<std::vector<std::pair<std::string, int> > > locationChuncks;
 
 	locationChuncks = findChunck(chunck, "location");
-	for (int i = 0; i < locationChuncks.size(); i ++)
+	for (int i = 0; i < int(locationChuncks.size()); i ++)
 	{
 		std::string tmp = parseString(locationChuncks[i], "location");
 		loc._httpMethods = parseMethod(locationChuncks[i]);

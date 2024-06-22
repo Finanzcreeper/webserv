@@ -3,58 +3,37 @@
 #include<sstream>
 #include <ctime>
 #include <string>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <dirent.h>
 
-std::string		root = "/home/thofting/repos/webserv_creeper/content";
 std::string		defaultPage = "index.html";
-std::string		vProtocol = "HTTP/1.1";
 
-MethodExecutor::MethodExecutor( void ): _serverSettings(0) {};
+MethodExecutor::MethodExecutor( void ): _serverSettings(0) {
+};
 
 MethodExecutor::MethodExecutor(const t_server *serverSettings): _serverSettings(serverSettings) {}
 
-void	MethodExecutor::_generateCommonHeaderFields(Response &resp)
-{
-	resp.headerFields["Server"] = "webserv";
-
-	// date
-	std::time_t now = std::time(0);
-    std::tm* gmt = std::gmtime(&now);
-    char buffer[100];
-    std::strftime(buffer, sizeof(buffer), "%a, %d %b %Y %H:%M:%S GMT", gmt);
-	resp.headerFields["Date"] = std::string(buffer);
-
-	resp.headerFields["Accept-Ranges"] = "none"; // Indicated that range requests are not allowed
-	resp.headerFields["Accept-Ranges"] = "0";
-
-	// entity fields
-	std::stringstream bodyLength;
-	bodyLength << resp.body.length();
-	resp.headerFields["Content-Length"] = bodyLength.str();
-}
-
-void	MethodExecutor::_generateSpecialErrorFields(Request &requ, Response &resp)
-{
-	if (requ.RequestIntegrity == METHOD_NOT_ALLOWED)
-		resp.headerFields["Allow"] = "Hardcoded GET PUT DELETE";
-}
-
 void	MethodExecutor::wrapperRequest(Request &requ, Response &resp)
 {
-	std::cout << "**** HEADER OF REQUEST: ****\n" << requ.HeaderBuffer << std::endl << "**** END OF HEADER ****" << std::endl;
+	requ.UsedRoute = _serverSettings->locations.find("/")->second;
+	std::cout << "Used route: " + requ.UsedRoute._path << std::endl;
+	//std::cout << "**** HEADER OF REQUEST: ****\n" << requ.HeaderBuffer << std::endl << "**** END OF HEADER ****" << std::endl;
 	resp.body.clear();
 	resp.responseBuffer.clear();
 	resp.headerFields.clear();
 	resp.httpStatus = requ.RequestIntegrity;
+	resp.httpStatus = METHOD_NOT_ALLOWED;
 	if (resp.httpStatus == MOVED_PERMANENTLY)
-		resp.headerFields["Location"] = requ.UsedRoute._redirect;//"tbd: Redirection location as defined in routing struct";
+		resp.headerFields["Location"] = requ.UsedRoute._redirect;
 	else if (resp.httpStatus == OK_HTTP)
 	{
 		switch (requ.ReqType){
 			case (GET):
-				_executeGet(requ, resp);
+				_executeGet(requ, &resp);
 				break ;
 			case (HEAD):
-				_executeGet(requ, resp); // Same procedure as for GET, but produced body is not sended to client
+				_executeGet(requ, &resp);
 				break ;
 			//case (POST):
 			//	_executePost(requ, resp);
@@ -71,13 +50,10 @@ void	MethodExecutor::wrapperRequest(Request &requ, Response &resp)
 		_generateSpecialErrorFields(requ, resp);
 		_generateErrorBody(resp);
 	}
-
 	_generateCommonHeaderFields(resp);
-
 	// Append header to response
 	_writeStatusLine(resp);
 	_writeHeaderFields(resp);
-
 	// Append body to response
 	if (requ.ReqType != HEAD)
 		resp.responseBuffer.append(resp.body);
@@ -86,44 +62,75 @@ void	MethodExecutor::wrapperRequest(Request &requ, Response &resp)
 	std::cout << "**** RESPONSE: ****\n" << resp.responseBuffer << "**** END OF RESPONSE ****" << std::endl;
 }
 
-void    MethodExecutor::_executeGet(Request &requ, Response &resp)
+void	MethodExecutor::_executeGet(Request &requ, Response *resp)
 {
-	std::string		path = root + requ.RequestedPath;
+	std::string	path = requ.UsedRoute._path + requ.RequestedPath;
+	struct stat	s;
 
 	// default page if no path specified
-	if (path.length() == root.length() + 1)
+	if (path.length() == _serverSettings->workingDir.length() + 1)
 		path.append(defaultPage);
 	
-	std::cout << "PATH:" << path << "*" << std::endl;
-	std::ifstream	ifs(path.c_str());
-	
-	// TODO: More detailed access check for files
-	// - Check if file exists
-	if (ifs.good())
+	if (access(path.c_str(), F_OK) == -1)
 	{
-		std::ostringstream ss;
-      	ss << ifs.rdbuf();
-		resp.body.append(ss.str());
+		resp->httpStatus = NOT_FOUND;
+		return ;
 	}
-	else
+	if (stat(path.c_str(), &s) == -1)
 	{
-		std::cout << "Error while opening requested file: \'" + root
-			+ requ.RequestedPath + "\'"<< std::endl;
-		resp.httpStatus = NOT_FOUND;
+		resp->httpStatus = INTERNAL_SERVER_ERROR;
+		return ;
 	}
-	ifs.close();
+	if (!(s.st_mode & S_IRGRP))
+		resp->httpStatus = UNAUTHORIZED;
+	else if ((s.st_mode & S_IFDIR))
+	{
+		if (requ.UsedRoute._dir_listing)
+		{
+			if (_createIndexPage(path, resp) == -1)
+				resp->httpStatus = INTERNAL_SERVER_ERROR;
+			return;
+		}
+		std::cout << path + " is directory!" << std::endl;
+		resp->httpStatus = NOT_FOUND;
+	}
+	else if (s.st_mode & S_IFREG)
+	{
+		std::ifstream	ifs(path.c_str());
+		if (ifs.good())
+		{
+			std::ostringstream ss;
+			ss << ifs.rdbuf();
+			resp->body.append(ss.str());
+
+			// read modification time
+			struct tm* gmt = std::gmtime(&s.st_mtim.tv_sec);
+			char buf[100];
+    		std::strftime(buf, sizeof(buf), "%a, %d %b %Y %H:%M:%S GMT", gmt);
+			resp->headerFields["Last-Modified"] = std::string(buf);
+		}
+		else
+		{
+			std::cout << "Error while opening requested file: \'" + _serverSettings->workingDir
+				+ requ.RequestedPath + "\'"<< std::endl;
+			resp->httpStatus = INTERNAL_SERVER_ERROR;
+		}
+		ifs.close();
+	}
 }
 
+// creates the status line for an http response and adds it to the output buffer
 void	MethodExecutor::_writeStatusLine(Response &resp)
 {
 	std::stringstream statusCode_str;
 	statusCode_str << resp.httpStatus;
 
-	resp.responseBuffer.append(vProtocol
-							   + " " + statusCode_str.str()
-							   + " " + getStatusCodeMessage(resp.httpStatus) + "\n");
+	resp.responseBuffer.append(std::string(HTTP_PROTOCOL) + " ");
+	resp.responseBuffer.append(statusCode_str.str()+ " ");
+	resp.responseBuffer.append(getStatusCodeMessage(resp.httpStatus) + "\n");
 }
 
+// adds all header fields which were filled to the output buffer
 void	MethodExecutor::_writeHeaderFields(Response &resp)
 {
 	std::map<std::string,std::string>::iterator iter;
@@ -131,67 +138,4 @@ void	MethodExecutor::_writeHeaderFields(Response &resp)
 		resp.responseBuffer.append(iter->first + ": " + iter->second + "\n");
 	resp.responseBuffer.append("\r\n\r\n");
 	return ;
-}
-
-void	MethodExecutor::_generateErrorBody(Response &resp)
-{
-	std::ifstream	ifs;
-	std::string		errorBody;
-	std::stringstream statusCode_str;
-	statusCode_str << resp.httpStatus;
-
-	resp.body.clear();
-	resp.body.append("<!DOCTYPE html>\n<html lang=\"en\">\n");
-	resp.body.append("<head>\n");
-	resp.body.append("	<meta charset=\"UTF-8\">\n");
-    resp.body.append("	<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n");
-    resp.body.append("	<title>");
-	resp.body.append(statusCode_str.str());
-	resp.body.append(" ");
-	resp.body.append(getStatusCodeMessage(resp.httpStatus));
-	resp.body.append(" </title>\n");
-    resp.body.append("	<style>\n");
-    resp.body.append("	    body {\n");
-    resp.body.append("	        font-family: Arial, sans-serif;\n");
-    resp.body.append("	        background-color: #f8f8f8;\n");
-    resp.body.append("	        color: #333;\n");
-    resp.body.append("	        display: flex;\n");
-    resp.body.append("	        justify-content: center;\n");
-    resp.body.append("	        align-items: center;\n");
-    resp.body.append("	        height: 100vh;\n");
-    resp.body.append("	        margin: 0;\n");
-    resp.body.append("	    }\n");
-    resp.body.append("	    .container {\n");
-    resp.body.append("	        text-align: center;\n");
-    resp.body.append("	    }\n");
-    resp.body.append("	    h1 {\n");
-    resp.body.append("	        font-size: 3em;\n");
-    resp.body.append("	        margin-bottom: 0.5em;\n");
-    resp.body.append("	    }\n");
-    resp.body.append("	    p {\n");
-    resp.body.append("	        font-size: 1.2em;\n");
-    resp.body.append("	    }\n");
-    resp.body.append("	    a {\n");
-    resp.body.append("	        color: #007bff;\n");
-    resp.body.append("	        text-decoration: none;\n");
-    resp.body.append("	    }\n");
-    resp.body.append("	    a:hover {\n");
-    resp.body.append("	        text-decoration: underline;\n");
-    resp.body.append("	    }\n");
-    resp.body.append("	</style>\n");
-	resp.body.append("</head>\n");
-	resp.body.append("<body>\n");
-	resp.body.append("    <div class=\"container\">\n");
-	resp.body.append("        <h1>");
-	resp.body.append(statusCode_str.str());
-	resp.body.append(" ");
-	resp.body.append(getStatusCodeMessage(resp.httpStatus));
-	resp.body.append( + " </h1>\n");
-	resp.body.append("        <p> ");
-	resp.body.append(getStatusCodeDescription(resp.httpStatus));
-	resp.body.append(" </p>\n");
-	resp.body.append("        <p><a href=\"/home/thofting/repos/webserv_creeper\">Go to Homepage</a></p>\n");
-	resp.body.append("    </div>");
-	resp.body.append("</body>");
-	resp.body.append("</html>\n");
 }

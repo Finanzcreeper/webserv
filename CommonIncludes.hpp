@@ -5,6 +5,7 @@
 #include <map>
 #include"server/statusCodes.h"
 
+# define HTTP_PROTOCOL "HTTP/1.1"
 
 //going to be saved as a vector to save multiple servers inside of one config file
 
@@ -39,6 +40,7 @@ struct location{
 typedef struct s_server
 {
 	std::string	 						port;
+	std::string							workingDir;
 	std::string 						host;
 	std::string							server_name;
 	std::string							root;				 //where webserver html/db/cgi/everything files are saved

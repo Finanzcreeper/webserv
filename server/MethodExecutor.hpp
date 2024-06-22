@@ -13,14 +13,16 @@ class MethodExecutor
 {
 	private:
 		const t_server*	_serverSettings;
-		void			_executeGet(Request &requ, Response &resp);
+		void			_executeGet(Request &requ, Response *resp);
 		//void			_executePost(Request &requ, Response &resp);
 		//void			_executeDelete(Request &requ, Response &resp);
 		void			_writeStatusLine(Response &resp);
 		void			_writeHeaderFields(Response &resp);
 		void			_generateCommonHeaderFields(Response &resp);
 		void			_generateSpecialErrorFields(Request &req, Response &resp);
-		void			_generateErrorBody(Response &resp);
+
+		int		_generateErrorBody(Response &resp);
+		int		_createIndexPage(std::string path, Response *resp);
 
 	public:
 		MethodExecutor( void );
