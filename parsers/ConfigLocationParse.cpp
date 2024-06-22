@@ -6,7 +6,7 @@
 /*   By: subpark <subpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/06 13:43:52 by subpark           #+#    #+#             */
-/*   Updated: 2024/06/21 20:07:32 by subpark          ###   ########.fr       */
+/*   Updated: 2024/06/22 20:34:59 by subpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,12 +75,12 @@ std::map<std::string, location> parseLocations(std::vector<std::pair<std::string
 	{
 		std::string tmp = parseString(locationChuncks[i], "location");
 		loc.locationName = tmp;
-		loc._httpMethods = parseMethod(locationChuncks[i]);
-		loc._dir_listing = !strcmp("ON", parseString(locationChuncks[i], "dirlisting").c_str());
-		loc._index = parseString(locationChuncks[i], "index");
-		loc._redirect = parseString(locationChuncks[i], "redirect");
-		loc._cgi = parseCgi(locationChuncks[i]);
-		loc._root = parseString(locationChuncks[i], "root");
+		loc.httpMethods = parseMethod(locationChuncks[i]);
+		loc.dirListing = !strcmp("ON", parseString(locationChuncks[i], "dirlisting").c_str());
+		loc.index = parseString(locationChuncks[i], "index");
+		loc.redirect = parseString(locationChuncks[i], "redirect");
+		loc.cgi = parseCgi(locationChuncks[i]);
+		loc.root = parseString(locationChuncks[i], "root");
 		locations.insert(std::pair<std::string, location>(tmp, loc));
 	}
 	return locations;

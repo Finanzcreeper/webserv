@@ -8,16 +8,14 @@
 struct location{
 
 //data requested for general
-		int				_httpMethods;
-		std::string		_redirect;
+		int				httpMethods;
+		std::string		redirect;
 //data requested for index page
-		bool			_dir_listing;// to show it in order(like alphabetic) automatically or not
-		std::string		_index;
-
+		bool			dirListing;
+		std::string		index;
 //data requested for cgi
-		std::map<std::string, std::string>	_cgi;
-		std::string							_root;
-
+		std::map<std::string, std::string>	cgi;
+		std::string							root;
 		std::string				 			locationName;
 
 	//	std::string		_path;						 //where data from post/get(?) saved/called
@@ -27,14 +25,12 @@ typedef struct s_server
 {
 	std::string	 						port;
 	std::string 						host;
-	std::string							server_name;
-	std::map<int, std::string>			error_pages;
-	long unsigned int					client_max_body_size;
+	std::string							serverName;
+	std::map<int, std::string>			errorPages;
+	long unsigned int					clientMaxBodySize;
 	int									timeoutTime;
 	int									timeoutReads;
-	std::map<std::string, location>		locations;			 //string will be the prefix, location is just a location
-															//std::string		_prefix;	//like "/" "/cgi", "/index"
-
+	std::map<std::string, location>		locations;
 }t_server;
 
 typedef enum Requesttype {

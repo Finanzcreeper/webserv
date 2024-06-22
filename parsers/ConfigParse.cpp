@@ -6,7 +6,7 @@
 /*   By: subpark <subpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/17 22:37:44 by siun              #+#    #+#             */
-/*   Updated: 2024/06/21 20:59:16 by subpark          ###   ########.fr       */
+/*   Updated: 2024/06/22 20:34:42 by subpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,12 +101,21 @@ std::string	parseString(const std::vector<std::pair<std::string, int> > chunck, 
 std::map<int, std::string> parseErrorPages(const std::vector<std::pair<std::string, int> > chunck)
 {
 	std::map<int, std::string> error_pages;
-	std::vector<std::pair<std::string, int> > errorChunck;
-	std::string keyword = "errorPages";
-
-	errorChunck = findChunck(chunck, keyword)[0];
-	for (size_t i = 1; i < errorChunck.size(); i ++)
-		error_pages[std::atoi(nth_word(errorChunck[i].first, 1).c_str())] = nth_word(errorChunck[i].first, 2);
+	for (size_t i = 0; i < chunck.size(); i ++)
+	{
+		if (nth_word(chunck[i].first, 1) == "errorPages")
+		{
+			int indent = chunck[i].second;
+			i ++;
+			while (i < chunck.size() && chunck[i].second > indent)
+			{
+				int error_code = std::atoi(nth_word(chunck[i].first, 1).c_str());
+				std::string page = nth_word(chunck[i].first, 2);
+				error_pages.insert(std::make_pair(error_code, page));
+				++ i ;
+			}
+		}
+	}
 	return error_pages;
 }
 
@@ -116,11 +125,11 @@ t_server parseServerConfig(const std::vector<std::pair<std::string, int> > chunc
 
 	server.port = parseString(chunck, "port");
 	server.host = parseString(chunck, "host");
-	server.server_name = parseString(chunck, "server_name");
-	server.client_max_body_size = std::atoi(parseString(chunck, "client_max_body_size").c_str());
+	server.serverName = parseString(chunck, "server_name");
+	server.clientMaxBodySize = std::atoi(parseString(chunck, "client_max_body_size").c_str());
 	server.timeoutTime = std::atoi(parseString(chunck, "timeoutTime").c_str());
 	server.timeoutReads = std::atoi(parseString(chunck, "timeoutReads").c_str());
-	server.error_pages = parseErrorPages(chunck);
+	server.errorPages = parseErrorPages(chunck);
 	server.locations = parseLocations(chunck);
 	return server;
 }
@@ -167,23 +176,23 @@ int main() {
 		std::cout << "Server Configuration:" << std::endl;
 		std::cout << "Port: " << server.port << std::endl;
 		std::cout << "Host: " << server.host << std::endl;
-		std::cout << "Server Name: " << server.server_name << std::endl;
-		std::cout << "Client Max Body Size: " << server.client_max_body_size << std::endl;
+		std::cout << "Server Name: " << server.serverName << std::endl;
+		std::cout << "Client Max Body Size: " << server.clientMaxBodySize << std::endl;
 		std::cout << "Timeout Time: " << server.timeoutTime << std::endl;
 		std::cout << "Timeout Reads: " << server.timeoutReads << std::endl;
 		
 		std::cout << "Error Pages:" << std::endl;
-		for (const auto& errorPage : server.error_pages) {
+		for (const auto& errorPage : server.errorPages) {
 			std::cout << "Error Code: " << errorPage.first << ", Page: " << errorPage.second << std::endl;
 		}
 		
 		std::cout << "Locations:" << std::endl;
 		for (const auto& location : server.locations) {
 			//std::cout << "Location Path: " << location.path << std::endl;
-			std::cout << "Location Root: " << location.second._root << std::endl;
-			std::cout << "Location Index: " << location.second._index << std::endl;
+			std::cout << "Location Root: " << location.second.root << std::endl;
+			std::cout << "Location Index: " << location.second.index << std::endl;
 			std::cout << "Location Methods: ";
-			std::cout << location.second._httpMethods << std::endl;
+			std::cout << location.second.httpMethods << std::endl;
 			std::cout << std::endl;
 		}
 		
