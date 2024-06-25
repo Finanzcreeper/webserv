@@ -114,7 +114,7 @@ void httpParser::handleBody(Request &request, size_t endOfBlock) {
 		request.Body.append(request.RequestBuffer.substr(0,endOfBlock + 4));
 		request.RequestBuffer.erase(0, endOfBlock + 4);
 	}
-	if (request.Body.size() > settings.client_max_body_size) {
+	if (request.Body.size() > settings.clientMaxBodySize) {
 		this->req->second.RequestIntegrity = PAYLOAD_TO_LARGE;
 		throw std::runtime_error("Http request has an oversized Body!");
 	}

@@ -17,15 +17,18 @@ MethodExecutor::MethodExecutor(const t_server *serverSettings): _serverSettings(
 void	MethodExecutor::wrapperRequest(Request &requ, Response &resp)
 {
 	requ.UsedRoute = _serverSettings->locations.find("/")->second;
-	std::cout << "Used route: " + requ.UsedRoute._path << std::endl;
-	//std::cout << "**** HEADER OF REQUEST: ****\n" << requ.HeaderBuffer << std::endl << "**** END OF HEADER ****" << std::endl;
+	std::cout << "Used route: " + requ.UsedRoute.root << std::endl;
+	std::cout << "**** HEADER OF REQUEST: ****\n" << requ.HeaderBuffer << std::endl << "**** END OF HEADER ****" << std::endl;
+	std::cout << "**** BODY OF REQUEST: ****\n" << requ.Body << std::endl << "**** END OF BODY ****" << std::endl;
+	std::cout << "REQUEST TYPE: " << requ.ReqType << std::endl;
 	resp.body.clear();
 	resp.responseBuffer.clear();
 	resp.headerFields.clear();
 	resp.httpStatus = requ.RequestIntegrity;
-	resp.httpStatus = METHOD_NOT_ALLOWED;
+	requ.HeaderFields["content-type"] = "text/plain";
+
 	if (resp.httpStatus == MOVED_PERMANENTLY)
-		resp.headerFields["Location"] = requ.UsedRoute._redirect;
+		resp.headerFields["Location"] = requ.UsedRoute.redirect;
 	else if (resp.httpStatus == OK_HTTP)
 	{
 		switch (requ.ReqType){
@@ -35,8 +38,9 @@ void	MethodExecutor::wrapperRequest(Request &requ, Response &resp)
 			case (HEAD):
 				_executeGet(requ, &resp);
 				break ;
-			//case (POST):
-			//	_executePost(requ, resp);
+			case (POST):
+				_executePost(requ, &resp);
+				break ;
 			//	break ;
 			//case (DELETE):
 			//	_executeDelete(requ, resp);
@@ -62,30 +66,59 @@ void	MethodExecutor::wrapperRequest(Request &requ, Response &resp)
 	std::cout << "**** RESPONSE: ****\n" << resp.responseBuffer << "**** END OF RESPONSE ****" << std::endl;
 }
 
+void	MethodExecutor::_executePost(Request &requ, Response *resp)
+{
+	std::string	path = requ.UsedRoute.root + requ.RequestedPath;
+	struct stat	s;
+	// check if file already exists
+	if (stat(path.c_str(), &s) == 0)
+	{
+		resp->httpStatus = FORBIDDEN;
+		return ;
+	}
+	std::ofstream	ofs(path.c_str(), std::ios::out);
+	if (ofs.good())
+	{
+		ofs << requ.Body;
+		if(ofs.fail())
+		{
+			std::cout << "Error while creating requested file: \'" + _serverSettings->workingDir
+					+ requ.RequestedPath + "\'"<< std::endl;
+			resp->httpStatus = INTERNAL_SERVER_ERROR;
+		}
+		else
+		{
+			resp->httpStatus = CREATED;
+			resp->headerFields["Location"] = requ.RequestedPath;
+		}
+	}
+	else
+	{
+		std::cout << "Error while creating requested file: \'" + _serverSettings->workingDir
+				+ requ.RequestedPath + "\'"<< std::endl;
+		resp->httpStatus = INTERNAL_SERVER_ERROR;
+	}
+	ofs.close();
+}
+
 void	MethodExecutor::_executeGet(Request &requ, Response *resp)
 {
-	std::string	path = requ.UsedRoute._path + requ.RequestedPath;
+	std::string	path = requ.UsedRoute.root + requ.RequestedPath;
 	struct stat	s;
 
 	// default page if no path specified
 	if (path.length() == _serverSettings->workingDir.length() + 1)
 		path.append(defaultPage);
-	
-	if (access(path.c_str(), F_OK) == -1)
-	{
-		resp->httpStatus = NOT_FOUND;
-		return ;
-	}
 	if (stat(path.c_str(), &s) == -1)
 	{
-		resp->httpStatus = INTERNAL_SERVER_ERROR;
+		resp->httpStatus = NOT_FOUND;
 		return ;
 	}
 	if (!(s.st_mode & S_IRGRP))
 		resp->httpStatus = UNAUTHORIZED;
 	else if ((s.st_mode & S_IFDIR))
 	{
-		if (requ.UsedRoute._dir_listing)
+		if (requ.UsedRoute.dirListing)
 		{
 			if (_createIndexPage(path, resp) == -1)
 				resp->httpStatus = INTERNAL_SERVER_ERROR;

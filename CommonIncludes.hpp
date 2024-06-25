@@ -5,6 +5,8 @@
 #include <map>
 #include"server/statusCodes.h"
 
+#define HTTP_PROTOCOL "HTTP/1.1"
+
 struct location {
 	int					httpMethods;
 	std::string				redirect;
@@ -19,6 +21,7 @@ typedef struct s_server {
 	std::string	 			port;
 	std::string 				host;
 	std::string				serverName;
+	std::string		workingDir;
 	std::map<statusCode, std::string>	errorPages;
 	long unsigned int			clientMaxBodySize;
 	int					timeoutTime;

@@ -7,7 +7,7 @@ int parseMethod(const std::vector<std::pair<std::string, int> >& chunck) {
 	std::string str;
 	std::string method;
 
-	int i = 0;
+	size_t i = 0;
 	while (i < chunck.size() && nth_word(chunck[i].first, 1) != "method")
 		++i;
 	str = chunck[i].first;
