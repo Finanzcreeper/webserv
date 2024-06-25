@@ -150,6 +150,7 @@ std::vector <t_server> configParse(std::string configFilePath)
 	return std::vector<t_server>();
 }
 
+/*
 int main() {
 	std::string configFilePath = "parsers/sampleConfig.conf";
 	std::vector<t_server> servers = configParse(configFilePath);
@@ -189,3 +190,4 @@ int main() {
 	
 	return 0;
 }
+*/
