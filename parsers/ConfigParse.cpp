@@ -6,7 +6,7 @@
 /*   By: subpark <subpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/17 22:37:44 by siun              #+#    #+#             */
-/*   Updated: 2024/06/22 20:34:42 by subpark          ###   ########.fr       */
+/*   Updated: 2024/06/25 13:46:13 by subpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,9 +98,9 @@ std::string	parseString(const std::vector<std::pair<std::string, int> > chunck, 
 	return nth_word(chunck[i].first, 2);
 }
 
-std::map<int, std::string> parseErrorPages(const std::vector<std::pair<std::string, int> > chunck)
+std::map<statusCode, std::string> parseErrorPages(const std::vector<std::pair<std::string, int> > chunck)
 {
-	std::map<int, std::string> error_pages;
+	std::map<statusCode, std::string> error_pages;
 	for (size_t i = 0; i < chunck.size(); i ++)
 	{
 		if (nth_word(chunck[i].first, 1) == "errorPages")
@@ -109,7 +109,7 @@ std::map<int, std::string> parseErrorPages(const std::vector<std::pair<std::stri
 			i ++;
 			while (i < chunck.size() && chunck[i].second > indent)
 			{
-				int error_code = std::atoi(nth_word(chunck[i].first, 1).c_str());
+				statusCode error_code = (statusCode)std::atoi(nth_word(chunck[i].first, 1).c_str());
 				std::string page = nth_word(chunck[i].first, 2);
 				error_pages.insert(std::make_pair(error_code, page));
 				++ i ;

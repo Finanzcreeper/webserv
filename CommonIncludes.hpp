@@ -26,7 +26,7 @@ typedef struct s_server
 	std::string	 						port;
 	std::string 						host;
 	std::string							serverName;
-	std::map<int, std::string>			errorPages;
+	std::map<statusCode, std::string>			errorPages;
 	long unsigned int					clientMaxBodySize;
 	int									timeoutTime;
 	int									timeoutReads;
