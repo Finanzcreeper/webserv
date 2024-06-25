@@ -7,7 +7,7 @@ int parseMethod(const std::vector<std::pair<std::string, int> >& chunck) {
 	std::string str;
 	std::string method;
 
-	int i = 0;
+	size_t i = 0;
 	while (i < chunck.size() && nth_word(chunck[i].first, 1) != "method")
 		++i;
 	str = chunck[i].first;
@@ -59,7 +59,7 @@ std::map<std::string, location> parseLocations(std::vector<std::pair<std::string
 	std::vector<std::vector<std::pair<std::string, int> > > locationChuncks;
 
 	locationChuncks = findChunck(chunck, "location");
-	for (int i = 0; i < locationChuncks.size(); i ++)
+	for (size_t i = 0; i < locationChuncks.size(); i ++)
 	{
 		std::string tmp = parseString(locationChuncks[i], "location");
 		loc.locationName = tmp;

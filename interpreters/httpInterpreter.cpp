@@ -5,7 +5,7 @@ void InterpretRequest(Request& request, const t_server& settings) {
 	if (request.RequestIntegrity != OK_HTTP) {
 		return;
 	}
-	checkIfMethodIsAllowedOnRoute(request, settings);
+	checkIfMethodIsAllowedOnRoute(request);
 	if (request.RequestIntegrity != OK_HTTP) {
 		return;
 	}
@@ -13,25 +13,25 @@ void InterpretRequest(Request& request, const t_server& settings) {
 	if (request.RequestIntegrity != OK_HTTP) {
 		return;
 	}
-	redirectionChecker(request, settings);
+	redirectionChecker(request);
 	if (request.RequestIntegrity != OK_HTTP) {
 		return;
 	}
 }
 
-void findRoute(Request& request, t_server& settings) {
-	std::map<std::string,route>::iterator RouteIterator;
+void findRoute(Request& request,  const t_server& settings) {
+	std::map<std::string, location>::const_iterator RouteIterator;
 	bool routeSet = false;
 
-	RouteIterator = settings.routes.find(request.RequestedPath);
-	if (RouteIterator != settings.routes.end()) {
+	RouteIterator = settings.locations.find(request.RequestedPath);
+	if (RouteIterator != settings.locations.end()) {
 		request.UsedRoute = RouteIterator->second;
 		routeSet = true;
 		return;
 	} else {
-		RouteIterator = settings.routes.begin();
-		while (RouteIterator != settings.routes.end()) {
-			if (request.RequestedPath.substr(0,RouteIterator->first.size()) == RouteIterator->first && request.UsedRoute.location.size() < RouteIterator->first.size()){
+		RouteIterator = settings.locations.begin();
+		while (RouteIterator != settings.locations.end()) {
+			if (request.RequestedPath.substr(0,RouteIterator->first.size()) == RouteIterator->first && request.UsedRoute.locationName.size() < RouteIterator->first.size()){
 				request.UsedRoute = RouteIterator->second;
 				routeSet = true;
 			}
@@ -41,29 +41,29 @@ void findRoute(Request& request, t_server& settings) {
 	if (routeSet == false) {
 		request.RequestIntegrity = NOT_FOUND;
 	} else {
-		request.RoutedPath = request.RequestedPath.replace(0,request.UsedRoute.location.size(),request.UsedRoute.root);
+		request.RoutedPath = request.RequestedPath.replace(0,request.UsedRoute.locationName.size(),request.UsedRoute.root);
 	}
 }
 
-void checkIfMethodIsAllowedOnRoute(Request& request, t_server& settings) {
-	if ((request.ReqType &  request.UsedRoute.methods) == 0) {
+void checkIfMethodIsAllowedOnRoute(Request& request) {
+	if ((request.ReqType &  request.UsedRoute.httpMethods) == 0) {
 		request.RequestIntegrity = METHOD_NOT_ALLOWED;
 	}
 }
 
 void checkBodySize(Request& request, const t_server& settings) {
-	if (request.Body.size() > settings.client_max_body_size) {
+	if (request.Body.size() > settings.clientMaxBodySize) {
 		request.RequestIntegrity = PAYLOAD_TO_LARGE;
 	}
 }
 
-void redirectionChecker(Request& request, const t_server& settings) {
-	if (request.UsedRoute.httpRedirection.empty() == false) {
+void redirectionChecker(Request& request) {
+	if (request.UsedRoute.redirect.empty() == false) {
 		request.RequestIntegrity = MOVED_PERMANENTLY;
 	}
 }
 
-void checkContentType(Request& request, const t_server& settings) {
+void checkContentType(Request& request) {
 	std::map<std::string,std::string>::iterator headerField;
 	headerField = request.HeaderFields.find("content-type");
 	if(headerField == request.HeaderFields.end()) {
@@ -92,7 +92,7 @@ void checkContentType(Request& request, const t_server& settings) {
 		}
 		++allowedContentTypeIterator;
 	}
-	if  (contentTypeFound = false) {
+	if  (contentTypeFound == false) {
 		request.RequestIntegrity = UNSUPPORTED_MEDIA_TYPE;
 	} else {
 		std::vector<std::string>::iterator allowedContentSubtypeIterator = allowedContentSubtypes.begin();
@@ -104,7 +104,7 @@ void checkContentType(Request& request, const t_server& settings) {
 			++allowedContentSubtypeIterator;
 		}
 	}
-	if (contentSubtypeFound = false) {
+	if (contentSubtypeFound == false) {
 		request.RequestIntegrity = UNSUPPORTED_MEDIA_TYPE;
 	}
 }
