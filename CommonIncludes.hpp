@@ -1,22 +1,29 @@
 #ifndef WEBSERV_COMMONINCLUDES_HPP
 #define WEBSERV_COMMONINCLUDES_HPP
 
+#include <vector>
+#include <map>
 #include"server/statusCodes.h"
 
-//going to be saved as a vector to save multiple servers inside of one config file
-typedef struct s_server
-{
-	std::string	 						port;
-	std::string 						host;
-	std::string							server_name;
-	std::string 						default_error_page;
-	long unsigned int					client_max_body_size;
-	int									httpMethods;
-	std::string							httpRedirection;
-	std::vector<std::string>			path;
-	std::map<std::string, std::string>	cgi_extension;
-	bool								dir_listing;
-	std::string							dir_request_default; //default file if the request is a directory
+struct location {
+	int					httpMethods;
+	std::string				redirect;
+	bool					dirListing;
+	std::string				index;
+	std::map<std::string, std::string>	cgi;
+	std::string				root;
+	std::string	 			locationName;
+};
+
+typedef struct s_server {
+	std::string	 			port;
+	std::string 				host;
+	std::string				serverName;
+	std::map<statusCode, std::string>	errorPages;
+	long unsigned int			clientMaxBodySize;
+	int					timeoutTime;
+	int					timeoutReads;
+	std::map<std::string, location>		locations;
 }t_server;
 
 typedef enum Requesttype {
@@ -52,9 +59,9 @@ struct Request {
 struct Response {
 	std::string 	responseBuffer;
 	std::string 	headerBuffer;
-	statusCode		ResponseIntegrity;
+	statusCode	ResponseIntegrity;
 	std::string 	body;
-	bool			isReady;
+	bool		isReady;
 };
 
 #endif //WEBSERV_COMMONINCLUDES_HPP
