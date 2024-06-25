@@ -8,6 +8,7 @@
 #include "MethodExecutor.hpp"
 
 Server::Server(t_server sett) : settings(sett), socketOption(ON){
+	this->lastTimeoutCheck = time(NULL);
 	bzero(&listening_socket, sizeof(listening_socket));
 	bzero(&hints, sizeof(hints));
 	hints.ai_family = AF_INET;
