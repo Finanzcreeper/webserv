@@ -1,35 +1,29 @@
 #ifndef WEBSERV_COMMONINCLUDES_HPP
 #define WEBSERV_COMMONINCLUDES_HPP
 
-#include"server/statusCodes.h"
-#include <map>
 #include <vector>
-//going to be saved as a vector to save multiple servers inside of one config file
+#include <map>
+#include"server/statusCodes.h"
 
-struct route {
-	std::string	location;
-	int			methods;
-	std::string	httpRedirection;
-	std::string root;
-	std::string	Index;
-	bool		dirListing;
+struct location {
+	int					httpMethods;
+	std::string				redirect;
+	bool					dirListing;
+	std::string				index;
 	std::map<std::string, std::string>	cgi;
+	std::string				root;
+	std::string	 			locationName;
 };
 
 typedef struct s_server {
-	int									timeoutTime;
-	int									timeoutReads;
-	std::string	 						port;
-	std::string 						host;
-	std::string							server_name;
-	std::string 						default_error_page;
-	long unsigned int					client_max_body_size;
-	std::map<std::string,route>			routes;
-	int									httpMethods;
-	std::vector<std::string>			path;
-	std::map<std::string, std::string>	cgi_extension;
-	bool								dir_listing;
-	std::string							dir_request_default; //default file if the request is a directory
+	std::string	 			port;
+	std::string 				host;
+	std::string				serverName;
+	std::map<statusCode, std::string>	errorPages;
+	long unsigned int			clientMaxBodySize;
+	int					timeoutTime;
+	int					timeoutReads;
+	std::map<std::string, location>		locations;
 }t_server;
 
 typedef enum Requesttype {
@@ -50,7 +44,6 @@ enum sockoption{
 	OFF,
 	ON,
 };
-
 
 struct Request {
 	std::string RequestBuffer;
