@@ -14,4 +14,6 @@ void checkBodySize(Request& request, const t_server& settings);
 
 void redirectionChecker(Request& request, const t_server& settings);
 
+void checkContentType(Request& request, const t_server& settings);
+
 #endif //WEBSERV_HTTPINTERPRETER_HPP

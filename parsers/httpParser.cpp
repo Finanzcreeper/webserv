@@ -79,6 +79,8 @@ void httpParser::extractHeaderFields(Request& request) {
 	SearchedHeaderFields.push_back("connection");
 	SearchedHeaderFields.push_back("transfer-encoding");
 	SearchedHeaderFields.push_back("user-agent");
+	SearchedHeaderFields.push_back("content-type");
+
 
 	long unsigned int i = 0;
 	while (i < SearchedHeaderFields.size()) {
