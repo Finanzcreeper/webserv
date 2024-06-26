@@ -5,31 +5,24 @@
 #include <map>
 #include"server/statusCodes.h"
 
-struct location{
-
-//data requested for general
-		int				httpMethods;
-		std::string		redirect;
-//data requested for index page
-		bool			dirListing;
-		std::string		index;
-//data requested for cgi
-		std::map<std::string, std::string>	cgi;
-		std::string							root;
-		std::string				 			locationName;
-
-	//	std::string		_path;						 //where data from post/get(?) saved/called
+struct location {
+	int					httpMethods;
+	std::string				redirect;
+	bool					dirListing;
+	std::string				index;
+	std::map<std::string, std::string>	cgi;
+	std::string				root;
+	std::string	 			locationName;
 };
 
-typedef struct s_server
-{
-	std::string	 						port;
-	std::string 						host;
-	std::string							serverName;
-	std::map<statusCode, std::string>			errorPages;
-	long unsigned int					clientMaxBodySize;
-	int									timeoutTime;
-	int									timeoutReads;
+typedef struct s_server {
+	std::string	 			port;
+	std::string 				host;
+	std::string				serverName;
+	std::map<statusCode, std::string>	errorPages;
+	long unsigned int			clientMaxBodySize;
+	int					timeoutTime;
+	int					timeoutReads;
 	std::map<std::string, location>		locations;
 }t_server;
 
@@ -66,9 +59,9 @@ struct Request {
 struct Response {
 	std::string 	responseBuffer;
 	std::string 	headerBuffer;
-	statusCode		ResponseIntegrity;
+	statusCode	ResponseIntegrity;
 	std::string 	body;
-	bool			isReady;
+	bool		isReady;
 };
 
 #endif //WEBSERV_COMMONINCLUDES_HPP
