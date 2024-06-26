@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   ConfigParse.cpp                                    :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: subpark <subpark@student.42.fr>            +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/05/17 22:37:44 by siun              #+#    #+#             */
-/*   Updated: 2024/06/25 13:46:13 by subpark          ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "ConfigParse.hpp"
 #include "../CommonIncludes.hpp"
 
@@ -67,23 +55,24 @@ std::vector<std::pair<std::string, int> >	findIndent(std::string str)
 std::vector<std::vector<std::pair<std::string, int> > > findChunck(std::vector<std::pair<std::string, int> > indents, std::string keyword)
 {
 	std::vector<std::vector<std::pair<std::string, int> > > multiChunck;
-	size_t start = 0;
-	size_t	end = 0;
-	
-	while (end < indents.size())
-	{
-		while (start < indents.size() && nth_word(indents[start].first, 1) != keyword)
+	std::vector<std::pair<std::string, int> >::iterator start = indents.begin();
+	std::vector<std::pair<std::string, int> >::iterator end;
+
+	while (start < indents.end()){
+		if (nth_word(start->first, 1) == keyword){
+			end = start + 1;
+			while (end < indents.end() && end->second > start->second){
+				++ end;
+			}
+			if (end < indents.end())
+				multiChunck.push_back(std::vector<std::pair<std::string, int> >(start, end - 1));
+			else
+				multiChunck.push_back(std::vector<std::pair<std::string, int> >(start, indents.end() - 1));
+			start = end;
+		}
+		else
 			++ start;
-		end = start;
-		while (end + 1 < indents.size() && indents[end + 1].second > indents[start].second)
-			++ end;
-		std::vector<std::pair<std::string, int> > chunck(indents.begin() + start, indents.begin() + end + 1);
-		multiChunck.push_back(chunck);
-		if (end == indents.size())
-			break;
-		++ end;
-		start = end;
-	}
+	}	
 	return multiChunck;
 }
 
@@ -162,6 +151,7 @@ std::vector <t_server> configParse(std::string configFilePath)
 	return std::vector<t_server>();
 }
 
+/*
 int main() {
 	std::string configFilePath = "parsers/sampleConfig.conf";
 	std::vector<t_server> servers = configParse(configFilePath);
@@ -201,3 +191,4 @@ int main() {
 	
 	return 0;
 }
+*/
