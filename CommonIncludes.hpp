@@ -68,7 +68,6 @@ struct Response {
 };
 
 struct timeoutHandler {
-	int fd;
 	time_t lastMsg;
 	unsigned int msgAmt;
 };

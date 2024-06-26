@@ -73,6 +73,8 @@ void Server::CheckForConnections() {
 			connectionMsgs.insert(std::make_pair(client.fd, request));
 			answerMsgs.insert(std::make_pair(client.fd,response));
 			Fds.push_back(client);
+			connectionMsgs.find(client.fd)->second.t.msgAmt = 0;
+			connectionMsgs.find(client.fd)->second.t.lastMsg = time(NULL);
 			answerMsgs.find(client.fd)->second.isReady = true;
 			--i;
 		}
@@ -100,6 +102,7 @@ void Server::CheckForConnections() {
 							//get error page based on request.integrity!
 						}
 						InterpretRequest(mt->second.r, settings);
+						std::cout << mt->second.r.RequestIntegrity << std::endl;
 						if (mt->second.r.RequestIntegrity == OK_HTTP){
 							executor.wrapperRequest(mt->second.r, resps->second);
 							mt->second.r.HeaderBuffer.clear();
@@ -123,7 +126,7 @@ void Server::CheckForConnections() {
 			}
 		}
 		if (difftime(time(NULL), lastTimeoutCheck) > settings.timeoutTime) {
-			checkConnectionsForTimeout();
+		checkConnectionsForTimeout();
 		}
 	}
 }
@@ -146,6 +149,7 @@ void Server::checkConnectionsForTimeout() {
 		if (difftime(it->second.t.lastMsg,time(NULL)) > settings.timeoutTime) {
 			it->second.r.RequestIntegrity = REQUEST_TIMEOUT;
 		}
+		++it;
 	}
 }
 
