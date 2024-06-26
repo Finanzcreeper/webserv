@@ -29,23 +29,23 @@ void httpParser::handleHeader(Request &request, size_t endOfBlock) {
 
 void httpParser::GetRequestType(Request& request) {
 	std::string firstLine = request.HeaderBuffer.substr(0,request.HeaderBuffer.find('\r'));
-	if (firstLine.find("GET") == 0) {
+	if (firstLine.find("GET ") == 0) {
 		request.ReqType = GET;
-	} else if (firstLine.find("HEAD") == 0) {
+	} else if (firstLine.find("HEAD ") == 0) {
 		request.ReqType = HEAD;
-	}else if (firstLine.find("POST") == 0) {
+	} else if (firstLine.find("POST ") == 0) {
 		request.ReqType = POST;
-	} else if (firstLine.find("PUT") == 0) {
+	} else if (firstLine.find("PUT ") == 0) {
 		request.ReqType = PUT;
-	} else if (firstLine.find("DELETE") == 0) {
+	} else if (firstLine.find("DELETE ") == 0) {
 		request.ReqType = DELETE;
-	} else if (firstLine.find("CONNECT") == 0) {
+	} else if (firstLine.find("CONNECT ") == 0) {
 		request.ReqType = CONNECT;
-	} else if (firstLine.find("OPTIONS") == 0) {
+	} else if (firstLine.find("OPTIONS ") == 0) {
 		request.ReqType = OPTIONS;
-	} else if (firstLine.find("TRACE") == 0) {
+	} else if (firstLine.find("TRACE ") == 0) {
 		request.ReqType = TRACE;
-	} else if (firstLine.find("PATCH") == 0) {
+	} else if (firstLine.find("PATCH ") == 0) {
 		request.ReqType = PATCH;
 	} else {
 		request.ReqType = INVALID;
