@@ -52,6 +52,16 @@ std::map<std::string, std::string> parseCgi(std::vector<std::pair<std::string, i
 	return cgi;
 }
 
+std::string getCurrentWorkingDir() {
+    char buffer[PATH_MAX];
+    if (getcwd(buffer, sizeof(buffer)) != NULL) {
+        return std::string(buffer);
+    } else {
+        // Handle error
+        return std::string(); // Return an empty string or handle the error as needed
+    }
+}
+
 std::map<std::string, location> parseLocations(std::vector<std::pair<std::string, int> > chunck)
 {
 	std::map<std::string, location>	locations;
@@ -68,7 +78,7 @@ std::map<std::string, location> parseLocations(std::vector<std::pair<std::string
 		loc.index = parseString(locationChuncks[i], "index");
 		loc.redirect = parseString(locationChuncks[i], "redirect");
 		loc.cgi = parseCgi(locationChuncks[i]);
-		loc.root = parseString(locationChuncks[i], "root");
+		loc.root = getCurrentWorkingDir() + tmp; //can be modified later, according to the structure of the server project
 		locations.insert(std::pair<std::string, location>(tmp, loc));
 	}
 	return locations;
