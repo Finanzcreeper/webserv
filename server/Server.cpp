@@ -3,10 +3,12 @@
 #include <cerrno>
 #include <cstring>
 #include "../parsers/httpParser.hpp"
+#include "../interpreters/httpInterpreter.hpp"
 #include <unistd.h>
 #include "MethodExecutor.hpp"
 
 Server::Server(t_server sett) : settings(sett), socketOption(ON){
+	this->lastTimeoutCheck = time(NULL);
 	bzero(&listening_socket, sizeof(listening_socket));
 	bzero(&hints, sizeof(hints));
 	hints.ai_family = AF_INET;
@@ -42,16 +44,16 @@ Server::Server(t_server sett) : settings(sett), socketOption(ON){
 
 void Server::CheckForConnections() {
 	std::vector<pollfd>::iterator it;
-	std::map<int, Request>::iterator mt;
+	std::map<int, connection>::iterator mt;
 	std::map<int, Response>::iterator resps;
 
 	MethodExecutor executor = MethodExecutor(&(this->settings));
 
-	Request request;
+	connection request;
 	Response response;
 
-	request.ReqType = NONE;
-	request.RequestIntegrity = OK_HTTP;
+	request.r.ReqType = NONE;
+	request.r.RequestIntegrity = OK_HTTP;
 
 	listening_socket.events = POLLIN;
 	Fds.push_back(listening_socket);
@@ -71,6 +73,8 @@ void Server::CheckForConnections() {
 			connectionMsgs.insert(std::make_pair(client.fd, request));
 			answerMsgs.insert(std::make_pair(client.fd,response));
 			Fds.push_back(client);
+			connectionMsgs.find(client.fd)->second.t.msgAmt = 0;
+			connectionMsgs.find(client.fd)->second.t.lastMsg = time(NULL);
 			answerMsgs.find(client.fd)->second.isReady = true;
 			--i;
 		}
@@ -84,18 +88,25 @@ void Server::CheckForConnections() {
 					mt = connectionMsgs.find(it->fd);
 					resps = answerMsgs.find(it->fd);
 					if (recv(it->fd, buffer, 1000, 0) != 0) {
-						mt->second.RequestBuffer.append(buffer);
+						mt->second.r.RequestBuffer.append(buffer);
+						time(&mt->second.t.lastMsg);
+						++mt->second.t.msgAmt;
+						if (mt->second.t.msgAmt > settings.timeoutReads) {
+							mt->second.r.RequestIntegrity = REQUEST_TIMEOUT;
+						}
 						try {
-							httpParser test(mt,this->settings);
+							httpParser test(mt);
 						}
 						catch (const std::runtime_error &e){
 							std::cerr << e.what() << std::endl;
 							//get error page based on request.integrity!
 						}
-						if (mt->second.RequestIntegrity == OK_HTTP){
-							executor.wrapperRequest(mt->second, resps->second);
-							mt->second.HeaderBuffer.clear();
-							mt->second.RequestBuffer.clear();
+						InterpretRequest(mt->second.r, settings);
+						std::cout << mt->second.r.RequestIntegrity << std::endl;
+						if (mt->second.r.RequestIntegrity == OK_HTTP){
+							executor.wrapperRequest(mt->second.r, resps->second);
+							mt->second.r.HeaderBuffer.clear();
+							mt->second.r.RequestBuffer.clear();
 						}
 					} else {
 						//cleanup
@@ -114,8 +125,10 @@ void Server::CheckForConnections() {
 				++it;
 			}
 		}
+		if (difftime(time(NULL), lastTimeoutCheck) > settings.timeoutTime) {
+		checkConnectionsForTimeout();
+		}
 	}
-	std::cout << "end" << std::endl;
 }
 
 void Server::responder(std::map <int, Response>::iterator& response) {
@@ -129,53 +142,19 @@ void Server::responder(std::map <int, Response>::iterator& response) {
 		response->second.responseBuffer.erase(0,sentAmt);
 }
 
-	/*
-	 * Messages have structure:
-	 * first line is message type and path
-	 * after first line header begins
-	 *
-	 * header options:
-	 *	1: no hint to message -> no message
-	 *	\r\n\r\n ends message;
-	 *		Solution:
-	 *		1: send 411 code
-	 *		2: handle situation
-	 *
-	 *	2: HeaderBuffer contains Transfer-Encoding: chunked, ...
-	 *	multiple messages will be sent, each containing size of message in OCTET
-	 *	message follows after
-	 *	message chunks look like:
-	 *
-	 *	<OCTAL number>\r\n<message>\r\n
-	 *
-	 *	<message> MUST be the correct length
-	 *
-	 *	the last chunk is defined as
-	 *
-	 *	0\r\n\r\n
-	 *		Solution:
-	 *		handle chunked messages when Transfer-Encoding: chunked, ... is found
-	 *
-	 *	3: HeaderBuffer contains Content-Length: ...
-	 *		Solution: message is exactly ... bytes long, read that amount in total
-	 *
-	 *	4: HeaderBuffer contains Transfer-Encoding: and Content-Length:
-	 *		Solution: ignore Content-Length and apply Transfer-Encoding Rule.
-	 *
-	 *
-	 *
-	 * options after the header:
-	 *
-	 *
-	 *
-	 * Solution:
-	 *
-	 * when empty
-	 *
-	 * header ends with \r\n\r\n
-	*/
+void Server::checkConnectionsForTimeout() {
+	std::map<int,connection>::iterator it = connectionMsgs.begin();
+
+	while (it != connectionMsgs.end()) {
+		if (difftime(it->second.t.lastMsg,time(NULL)) > settings.timeoutTime) {
+			it->second.r.RequestIntegrity = REQUEST_TIMEOUT;
+		}
+		++it;
+	}
+}
 
 Server::~Server() {
 	freeaddrinfo(serverInfo);
 }
+
 

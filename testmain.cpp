@@ -8,7 +8,7 @@ int main() {
 	//std::vector<t_server>::iterator servernbr = configs.begin();
 	std::vector<t_server> Config;
 	try  {
-		Config = configParse("parsers/sampleConfig.conf");
+		Config = configParse("/home/nreher/dev/webserv/parsers/sampleConfig.conf");
 	} catch (std::runtime_error &e) {
 		std::cout <<e.what() << std::endl;
 	}

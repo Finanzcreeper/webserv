@@ -8,7 +8,7 @@ OBJS = ${SRCS:.cpp=.o}
 NAME = webserv
 
 CXX = c++
-CXXFLAGS = -Wall -Werror -Wextra -std=c++98 #-g #-fsanitize=thread
+CXXFLAGS = -Wall -Werror -Wextra -std=c++98 -g3 #-fsanitize=thread
 
 all: ${NAME}
 
