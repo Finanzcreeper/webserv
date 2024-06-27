@@ -2,7 +2,9 @@ CMakeLists.txt
 cmake-build-debug
 .idea
 a.out
+#all .o files
 *.o
+*/*.o
 
 Settings.hpp
 

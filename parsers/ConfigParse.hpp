@@ -11,7 +11,10 @@
 # include <algorithm>
 # include <sstream>
 # include <map>
+# include <unistd.h>
 #include "../CommonIncludes.hpp"
+
+#define PATH_MAX 1024
 
 
 t_server												parseServerConfig(const std::vector<std::pair<std::string, int> >chunck);
