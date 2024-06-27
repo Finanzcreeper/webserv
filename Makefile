@@ -1,11 +1,12 @@
 SRCS =	server/MethodExecutor.cpp server/statusCodes.cpp server/Server.cpp \
 		parsers/ConfigParse.cpp parsers/httpParser.cpp parsers/ConfigLocationParse.cpp \
 		interpreters/httpInterpreter.cpp \
+		tests/Tests.cpp \
 		testmain.cpp
 
 OBJS = ${SRCS:.cpp=.o}
 
-NAME = webserv
+NAME = webservTesting
 
 CXX = c++
 CXXFLAGS = -Wall -Werror -Wextra -std=c++98 -g3 #-fsanitize=thread

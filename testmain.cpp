@@ -2,6 +2,7 @@
 #include <vector>
 #include "parsers/ConfigParse.hpp"
 
+/*
 int main() {
 	//std::vector<t_server> configs;
 	//std::vector<t_server>::iterator servernbr = configs.begin();
@@ -17,4 +18,15 @@ int main() {
 	//}
 
 	delete sock;
+}
+ */
+
+#include "tests/Tests.hpp"
+
+int main() {
+	std::cout << "Running tests: " << std::endl;
+
+	Tests tester;
+
+	tester.testing();
 }
