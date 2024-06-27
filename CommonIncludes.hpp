@@ -57,7 +57,6 @@ struct Request {
 	statusCode RequestIntegrity;
 	std::string RequestedPath;
 	std::string RoutedPath;
-	location UsedRoute;
 	std::string BodyBuffer;
 	location	UsedRoute;
 	std::string Body;
@@ -69,6 +68,16 @@ struct Response {
 	statusCode							httpStatus;
 	std::string 						body;
 	bool								isReady;
+};
+
+struct timeoutHandler {
+	time_t lastMsg;
+	unsigned int msgAmt;
+};
+
+struct connection {
+	timeoutHandler t;
+	Request r;
 };
 
 #endif //WEBSERV_COMMONINCLUDES_HPP

@@ -16,10 +16,11 @@ MethodExecutor::MethodExecutor(const t_server *serverSettings): _serverSettings(
 
 void	MethodExecutor::wrapperRequest(Request &requ, Response &resp)
 {
-	requ.UsedRoute = _serverSettings->locations.find("/")->second;
-	std::cout << "Used route: " + requ.UsedRoute.root << std::endl;
-	std::cout << "**** HEADER OF REQUEST: ****\n" << requ.HeaderBuffer << std::endl << "**** END OF HEADER ****" << std::endl;
-	std::cout << "**** BODY OF REQUEST: ****\n" << requ.Body << std::endl << "**** END OF BODY ****" << std::endl;
+	std::cout << "Used route: " + requ.UsedRoute.locationName << std::endl;
+	std::cout << "Used redirect: " + requ.UsedRoute.root << std::endl;
+	std::cout << "Used path: " + requ.RoutedPath << std::endl;
+	//std::cout << "**** HEADER OF REQUEST: ****\n" << requ.HeaderBuffer << std::endl << "**** END OF HEADER ****" << std::endl;
+	//std::cout << "**** BODY OF REQUEST: ****\n" << requ.Body << std::endl << "**** END OF BODY ****" << std::endl;
 	std::cout << "REQUEST TYPE: " << requ.ReqType << std::endl;
 	resp.body.clear();
 	resp.responseBuffer.clear();
@@ -28,7 +29,7 @@ void	MethodExecutor::wrapperRequest(Request &requ, Response &resp)
 	requ.HeaderFields["content-type"] = "text/plain";
 
 	if (resp.httpStatus == MOVED_PERMANENTLY)
-		resp.headerFields["Location"] = requ.UsedRoute.redirect;
+		resp.headerFields["location"] = requ.UsedRoute.redirect;
 	else if (resp.httpStatus == OK_HTTP)
 	{
 		switch (requ.ReqType){
@@ -41,7 +42,6 @@ void	MethodExecutor::wrapperRequest(Request &requ, Response &resp)
 			case (POST):
 				_executePost(requ, &resp);
 				break ;
-			//	break ;
 			//case (DELETE):
 			//	_executeDelete(requ, resp);
 			//	break ;
@@ -62,14 +62,14 @@ void	MethodExecutor::wrapperRequest(Request &requ, Response &resp)
 	if (requ.ReqType != HEAD)
 		resp.responseBuffer.append(resp.body);
 	resp.isReady = true;
-
-	std::cout << "**** RESPONSE: ****\n" << resp.responseBuffer << "**** END OF RESPONSE ****" << std::endl;
+	//std::cout << "**** RESPONSE: ****\n" << resp.responseBuffer << "**** END OF RESPONSE ****" << std::endl;
 }
 
 void	MethodExecutor::_executePost(Request &requ, Response *resp)
 {
-	std::string	path = requ.UsedRoute.root + requ.RequestedPath;
+	std::string	path = requ.RoutedPath;
 	struct stat	s;
+	std::cout << "HALLO" << std::endl;
 	// check if file already exists
 	if (stat(path.c_str(), &s) == 0)
 	{
@@ -82,8 +82,7 @@ void	MethodExecutor::_executePost(Request &requ, Response *resp)
 		ofs << requ.Body;
 		if(ofs.fail())
 		{
-			std::cout << "Error while creating requested file: \'" + _serverSettings->workingDir
-					+ requ.RequestedPath + "\'"<< std::endl;
+			std::cout << "Error while creating requested file: \'" + requ.RoutedPath + "\'"<< std::endl;
 			resp->httpStatus = INTERNAL_SERVER_ERROR;
 		}
 		else
@@ -94,8 +93,7 @@ void	MethodExecutor::_executePost(Request &requ, Response *resp)
 	}
 	else
 	{
-		std::cout << "Error while creating requested file: \'" + _serverSettings->workingDir
-				+ requ.RequestedPath + "\'"<< std::endl;
+		std::cout << "Error while creating requested file: \'" + requ.RoutedPath + "\'"<< std::endl;
 		resp->httpStatus = INTERNAL_SERVER_ERROR;
 	}
 	ofs.close();
@@ -103,12 +101,12 @@ void	MethodExecutor::_executePost(Request &requ, Response *resp)
 
 void	MethodExecutor::_executeGet(Request &requ, Response *resp)
 {
-	std::string	path = requ.UsedRoute.root + requ.RequestedPath;
+	std::string	path = requ.RoutedPath;
 	struct stat	s;
 
 	// default page if no path specified
 	if (path.length() == _serverSettings->workingDir.length() + 1)
-		path.append(defaultPage);
+		path.append(requ.UsedRoute.index);
 	if (stat(path.c_str(), &s) == -1)
 	{
 		resp->httpStatus = NOT_FOUND;
@@ -144,8 +142,7 @@ void	MethodExecutor::_executeGet(Request &requ, Response *resp)
 		}
 		else
 		{
-			std::cout << "Error while opening requested file: \'" + _serverSettings->workingDir
-				+ requ.RequestedPath + "\'"<< std::endl;
+			std::cout << "Error while opening requested file: \'" + requ.RoutedPath + "\'"<< std::endl;
 			resp->httpStatus = INTERNAL_SERVER_ERROR;
 		}
 		ifs.close();

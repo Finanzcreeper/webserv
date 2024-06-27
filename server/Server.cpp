@@ -101,7 +101,7 @@ void Server::CheckForConnections() {
 							std::cerr << e.what() << std::endl;
 							//get error page based on request.integrity!
 						}
-						InterpretRequest(mt->second.r, settings);
+						interpretRequest(mt->second.r, settings);
 						std::cout << mt->second.r.RequestIntegrity << std::endl;
 						if (mt->second.r.RequestIntegrity == OK_HTTP){
 							executor.wrapperRequest(mt->second.r, resps->second);
