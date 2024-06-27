@@ -11,17 +11,17 @@ static std::string	generateAllowField(int allowedTypes);
 // adds fields to the header which are shared by all responses
 void	MethodExecutor::_generateCommonHeaderFields(Response &resp)
 {
-	resp.headerFields["Server"] = _serverSettings->serverName;
-	resp.headerFields["Date"] = generateDateField();
-	resp.headerFields["Accept-Ranges"] = "0";
-	resp.headerFields["Content-Length"] = generateContentLengthField(resp.body);
+	resp.headerFields["server"] = _serverSettings->serverName;
+	resp.headerFields["date"] = generateDateField();
+	resp.headerFields["accept-ranges"] = "0";
+	resp.headerFields["content-length"] = generateContentLengthField(resp.body);
 }
 
 // adds fields to the header of responses in case an error occured
 void	MethodExecutor::_generateSpecialErrorFields(Request &requ, Response &resp)
 {
 	if (resp.httpStatus == METHOD_NOT_ALLOWED)
-		resp.headerFields["Allow"] = generateAllowField(requ.UsedRoute.httpMethods);
+		resp.headerFields["allow"] = generateAllowField(requ.UsedRoute.httpMethods);
 }
 
 static std::string	generateDateField(void)

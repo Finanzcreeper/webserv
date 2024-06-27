@@ -88,7 +88,7 @@ void	MethodExecutor::_executePost(Request &requ, Response *resp)
 		else
 		{
 			resp->httpStatus = CREATED;
-			resp->headerFields["Location"] = requ.RequestedPath;
+			resp->headerFields["location"] = requ.RequestedPath;
 		}
 	}
 	else
@@ -138,7 +138,7 @@ void	MethodExecutor::_executeGet(Request &requ, Response *resp)
 			struct tm* gmt = std::gmtime(&s.st_mtim.tv_sec);
 			char buf[100];
     		std::strftime(buf, sizeof(buf), "%a, %d %b %Y %H:%M:%S GMT", gmt);
-			resp->headerFields["Last-Modified"] = std::string(buf);
+			resp->headerFields["last-modified"] = std::string(buf);
 		}
 		else
 		{

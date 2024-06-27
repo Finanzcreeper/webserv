@@ -51,10 +51,26 @@ int	MethodExecutor::_createIndexPage(std::string path, Response *resp)
 // Creates the body of the response in case an error occured
 int	MethodExecutor::_generateErrorBody(Response &resp)
 {
-	//TODO: Check if there is an default file for an specific error
-	std::stringstream statusCode_str;
+	std::stringstream	statusCode_str;
 	statusCode_str << resp.httpStatus;
-
+	std::map<statusCode, std::string>::const_iterator iter;
+	iter = _serverSettings->errorPages.find(resp.httpStatus);
+	if (iter != _serverSettings->errorPages.end())
+	{
+		std::ifstream	errorPage((_serverSettings->workingDir \
+			+ iter->second).c_str());
+		std::cout << "ERROR PAGE PATH: " << _serverSettings->workingDir \
+			+ iter->second << std::endl;
+		if (errorPage.good())
+		{
+			std::ostringstream ss;
+			ss << errorPage.rdbuf();
+			resp.body.append(ss.str());
+			errorPage.close();
+			return (0);
+		}
+		errorPage.close();
+	}
 	std::string statusCode = statusCode_str.str();
 	std::string	statusMessage = getStatusCodeMessage(resp.httpStatus);
 	std::string statusDescription = getStatusCodeDescription(resp.httpStatus);
