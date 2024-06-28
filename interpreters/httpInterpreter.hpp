@@ -4,7 +4,7 @@
 #include "../CommonIncludes.hpp"
 #include <map>
 
-void InterpretRequest(Request& request, const t_server& settings);
+void interpretRequest(Request& request, const t_server& settings);
 
 void findRoute(Request& request, const t_server& settings);
 

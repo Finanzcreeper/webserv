@@ -1,6 +1,6 @@
 #include "httpInterpreter.hpp"
 
-void InterpretRequest(Request& request, const t_server& settings) {
+void interpretRequest(Request& request, const t_server& settings) {
 	findRoute(request,settings);
 	if (request.RequestIntegrity != OK_HTTP) {
 		return;
