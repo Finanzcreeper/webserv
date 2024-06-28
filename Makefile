@@ -8,9 +8,9 @@ TESTMAIN =	testmain.cpp
 
 MAKEFLAGS += --no-print-directory
 
-OBJS = ${SRCS:.cpp=.o}
-MAINOBJ = ${MAIN:.cpp=.o}
-TESTMAINOBJ =${TESTMAIN:.cpp=.o}
+OBJS = $(SRCS:.cpp=.o)
+MAINOBJ = $(MAIN:.cpp=.o)
+TESTMAINOBJ =$(TESTMAIN:.cpp=.o)
 NAME = webserv
 TESTNAME = webtest
 
@@ -19,30 +19,30 @@ CXXFLAGS = -Wall -Werror -Wextra -std=c++98 -g3 #-fsanitize=thread
 
 .SILENT:
 
-all: ${NAME}
+all: $(NAME)
 
-%.o: %.cpp objectEcho
-	${CXX} ${CXXFLAGS} -c $< -o $@
+%.o: %.cpp | objectEcho
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 objectEcho:
 	echo -e "\033[1;32mCreating Objects\033[0m"
 
-${NAME}: ${MAINOBJ} ${OBJS}
+$(NAME): $(MAINOBJ) $(OBJS)
 	echo -e "\033[1;32mCompiling files\033[0m"
-	${CXX} ${CXXFLAGS} $^ -o ${NAME}
+	$(CXX) $(CXXFLAGS) $^ -o $(NAME)
 
- test: ${TESTMAINOBJ} ${OBJS}
-	${CXX} ${CXXFLAGS} $^ -o ${TESTNAME}
+ test: $(TESTMAINOBJ) $(OBJS)
+	$(CXX) $(CXXFLAGS) $^ -o $(TESTNAME)
 	./webtest
 
 clean:
-	rm -f ${OBJS} ${MAINOBJ} ${TESTMAINOBJ}
+	rm -f $(OBJS) $(MAINOBJ) $(TESTMAINOBJ)
 	echo -e "\033[1;31mCleaning\033[0m "
 
 fclean: clean
-	rm -f ${NAME} ${TESTNAME}
+	rm -f $(NAME) $(TESTNAME)
 	echo -e "\033[1;31mEverything\033[0m"
 
 re: fclean all
 
-.PHONY: all clean fclean re test
+.PHONY: all clean fclean re test objectEcho
