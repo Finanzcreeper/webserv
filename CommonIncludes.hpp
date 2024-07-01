@@ -6,6 +6,8 @@
 #include"server/statusCodes.h"
 #include <ctime>
 
+#define HTTP_PROTOCOL "HTTP/1.1"
+
 struct location {
 	int									httpMethods;
 	std::string							redirect;
@@ -20,6 +22,7 @@ typedef struct s_server {
 	std::string							port;
 	std::string							host;
 	std::string							serverName;
+	std::string							workingDir;
 	std::map<statusCode, std::string>	errorPages;
 	long unsigned int					clientMaxBodySize;
 	int									timeoutTime;
@@ -54,17 +57,17 @@ struct Request {
 	statusCode RequestIntegrity;
 	std::string RequestedPath;
 	std::string RoutedPath;
-	location UsedRoute;
 	std::string BodyBuffer;
+	location	UsedRoute;
 	std::string Body;
 };
 
 struct Response {
-	std::string 	responseBuffer;
-	std::string 	headerBuffer;
-	statusCode		ResponseIntegrity;
-	std::string 	body;
-	bool			isReady;
+	std::string 						responseBuffer;
+	std::map<std::string,std::string>	headerFields;
+	statusCode							httpStatus;
+	std::string 						body;
+	bool								isReady;
 };
 
 struct timeoutHandler {

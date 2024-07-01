@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload File</title>
+</head>
+<body>
+    <h1>Upload a Text File</h1>
+    <input type="file" id="fileInput" accept=".txt"/>
+    <button onclick="uploadFile()">Upload</button>
+
+    <script>
+        function uploadFile() {
+            const fileInput = document.getElementById('fileInput');
+            if (fileInput.files.length === 0) {
+                alert('Please select a file');
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(event) {
+                const fileContent = event.target.result;
+                const xhr = new XMLHttpRequest();
+                const url = '/upload/' + file.name;
+
+                xhr.open('POST', url, true);
+                xhr.setRequestHeader('Content-Type', 'text/plain');
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4 && xhr.status === 201) {
+                        alert('File uploaded successfully');
+                    }
+					else {
+						alert('File uploaded failed');
+					}
+                };
+                xhr.send(fileContent);
+            };
+
+            reader.readAsText(file);
+        }
+    </script>
+</body>
+</html>

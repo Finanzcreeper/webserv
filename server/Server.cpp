@@ -47,7 +47,7 @@ void Server::CheckForConnections() {
 	std::map<int, connection>::iterator mt;
 	std::map<int, Response>::iterator resps;
 
-	MethodExecutor executor = MethodExecutor(this);
+	MethodExecutor executor = MethodExecutor(&(this->settings));
 
 	connection request;
 	Response response;
