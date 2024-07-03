@@ -1,12 +1,17 @@
+
+#ignoring Clion stuff
 CMakeLists.txt
 cmake-build-debug
 .idea
-a.out
+
+#ignoring vscode stuff
+.vscode
+
 #all .o files
 *.o
 */*.o
 
-Settings.hpp
-
+#ignoring executables
+a.out
 webserv
 webtest
