@@ -2,11 +2,17 @@
 #define WEBSERV_TESTS_HPP
 
 #include <iostream>
+#include <cstring>
 #include "../interpreters/httpInterpreter.hpp"
+#include "../parsers/httpParser.hpp"
 
 class Tests {
 
 private:
+
+	connection testConnection;
+	std::map<int, connection> testConnectionMap;
+	std::map<int, connection>::iterator testPair;
 
 	Request testRequest;
 	t_server testSettings;
