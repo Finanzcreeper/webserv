@@ -1,5 +1,4 @@
 #include "httpInterpreter.hpp"
-#include <iostream>
 
 void interpretRequest(Request& request, const t_server& settings) {
 	findRoute(request,settings);

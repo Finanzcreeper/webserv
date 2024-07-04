@@ -78,7 +78,7 @@ std::map<std::string, location> parseLocations(std::vector<std::pair<std::string
 		loc.index = parseString(locationChuncks[i], "index");
 		loc.redirect = parseString(locationChuncks[i], "redirect");
 		loc.cgi = parseCgi(locationChuncks[i]);
-		loc.root = getCurrentWorkingDir() + parseString(locationChuncks[i], "path") + "/"; //can be modified later, according to the structure of the server project
+		loc.root = getCurrentWorkingDir() + parseString(locationChuncks[i], "path") + "/";
 		locations.insert(std::pair<std::string, location>(tmp, loc));
 	}
 	return locations;

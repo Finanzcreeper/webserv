@@ -6,6 +6,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <dirent.h>
+#include <iostream>
 
 std::string		defaultPage = "index.html";
 
@@ -62,14 +63,13 @@ void	MethodExecutor::wrapperRequest(Request &requ, Response &resp)
 	if (requ.ReqType != HEAD)
 		resp.responseBuffer.append(resp.body);
 	resp.isReady = true;
-	//std::cout << "**** RESPONSE: ****\n" << resp.responseBuffer << "**** END OF RESPONSE ****" << std::endl;
+	std::cout << "**** RESPONSE: ****\n" << resp.responseBuffer << "**** END OF RESPONSE ****" << std::endl;
 }
 
 void	MethodExecutor::_executePost(Request &requ, Response *resp)
 {
 	std::string	path = requ.RoutedPath;
 	struct stat	s;
-	std::cout << "HALLO" << std::endl;
 	// check if file already exists
 	if (stat(path.c_str(), &s) == 0)
 	{
