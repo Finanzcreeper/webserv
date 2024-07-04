@@ -5,18 +5,31 @@
 void Tests::testHttpInterpreter() {
 	std::cout << "\033[1;95mTesting the httpInterpreter:\033[0m " << std::endl;
 	std::cout <<"[1;34m--------------findRoute---------------[0m" << std::endl;
+
+	location empty;
+	empty.cgi.clear();
+	empty.dirListing = "";
+	empty.httpMethods = 0;
+	empty.index = "";
+	empty.locationName = "";
+	empty.redirect = "";
+	empty.root = "";
 //==========================================================//
 //-------------------Preparing for Test 1-------------------//
 //==========================================================//
+	this->testRequest.UsedRoute = empty;
 	testRequest.RequestedPath = "testing";
 	testRequest.RequestIntegrity = OK_HTTP;
+
+	this->testLocation.locationName = "testing";
+	this->testLocation.root = "folder";
 	testSettings.locations.insert(std::make_pair("testing",testLocation));
 //----------------------------------------------------------//
 //======================Running Test 1======================//
 //----------------------------------------------------------//
 	std::cout << "Correct full Path: ";
 	findRoute(testRequest, testSettings);
-	if (testRequest.RequestIntegrity != OK_HTTP) {
+	if (testRequest.RequestIntegrity != OK_HTTP || testRequest.RoutedPath != "folder") {
 		std::cout << "\033[1;31mFAILED\033[0m" << std::endl;
 	} else {
 		std::cout << "\033[1;32mOK\033[0m" << std::endl;
@@ -24,14 +37,16 @@ void Tests::testHttpInterpreter() {
 //==========================================================//
 //-------------------Preparing for Test 2-------------------//
 //==========================================================//
+	this->testRequest.UsedRoute = empty;
 	testRequest.RequestedPath = "testing/everything";
+	testRequest.RoutedPath = "";
 	testRequest.RequestIntegrity = OK_HTTP;
 //----------------------------------------------------------//
 //======================Running Test 2======================//
 //----------------------------------------------------------//
 	std::cout << "Correct Partial Path: ";
 	findRoute(testRequest, testSettings);
-	if (testRequest.RequestIntegrity != OK_HTTP) {
+	if (testRequest.RequestIntegrity != OK_HTTP || testRequest.RoutedPath != "folder/everything") {
 		std::cout << "\033[1;31mFAILED\033[0m" << std::endl;
 	} else {
 		std::cout << "\033[1;32mOK\033[0m" << std::endl;
@@ -39,14 +54,16 @@ void Tests::testHttpInterpreter() {
 //==========================================================//
 //-------------------Preparing for Test 3-------------------//
 //==========================================================//
+	this->testRequest.UsedRoute = empty;
 	testRequest.RequestedPath = "";
+	testRequest.RoutedPath = "";
 	testRequest.RequestIntegrity = OK_HTTP;
 //----------------------------------------------------------//
 //======================Running Test 3======================//
 //----------------------------------------------------------//
 	std::cout << "Empty Path: ";
 	findRoute(testRequest, testSettings);
-	if (testRequest.RequestIntegrity != NOT_FOUND) {
+	if (testRequest.RequestIntegrity != NOT_FOUND || testRequest.RoutedPath != "") {
 		std::cout << "\033[1;31mFAILED\033[0m" << std::endl;
 	} else {
 		std::cout << "\033[1;32mOK\033[0m" << std::endl;
@@ -56,16 +73,36 @@ void Tests::testHttpInterpreter() {
 //==========================================================//
 	testRequest.RequestedPath = "hubkhbkf";
 	testRequest.RequestIntegrity = OK_HTTP;
+	this->testRequest.UsedRoute = empty;
+	testRequest.RoutedPath = "";
 //----------------------------------------------------------//
 //======================Running Test 4======================//
 //----------------------------------------------------------//
 	std::cout << "Incorrect Path: ";
 	findRoute(testRequest, testSettings);
-	if (testRequest.RequestIntegrity != NOT_FOUND) {
+	if (testRequest.RequestIntegrity != NOT_FOUND || testRequest.RoutedPath != "") {
 		std::cout << "\033[1;31mFAILED\033[0m" << std::endl;
 	} else {
 		std::cout << "\033[1;32mOK\033[0m" << std::endl;
 	}
+//==========================================================//
+//-------------------Preparing for Test 5-------------------//
+//==========================================================//
+	testRequest.RequestedPath = "testing.html";
+	testRequest.RequestIntegrity = OK_HTTP;
+	this->testRequest.UsedRoute = empty;
+	testRequest.RoutedPath = "";
+//----------------------------------------------------------//
+//======================Running Test 4======================//
+//----------------------------------------------------------//
+	std::cout << "requested file with same name as location: ";
+	findRoute(testRequest, testSettings);
+	if (testRequest.RequestIntegrity != NOT_FOUND || testRequest.RoutedPath != "") {
+		std::cout << "\033[1;31mFAILED\033[0m" << std::endl;
+	} else {
+		std::cout << "\033[1;32mOK\033[0m" << std::endl;
+	}
+
 
 	std::cout <<"[1;34m-----checkIfMethodIsAllowedOnRoute----[0m" << std::endl;
 //==========================================================//
