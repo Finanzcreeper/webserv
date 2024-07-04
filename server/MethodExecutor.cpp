@@ -35,13 +35,13 @@ void	MethodExecutor::wrapperRequest(Request &requ, Response &resp)
 	{
 		switch (requ.ReqType){
 			case (GET):
-				_executeGet(requ, &resp);
+				_executeGet(requ, resp);
 				break ;
 			case (HEAD):
-				_executeGet(requ, &resp);
+				_executeGet(requ, resp);
 				break ;
 			case (POST):
-				_executePost(requ, &resp);
+				_executePost(requ, resp);
 				break ;
 			//case (DELETE):
 			//	_executeDelete(requ, resp);
@@ -66,14 +66,14 @@ void	MethodExecutor::wrapperRequest(Request &requ, Response &resp)
 	std::cout << "**** RESPONSE: ****\n" << resp.responseBuffer << "**** END OF RESPONSE ****" << std::endl;
 }
 
-void	MethodExecutor::_executePost(Request &requ, Response *resp)
+void	MethodExecutor::_executePost(Request &requ, Response &resp)
 {
 	std::string	path = requ.RoutedPath;
 	struct stat	s;
 	// check if file already exists
 	if (stat(path.c_str(), &s) == 0)
 	{
-		resp->httpStatus = FORBIDDEN;
+		resp.httpStatus = FORBIDDEN;
 		return ;
 	}
 	std::ofstream	ofs(path.c_str(), std::ios::out);
@@ -83,23 +83,23 @@ void	MethodExecutor::_executePost(Request &requ, Response *resp)
 		if(ofs.fail())
 		{
 			std::cout << "Error while creating requested file: \'" + requ.RoutedPath + "\'"<< std::endl;
-			resp->httpStatus = INTERNAL_SERVER_ERROR;
+			resp.httpStatus = INTERNAL_SERVER_ERROR;
 		}
 		else
 		{
-			resp->httpStatus = CREATED;
-			resp->headerFields["location"] = requ.RequestedPath;
+			resp.httpStatus = CREATED;
+			resp.headerFields["location"] = requ.RequestedPath;
 		}
 	}
 	else
 	{
 		std::cout << "Error while creating requested file: \'" + requ.RoutedPath + "\'"<< std::endl;
-		resp->httpStatus = INTERNAL_SERVER_ERROR;
+		resp.httpStatus = INTERNAL_SERVER_ERROR;
 	}
 	ofs.close();
 }
 
-void	MethodExecutor::_executeGet(Request &requ, Response *resp)
+void	MethodExecutor::_executeGet(Request &requ, Response &resp)
 {
 	std::string	path = requ.RoutedPath;
 	struct stat	s;
@@ -109,21 +109,21 @@ void	MethodExecutor::_executeGet(Request &requ, Response *resp)
 		path.append(requ.UsedRoute.index);
 	if (stat(path.c_str(), &s) == -1)
 	{
-		resp->httpStatus = NOT_FOUND;
+		resp.httpStatus = NOT_FOUND;
 		return ;
 	}
 	if (!(s.st_mode & S_IRGRP))
-		resp->httpStatus = UNAUTHORIZED;
+		resp.httpStatus = UNAUTHORIZED;
 	else if ((s.st_mode & S_IFDIR))
 	{
 		if (requ.UsedRoute.dirListing)
 		{
 			if (_createIndexPage(path, resp) == -1)
-				resp->httpStatus = INTERNAL_SERVER_ERROR;
+				resp.httpStatus = INTERNAL_SERVER_ERROR;
 			return;
 		}
 		std::cout << path + " is directory!" << std::endl;
-		resp->httpStatus = NOT_FOUND;
+		resp.httpStatus = NOT_FOUND;
 	}
 	else if (s.st_mode & S_IFREG)
 	{
@@ -132,18 +132,18 @@ void	MethodExecutor::_executeGet(Request &requ, Response *resp)
 		{
 			std::ostringstream ss;
 			ss << ifs.rdbuf();
-			resp->body.append(ss.str());
+			resp.body.append(ss.str());
 
 			// read modification time
 			struct tm* gmt = std::gmtime(&s.st_mtim.tv_sec);
 			char buf[100];
     		std::strftime(buf, sizeof(buf), "%a, %d %b %Y %H:%M:%S GMT", gmt);
-			resp->headerFields["last-modified"] = std::string(buf);
+			resp.headerFields["last-modified"] = std::string(buf);
 		}
 		else
 		{
 			std::cout << "Error while opening requested file: \'" + requ.RoutedPath + "\'"<< std::endl;
-			resp->httpStatus = INTERNAL_SERVER_ERROR;
+			resp.httpStatus = INTERNAL_SERVER_ERROR;
 		}
 		ifs.close();
 	}

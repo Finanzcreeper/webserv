@@ -9,13 +9,13 @@
 static void	checkAndReplace(std::string& line, std::string subStr, std::string newStr);
 
 // Creates the body when a directory is requested
-int	MethodExecutor::_createIndexPage(std::string path, Response *resp)
+int	MethodExecutor::_createIndexPage(std::string path, Response &resp)
 {
 	std::ifstream is((_serverSettings->workingDir \
 		+ "/content/templates/dir_listing_page.html").c_str());
 	if (!is.good())
 	{
-		resp->httpStatus = INTERNAL_SERVER_ERROR;
+		resp.httpStatus = INTERNAL_SERVER_ERROR;
 		return (-1);
 	}
 	std::string	line;
@@ -28,21 +28,21 @@ int	MethodExecutor::_createIndexPage(std::string path, Response *resp)
 			DIR	*dir = opendir(path.c_str());
 			if (!dir)
 			{
-				resp->httpStatus = INTERNAL_SERVER_ERROR;
+				resp.httpStatus = INTERNAL_SERVER_ERROR;
 				is.close();
 				return (-1);
 			}
 			dirent *entry = readdir(dir);
 			while (entry)
 			{
-				resp->body.append(line.replace(idx_start, \
+				resp.body.append(line.replace(idx_start, \
 					std::string("__DIR_ENTRY__").length(), entry->d_name));
 				entry = readdir(dir);
 			}
 			closedir(dir);
 		}
 		else
-			resp->body.append(line);
+			resp.body.append(line);
 	}
 	is.close();
 	return (0);
