@@ -306,6 +306,7 @@ void Tests::testHttpParser() {
 	this->testPair = this->testConnectionMap.find(3);
 	httpParser test1(this->testPair);
 	expectedHeaderFields.clear();
+	
 //==========================================================//
 //-------------------Preparing for Test 1-------------------//
 //==========================================================//
