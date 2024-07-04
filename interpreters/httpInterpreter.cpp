@@ -27,11 +27,14 @@ void findRoute(Request& request,  const t_server& settings) {
 	if (RouteIterator != settings.locations.end()) {
 		request.UsedRoute = RouteIterator->second;
 		routeSet = true;
-		return;
 	} else {
 		RouteIterator = settings.locations.begin();
+		if (RouteIterator->first.size() > request.RequestedPath.size()) {
+			request.RequestIntegrity = NOT_FOUND;
+			return;
+		}
 		while (RouteIterator != settings.locations.end()) {
-			if (request.RequestedPath.substr(0,RouteIterator->first.size()) == RouteIterator->first && request.UsedRoute.locationName.size() < RouteIterator->first.size()){
+			if (request.RequestedPath.substr(0,RouteIterator->first.size()) == RouteIterator->first && request.RequestedPath.at(RouteIterator->first.size()) == '/'  && request.UsedRoute.locationName.size() < RouteIterator->first.size()){
 				request.UsedRoute = RouteIterator->second;
 				routeSet = true;
 			}
