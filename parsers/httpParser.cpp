@@ -16,7 +16,7 @@ void httpParser(std::map<int, connection>::iterator& req) {
 	if (req->second.r.Body.empty() == true) {
 		handleBody(req->second.r, endOfBlock);
 	}
-	req->second.r.requestCompletlyRevieved = true;
+	req->second.r.requestCompletlyRecieved = true;
 	if (req->second.r.RequestBuffer.empty() == false) {
 		req->second.r.RequestIntegrity = BAD_REQUEST;
 		return;

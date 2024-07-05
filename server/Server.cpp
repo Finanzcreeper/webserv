@@ -50,6 +50,7 @@ void Server::CheckForConnections() {
 	MethodExecutor executor = MethodExecutor(&(this->settings));
 
 	connection request;
+	request.r.requestCompletlyRecieved = false;
 	Response response;
 
 	request.r.ReqType = NONE;
@@ -95,7 +96,7 @@ void Server::CheckForConnections() {
 							mt->second.r.RequestIntegrity = REQUEST_TIMEOUT;
 						}
 						httpParser(mt);
-						if (mt->second.r.requestCompletlyRevieved == true){
+						if (mt->second.r.requestCompletlyRecieved == true){
 							interpretRequest(mt->second.r, settings); 
 							executor.wrapperRequest(mt->second.r, resps->second);
 							mt->second.r.HeaderBuffer.clear();
