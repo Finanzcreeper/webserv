@@ -14,24 +14,13 @@
 //#include "../server/Server.hpp"
 #include "../CommonIncludes.hpp"
 
-//struct Request;
 
-class httpParser {
-private:
-	std::map<int,connection>::iterator& req;
-
+	void httpParser(std::map<int, connection>::iterator& req);
 	void GetRequestedPath(Request& request);
 	void GetRequestType(Request& request);
 	void decapitalizeHeaderFields(std::string& Header);
 	void extractHeaderFields(Request& req);
 	void handleHeader(Request &request, size_t endOfBlock);
 	void handleBody(Request &request, size_t endOfBlock);
-public:
-		httpParser(std::map<int, connection>::iterator& req);
-
-	//httpParser(std::map<int, Request>::iterator& req, const t_server sett);
-};
-
-
 
 #endif //HTTPPARSER_HPP

@@ -47,7 +47,7 @@ void Server::CheckForConnections() {
 	std::map<int, connection>::iterator mt;
 	std::map<int, Response>::iterator resps;
 
-	MethodExecutor executor = MethodExecutor(this);
+	MethodExecutor executor = MethodExecutor(&(this->settings));
 
 	connection request;
 	Response response;
@@ -95,7 +95,7 @@ void Server::CheckForConnections() {
 							mt->second.r.RequestIntegrity = REQUEST_TIMEOUT;
 						}
 						try {
-							httpParser test(mt);
+							httpParser(mt);
 						}
 						catch (const std::runtime_error &e){
 							std::cerr << e.what() << std::endl;

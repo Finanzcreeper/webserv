@@ -1,7 +1,7 @@
 #include "httpParser.hpp"
 #include <sstream>
 
-httpParser::httpParser(std::map<int, connection>::iterator& pair): req(pair) {
+void httpParser(std::map<int, connection>::iterator& req) {
 	size_t endOfBlock = req->second.r.RequestBuffer.find("\r\n\r\n");
 	if ( endOfBlock == std::string::npos) {
 		return;
@@ -18,7 +18,7 @@ httpParser::httpParser(std::map<int, connection>::iterator& pair): req(pair) {
 	}
 }
 
-void httpParser::handleHeader(Request &request, size_t endOfBlock) {
+void handleHeader(Request &request, size_t endOfBlock) {
 	request.HeaderBuffer = request.RequestBuffer.substr(0, endOfBlock + 4);
 	request.RequestBuffer.erase(0,endOfBlock + 4);
 	GetRequestType(request);
@@ -27,7 +27,7 @@ void httpParser::handleHeader(Request &request, size_t endOfBlock) {
 	extractHeaderFields(request);
 }
 
-void httpParser::GetRequestType(Request& request) {
+void GetRequestType(Request& request) {
 	std::string firstLine = request.HeaderBuffer.substr(0,request.HeaderBuffer.find('\r'));
 	if (firstLine.find("GET ") == 0) {
 		request.ReqType = GET;
@@ -52,12 +52,12 @@ void httpParser::GetRequestType(Request& request) {
 	}
 }
 
-void httpParser::GetRequestedPath(Request& request) {
+void GetRequestedPath(Request& request) {
 	size_t startOfPath = request.HeaderBuffer.find(' ') + 1;
 	request.RequestedPath = request.HeaderBuffer.substr(startOfPath, request.HeaderBuffer.find(' ', startOfPath) - startOfPath);
 }
 
-void httpParser::decapitalizeHeaderFields(std::string& Header) {
+void decapitalizeHeaderFields(std::string& Header) {
 	int i = 0;
 	while(Header[i] != '\n') {
 		i++;
@@ -73,7 +73,7 @@ void httpParser::decapitalizeHeaderFields(std::string& Header) {
 	}
 }
 
-void httpParser::extractHeaderFields(Request& request) {
+void extractHeaderFields(Request& request) {
 	std::vector<std::string> SearchedHeaderFields;
 	//Add HeaderBuffer fields to extract here
 	SearchedHeaderFields.push_back("connection");
@@ -92,7 +92,7 @@ void httpParser::extractHeaderFields(Request& request) {
 }
 
 
-void httpParser::handleBody(Request &request, size_t endOfBlock) {
+void handleBody(Request &request, size_t endOfBlock) {
 	std::map<std::string ,std::string>::iterator TransferCoding;
 	int ChunkSize = 0;
 	TransferCoding = request.HeaderFields.find("transfer-encoding");

@@ -9,22 +9,24 @@
 #include "Server.hpp"
 #include "../CommonIncludes.hpp"
 
-class Server;
-struct Response;
-//struct Request;
-
 class MethodExecutor
 {
 	private:
-		Server*	_server;
-		void	_executeGet(Request &requ, Response &resp);
-		void	_generateHeader(Request &requ, Response &resp);
-		void	_generateErrorBody(Response &resp);
-		//void    exexutePost();
-		//void    exexuteDelete();
+		const t_server*	_serverSettings;
+		void			_executeGet(Request &requ, Response &resp);
+		void			_executePost(Request &requ, Response &resp);
+		//void			_executeDelete(Request &requ, Response &resp);
+		void			_writeStatusLine(Response &resp);
+		void			_writeHeaderFields(Response &resp);
+		void			_generateCommonHeaderFields(Response &resp);
+		void			_generateSpecialErrorFields(Request &req, Response &resp);
+
+		int		_generateErrorBody(Response &resp);
+		int		_createIndexPage(std::string path, Response &resp);
+
 	public:
 		MethodExecutor( void );
-		MethodExecutor(Server *server);
+		MethodExecutor(const t_server *serverSettings);
 		~MethodExecutor(){};
 		void	wrapperRequest(Request &requ, Response &resp);
 };
