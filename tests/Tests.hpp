@@ -23,7 +23,7 @@ private:
 	t_server testSettings;
 	location testLocation;
 
-	int silent;
+	bool silent;
 
 	void testHttpInterpreter();
 	void testConfigParser();

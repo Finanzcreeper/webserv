@@ -36,7 +36,7 @@ $(NAME): $(MAINOBJ) $(OBJS)
 	$(CXX) $(CXXFLAGS) $^ -o $(TESTNAME)
 
 clean:
-	rm -f $(OBJS) $(MAINOBJ) $(TESTMAINOBJ)
+	rm -f $(OBJS) $(MAINOBJ) $(TESTMAINOBJ) *.o
 	echo -e "\033[1;31mCleaning\033[0m "
 
 fclean: clean

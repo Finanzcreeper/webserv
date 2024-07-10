@@ -43,7 +43,7 @@ void Tests::testHttpInterpreter() {
 	findRoute(testRequest, testSettings);
 	if (testRequest.RequestIntegrity != OK_HTTP || testRequest.RoutedPath != "/folder/") {
 		std::cout << "Correct full Path: \033[1;31mFAILED\033[0m" << std::endl;
-	} else if (this->silent != 1) {
+	} else if (this->silent == false) {
 		std::cout << "Correct full Path: \033[1;32mOK\033[0m" << std::endl;
 	}
 //==========================================================//
@@ -59,7 +59,7 @@ void Tests::testHttpInterpreter() {
 	findRoute(testRequest, testSettings);
 	if (testRequest.RequestIntegrity != OK_HTTP || testRequest.RoutedPath != "/folder/everything/") {
 		std::cout << "Correct Partial Path: \033[1;31mFAILED\033[0m" << std::endl;
-	} else if (this->silent != 1) {
+	} else if (this->silent == false) {
 		std::cout << "Correct Partial Path: \033[1;32mOK\033[0m" << std::endl;
 	}
 //==========================================================//
@@ -75,7 +75,7 @@ void Tests::testHttpInterpreter() {
 	findRoute(testRequest, testSettings);
 	if (testRequest.RequestIntegrity != NOT_FOUND || testRequest.RoutedPath != "") {
 		std::cout << "Empty Path: \033[1;31mFAILED\033[0m" << std::endl;
-	} else if (this->silent != 1) {
+	} else if (this->silent == false) {
 		std::cout << "Empty Path: \033[1;32mOK\033[0m" << std::endl;
 	}
 //==========================================================//
@@ -91,7 +91,7 @@ void Tests::testHttpInterpreter() {
 	findRoute(testRequest, testSettings);
 	if (testRequest.RequestIntegrity != NOT_FOUND || testRequest.RoutedPath != "") {
 		std::cout << "Incorrect Path: \033[1;31mFAILED\033[0m" << std::endl;
-	} else if (this->silent != 1) {
+	} else if (this->silent == false) {
 		std::cout << "Incorrect Path: \033[1;32mOK\033[0m" << std::endl;
 	}
 //==========================================================//
@@ -107,7 +107,7 @@ void Tests::testHttpInterpreter() {
 	findRoute(testRequest, testSettings);
 	if (testRequest.RequestIntegrity != OK_HTTP || testRequest.RoutedPath != "/ha/ha/ha/testing.html") {
 		std::cout << "requested file with same name as location: \033[1;31mFAILED\033[0m" << std::endl;
-	} else if (this->silent != 1) {
+	} else if (this->silent == false) {
 		std::cout << "requested file with same name as location: \033[1;32mOK\033[0m" << std::endl;
 	}
 
@@ -124,7 +124,7 @@ void Tests::testHttpInterpreter() {
 	findRoute(testRequest, testSettings);
 	if (testRequest.RequestIntegrity != OK_HTTP || testRequest.RoutedPath != "/gerhard/content.html") {
 		std::cout << "requested file with other (longer) path possible: \033[1;31mFAILED\033[0m" << std::endl;
-	} else if (this->silent != 1) {
+	} else if (this->silent == false) {
 		std::cout << "requested file with other (longer) path possible: \033[1;32mOK\033[0m" << std::endl;
 	}
 
@@ -141,7 +141,7 @@ void Tests::testHttpInterpreter() {
 	findRoute(testRequest, testSettings);
 	if (testRequest.RequestIntegrity != OK_HTTP || testRequest.RoutedPath != "/content/braunbär.html") {
 		std::cout << "requested file with other longer path: \033[1;31mFAILED\033[0m" << std::endl;
-	} else if (this->silent != 1) {
+	} else if (this->silent == false) {
 		std::cout << "requested file with other longer path: \033[1;32mOK\033[0m" << std::endl;
 	}
 
@@ -159,7 +159,7 @@ void Tests::testHttpInterpreter() {
 	checkIfMethodIsAllowedOnRoute(testRequest);
 	if (testRequest.RequestIntegrity != OK_HTTP) {
 		std::cout << "Allowed Method (one is allowed): \033[1;31mFAILED\033[0m" << std::endl;
-	} else if (this->silent != 1) {
+	} else if (this->silent == false) {
 		std::cout << "Allowed Method (one is allowed): \033[1;32mOK\033[0m" << std::endl;
 	}
 //==========================================================//
@@ -174,7 +174,7 @@ void Tests::testHttpInterpreter() {
 	checkIfMethodIsAllowedOnRoute(testRequest);
 	if (testRequest.RequestIntegrity != OK_HTTP) {
 		std::cout << "Allowed Method (multiple are allowed): \033[1;31mFAILED\033[0m" << std::endl;
-	} else if (this->silent != 1) {
+	} else if (this->silent == false) {
 		std::cout << "Allowed Method (multiple are allowed): \033[1;32mOK\033[0m" << std::endl;
 	}
 //==========================================================//
@@ -189,7 +189,7 @@ void Tests::testHttpInterpreter() {
 	checkIfMethodIsAllowedOnRoute(testRequest);
 	if (testRequest.RequestIntegrity != METHOD_NOT_ALLOWED) {
 		std::cout << "Disallowed Method (one is allowed): \033[1;31mFAILED\033[0m" << std::endl;
-	} else if (this->silent != 1) {
+	} else if (this->silent == false) {
 		std::cout << "Disallowed Method (one is allowed): \033[1;32mOK\033[0m" << std::endl;
 	}
 //==========================================================//
@@ -204,7 +204,7 @@ void Tests::testHttpInterpreter() {
 	checkIfMethodIsAllowedOnRoute(testRequest);
 	if (testRequest.RequestIntegrity != METHOD_NOT_ALLOWED) {
 		std::cout << "Disallowed Method (multiple are allowed): \033[1;31mFAILED\033[0m" << std::endl;
-	} else if (this->silent != 1) {
+	} else if (this->silent == false) {
 		std::cout << "Disallowed Method (multiple are allowed): \033[1;32mOK\033[0m" << std::endl;
 	}
 
@@ -221,7 +221,7 @@ void Tests::testHttpInterpreter() {
 	checkBodySize(testRequest,testSettings);
 	if (testRequest.RequestIntegrity != OK_HTTP) {
 		std::cout << "Body size ok: \033[1;31mFAILED\033[0m" << std::endl;
-	} else if (this->silent != 1) {
+	} else if (this->silent == false) {
 		std::cout << "Body size ok: \033[1;32mOK\033[0m" << std::endl;
 	}
 //==========================================================//
@@ -236,7 +236,7 @@ void Tests::testHttpInterpreter() {
 	checkBodySize(testRequest,testSettings);
 	if (testRequest.RequestIntegrity != PAYLOAD_TO_LARGE) {
 		std::cout << "Body size to big: \033[1;31mFAILED\033[0m" << std::endl;
-	} else if (this->silent != 1) {
+	} else if (this->silent == false) {
 		std::cout << "Body size to big: \033[1;32mOK\033[0m" << std::endl;
 	}
 //==========================================================//
@@ -251,7 +251,7 @@ void Tests::testHttpInterpreter() {
 	checkBodySize(testRequest,testSettings);
 	if (testRequest.RequestIntegrity != OK_HTTP) {
 		std::cout << "Body size same as clientMaxBodySize: \033[1;31mFAILED\033[0m" << std::endl;
-	} else if (this->silent != 1) {
+	} else if (this->silent == false) {
 		std::cout << "Body size same as clientMaxBodySize: \033[1;32mOK\033[0m" << std::endl;
 	}
 
@@ -267,7 +267,7 @@ void Tests::testHttpInterpreter() {
 	redirectionChecker(testRequest);
 	if (testRequest.RequestIntegrity != OK_HTTP) {
 		std::cout << "Redirect empty: \033[1;31mFAILED\033[0m" << std::endl;
-	} else if (this->silent != 1) {
+	} else if (this->silent == false) {
 		std::cout << "Redirect empty: \033[1;32mOK\033[0m" << std::endl;
 	}
 //==========================================================//
@@ -281,7 +281,7 @@ void Tests::testHttpInterpreter() {
 	redirectionChecker(testRequest);
 	if (testRequest.RequestIntegrity != MOVED_PERMANENTLY) {
 		std::cout << "Redirect not empty: \033[1;31mFAILED\033[0m" << std::endl;
-	} else if (this->silent != 1) {
+	} else if (this->silent == false) {
 		std::cout << "Redirect not empty: \033[1;32mOK\033[0m" << std::endl;
 	}
 
@@ -297,7 +297,7 @@ void Tests::testHttpInterpreter() {
 	checkContentType(testRequest);
 	if (testRequest.RequestIntegrity != OK_HTTP) {
 		std::cout << "No content type: \033[1;31mFAILED\033[0m" << std::endl;
-	} else if (this->silent != 1) {
+	} else if (this->silent == false) {
 		std::cout << "No content type: \033[1;32mOK\033[0m" << std::endl;
 	}
 //==========================================================//
@@ -312,7 +312,7 @@ void Tests::testHttpInterpreter() {
 	checkContentType(testRequest);
 	if (testRequest.RequestIntegrity != OK_HTTP) {
 		std::cout << "accepted content & subcontent type: \033[1;31mFAILED\033[0m" << std::endl;
-	} else if (this->silent != 1) {
+	} else if (this->silent == false) {
 		std::cout << "accepted content & subcontent type: \033[1;32mOK\033[0m" << std::endl;
 	}
 //==========================================================//
@@ -327,7 +327,7 @@ void Tests::testHttpInterpreter() {
 	checkContentType(testRequest);
 	if (testRequest.RequestIntegrity != UNSUPPORTED_MEDIA_TYPE) {
 		std::cout << "not accepted content type: \033[1;31mFAILED\033[0m" << std::endl;
-	} else if (this->silent != 1) {
+	} else if (this->silent == false) {
 		std::cout << "not accepted content type: \033[1;32mOK\033[0m" << std::endl;
 	}
 //==========================================================//
@@ -342,7 +342,7 @@ void Tests::testHttpInterpreter() {
 	checkContentType(testRequest);
 	if (testRequest.RequestIntegrity != UNSUPPORTED_MEDIA_TYPE) {
 		std::cout << "not accepted subContent type: \033[1;31mFAILED\033[0m" << std::endl;
-	} else if (this->silent != 1) {
+	} else if (this->silent == false) {
 		std::cout << "not accepted subContent type: \033[1;32mOK\033[0m" << std::endl;
 	}
 }
@@ -369,7 +369,7 @@ void Tests::testHttpParser() {
 	GetRequestType(this->testRequest);
 	if (testRequest.ReqType != INVALID) {
 		std::cout << "invalid request: \033[1;31mFAILED\033[0m" << std::endl;
-	} else if (this->silent != 1) {
+	} else if (this->silent == false) {
 		std::cout << "invalid request: \033[1;32mOK\033[0m" << std::endl;
 	}
 	//==========================================================//
@@ -383,7 +383,7 @@ void Tests::testHttpParser() {
 	GetRequestType(this->testRequest);
 	if (testRequest.ReqType != GET) {
 		std::cout << "GET: \033[1;31mFAILED\033[0m" << std::endl;
-	} else if (this->silent != 1) {
+	} else if (this->silent == false) {
 		std::cout << "GET: \033[1;32mOK\033[0m" << std::endl;
 	}
 	//==========================================================//
@@ -397,7 +397,7 @@ void Tests::testHttpParser() {
 	GetRequestType(this->testRequest);
 	if (testRequest.ReqType != HEAD) {
 		std::cout << "HEAD: \033[1;31mFAILED\033[0m" << std::endl;
-	} else if (this->silent != 1) {
+	} else if (this->silent == false) {
 		std::cout << "HEAD: \033[1;32mOK\033[0m" << std::endl;
 	}
 	//==========================================================//
@@ -411,7 +411,7 @@ void Tests::testHttpParser() {
 	GetRequestType(this->testRequest);
 	if (testRequest.ReqType != POST) {
 		std::cout << "POST: \033[1;31mFAILED\033[0m" << std::endl;
-	} else if (this->silent != 1) {
+	} else if (this->silent == false) {
 		std::cout << "POST: \033[1;32mOK\033[0m" << std::endl;
 	}
 	//==========================================================//
@@ -425,7 +425,7 @@ void Tests::testHttpParser() {
 	GetRequestType(this->testRequest);
 	if (testRequest.ReqType != PUT) {
 		std::cout << "PUT: \033[1;31mFAILED\033[0m" << std::endl;
-	} else if (this->silent != 1) {
+	} else if (this->silent == false) {
 		std::cout << "PUT: \033[1;32mOK\033[0m" << std::endl;
 	}	//==========================================================//
 	//-------------------Preparing for Test 6-------------------//
@@ -438,7 +438,7 @@ void Tests::testHttpParser() {
 	GetRequestType(this->testRequest);
 	if (testRequest.ReqType != DELETE) {
 		std::cout << "DELETE: \033[1;31mFAILED\033[0m" << std::endl;
-	} else if (this->silent != 1) {
+	} else if (this->silent == false) {
 		std::cout << "DELETE: \033[1;32mOK\033[0m" << std::endl;
 	}
 	//==========================================================//
@@ -452,7 +452,7 @@ void Tests::testHttpParser() {
 	GetRequestType(this->testRequest);
 	if (testRequest.ReqType != CONNECT) {
 		std::cout << "CONNECT: \033[1;31mFAILED\033[0m" << std::endl;
-	} else if (this->silent != 1) {
+	} else if (this->silent == false) {
 		std::cout << "CONNECT: \033[1;32mOK\033[0m" << std::endl;
 	}
 	//==========================================================//
@@ -466,7 +466,7 @@ void Tests::testHttpParser() {
 	GetRequestType(this->testRequest);
 	if (testRequest.ReqType != OPTIONS) {
 		std::cout << "OPTIONS: \033[1;31mFAILED\033[0m" << std::endl;
-	} else if (this->silent != 1) {
+	} else if (this->silent == false) {
 		std::cout << "OPTIONS: \033[1;32mOK\033[0m" << std::endl;
 	}
 	//==========================================================//
@@ -480,7 +480,7 @@ void Tests::testHttpParser() {
 	GetRequestType(this->testRequest);
 	if (testRequest.ReqType != TRACE) {
 		std::cout << "TRACE: \033[1;31mFAILED\033[0m" << std::endl;
-	} else if (this->silent != 1) {
+	} else if (this->silent == false) {
 		std::cout << "TRACE: \033[1;32mOK\033[0m" << std::endl;
 	}
 	//==========================================================//
@@ -494,7 +494,7 @@ void Tests::testHttpParser() {
 	GetRequestType(this->testRequest);
 	if (testRequest.ReqType != PATCH) {
 		std::cout << "PATCH: \033[1;31mFAILED\033[0m" << std::endl;
-	} else if (this->silent != 1) {
+	} else if (this->silent == false) {
 		std::cout << "PATCH: \033[1;32mOK\033[0m" << std::endl;
 	}
 
@@ -509,9 +509,9 @@ void Tests::testHttpParser() {
 	//----------------------------------------------------------//
 	GetRequestedPath(this->testRequest);
 	if (testRequest.RequestedPath != "/index.html") {
-		std::cout << "Valid Request: \033[1;31mFAILED\033[0m" << std::endl;
-	} else if (this->silent != 1) {
-		std::cout << "Valid Request: \033[1;32mOK\033[0m" << std::endl;
+		std::cout << "Valid Request Pattern: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent == false) {
+		std::cout << "Valid Request Pattern: \033[1;32mOK\033[0m" << std::endl;
 	}
 	//==========================================================//
 	//-------------------Preparing for Test 2-------------------//
@@ -523,10 +523,90 @@ void Tests::testHttpParser() {
 	//----------------------------------------------------------//
 	GetRequestedPath(this->testRequest);
 	if (testRequest.RequestedPath != "") {
-		std::cout << "Invalid Request: \033[1;31mFAILED\033[0m" << std::endl;
-		std::cout << testRequest.RequestedPath << std::endl;
-	} else if (this->silent != 1) {
-		std::cout << "Invalid Request: \033[1;32mOK\033[0m" << std::endl;
+		std::cout << "Invalid Request Pattern: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent == false) {
+		std::cout << "Invalid Request Pattern: \033[1;32mOK\033[0m" << std::endl;
+	}
+	//==========================================================//
+	//-------------------Preparing for Test 3-------------------//
+	//==========================================================//
+	this->testRequest.HeaderBuffer = "";
+	this->testRequest.RoutedPath.clear();
+	//----------------------------------------------------------//
+	//======================Running Test 3======================//
+	//----------------------------------------------------------//
+	GetRequestedPath(this->testRequest);
+	if (testRequest.RequestedPath != "") {
+		std::cout << "Empty Request Pattern: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent == false) {
+		std::cout << "Empty Request Pattern: \033[1;32mOK\033[0m" << std::endl;
+	}
+
+	std::cout <<"[1;34m--------decapitalizeHeaderFields--------[0m" << std::endl;
+	//==========================================================//
+	//-------------------Preparing for Test 1-------------------//
+	//==========================================================//
+	this->testRequest.HeaderBuffer = "GET / HTTP/1.1\r\nHost: www.example.com\r\nConnection: close\r\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8\r\nAccept-Language: en-US,en;q=0.9\r\n\r\n";
+	this->testRequest.RoutedPath.clear();
+	//----------------------------------------------------------//
+	//======================Running Test 1======================//
+	//----------------------------------------------------------//
+	decapitalizeHeaderFields(this->testRequest.HeaderBuffer);
+	if (testRequest.HeaderBuffer != "GET / HTTP/1.1\r\nhost: www.example.com\r\nconnection: close\r\nuser-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3\r\naccept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8\r\naccept-language: en-US,en;q=0.9\r\n\r\n") {
+		std::cout << "Valid Header Pattern: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent == false) {
+		std::cout << "Valid Header Pattern: \033[1;32mOK\033[0m" << std::endl;
+	}
+	std::cout <<"[1;34m-----------extractHeaderFields----------[0m" << std::endl;
+	//==========================================================//
+	//-------------------Preparing for Test 1-------------------//
+	//==========================================================//
+	this->testRequest.HeaderBuffer = "GET / HTTP/1.1\r\nhost: www.example.com\r\nconnection: close\r\nuser-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3\r\naccept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8\r\naccept-language: en-US,en;q=0.9\r\n\r\n";
+	this->testRequest.HeaderFields.clear();
+	std::map<std::string,std::string> testHeaderFieldMap;
+	testHeaderFieldMap.insert(std::make_pair("connection","close"));
+	testHeaderFieldMap.insert(std::make_pair("user-agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"));
+
+			//----------------------------------------------------------//
+	//======================Running Test 1======================//
+	//----------------------------------------------------------//
+	extractHeaderFields(this->testRequest);
+	if (testRequest.HeaderFields != testHeaderFieldMap) {
+	std::cout << "Searched & not searched Header Fields: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent == false) {
+		std::cout << "Searched & not searched Header Fields: \033[1;32mOK\033[0m" << std::endl;
+	}
+	//==========================================================//
+	//-------------------Preparing for Test 2-------------------//
+	//==========================================================//
+	this->testRequest.HeaderBuffer = "";
+	this->testRequest.HeaderFields.clear();
+	testHeaderFieldMap.clear();
+	//----------------------------------------------------------//
+	//======================Running Test 2======================//
+	//----------------------------------------------------------//
+	extractHeaderFields(this->testRequest);
+	if (testRequest.HeaderFields != testHeaderFieldMap) {
+		std::cout << "not searched Header Fields: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent == false) {
+		std::cout << "not searched Header Fields: \033[1;32mOK\033[0m" << std::endl;
+	}
+
+	std::cout <<"[1;34m----------------handlBody---------------[0m" << std::endl;
+	//==========================================================//
+	//-------------------Preparing for Test 2-------------------//
+	//==========================================================//
+	this->testRequest.HeaderBuffer = "";
+	this->testRequest.HeaderFields.clear();
+	testHeaderFieldMap.clear();
+	//----------------------------------------------------------//
+	//======================Running Test 2======================//
+	//----------------------------------------------------------//
+	extractHeaderFields(this->testRequest);
+	if (testRequest.HeaderFields != testHeaderFieldMap) {
+		std::cout << "not searched Header Fields: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent == false) {
+		std::cout << "not searched Header Fields: \033[1;32mOK\033[0m" << std::endl;
 	}
 }
 
@@ -552,8 +632,8 @@ void Tests::testing() {
 	testStatusCodes();
 }
 
-Tests::Tests(int argument) {
+Tests::Tests(int argument): silent(false) {
 	if (argument == SILENT) {
-		this->silent = 1;
+		this->silent = true;
 	}
 }

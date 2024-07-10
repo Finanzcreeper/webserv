@@ -28,7 +28,7 @@ void handleHeader(Request &request, size_t endOfBlock) {
 }
 
 void GetRequestType(Request& request) {
-	std::string firstLine = request.HeaderBuffer.substr(0,request.HeaderBuffer.find('\r'));
+	std::string firstLine = request.HeaderBuffer.substr(0,request.HeaderBuffer.find('\n'));
 	if (firstLine.find("GET ") == 0) {
 		request.ReqType = GET;
 	} else if (firstLine.find("HEAD ") == 0) {
