@@ -30,7 +30,7 @@ void handleHeader(Request &request, size_t endOfBlock) {
 	GetRequestedPath(request);
 	decapitalizeHeaderFields(request.HeaderBuffer);
 	extractHeaderFields(request);
-	if (request.HeaderFields.find("content-length")->second.empty() == true && request.HeaderFields.find("transfer-encoding")->second.empty() == true) {
+	if (request.HeaderFields.find("content-length") == request.HeaderFields.end() && request.HeaderFields.find("transfer-encoding") == request.HeaderFields.end()) {
 		request.requestCompletlyRecieved = true;
 	}
 }
