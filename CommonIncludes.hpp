@@ -60,6 +60,7 @@ struct Request {
 	std::string BodyBuffer;
 	location	UsedRoute;
 	std::string Body;
+	bool requestCompletlyRecieved;
 };
 
 struct Response {

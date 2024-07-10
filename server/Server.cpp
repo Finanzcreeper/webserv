@@ -50,6 +50,7 @@ void Server::CheckForConnections() {
 	MethodExecutor executor = MethodExecutor(&(this->settings));
 
 	connection request;
+	request.r.requestCompletlyRecieved = false;
 	Response response;
 
 	request.r.ReqType = NONE;
@@ -94,16 +95,9 @@ void Server::CheckForConnections() {
 						if (mt->second.t.msgAmt > settings.timeoutReads) {
 							mt->second.r.RequestIntegrity = REQUEST_TIMEOUT;
 						}
-						try {
-							httpParser(mt);
-						}
-						catch (const std::runtime_error &e){
-							std::cerr << e.what() << std::endl;
-							//get error page based on request.integrity!
-						}
-						interpretRequest(mt->second.r, settings);
-						std::cout << mt->second.r.RequestIntegrity << std::endl;
-						if (mt->second.r.RequestIntegrity == OK_HTTP){
+						httpParser(mt);
+						if (mt->second.r.requestCompletlyRecieved == true){
+							interpretRequest(mt->second.r, settings); 
 							executor.wrapperRequest(mt->second.r, resps->second);
 							mt->second.r.HeaderBuffer.clear();
 							mt->second.r.RequestBuffer.clear();

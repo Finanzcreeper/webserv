@@ -9,12 +9,17 @@ void httpParser(std::map<int, connection>::iterator& req) {
 	if (req->second.r.HeaderBuffer.empty() == true) {
 		handleHeader(req->second.r, endOfBlock);
 	}
+	endOfBlock = req->second.r.RequestBuffer.find("\r\n\r\n");
+	if ( endOfBlock == std::string::npos) {
+		return;
+	}
 	if (req->second.r.Body.empty() == true) {
 		handleBody(req->second.r, endOfBlock);
 	}
+	req->second.r.requestCompletlyRecieved = true;
 	if (req->second.r.RequestBuffer.empty() == false) {
 		req->second.r.RequestIntegrity = BAD_REQUEST;
-		throw std::runtime_error("Content after Body recieved!");
+		return;
 	}
 }
 
