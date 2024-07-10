@@ -88,7 +88,7 @@ void extractHeaderFields(Request& request) {
 	SearchedHeaderFields.push_back("transfer-encoding");
 	SearchedHeaderFields.push_back("user-agent");
 	SearchedHeaderFields.push_back("content-type");
-	SearchedHeaderFields.push_back("content-length")
+	SearchedHeaderFields.push_back("content-length");
 
 
 	long unsigned int i = 0;
