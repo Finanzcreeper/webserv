@@ -40,12 +40,11 @@ void Tests::testHttpInterpreter() {
 //----------------------------------------------------------//
 //======================Running Test 1======================//
 //----------------------------------------------------------//
-	std::cout << "Correct full Path: ";
 	findRoute(testRequest, testSettings);
 	if (testRequest.RequestIntegrity != OK_HTTP || testRequest.RoutedPath != "/folder/") {
-		std::cout << "\033[1;31mFAILED\033[0m" << std::endl;
-	} else {
-		std::cout << "\033[1;32mOK\033[0m" << std::endl;
+		std::cout << "Correct full Path: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent != 1) {
+		std::cout << "Correct full Path: \033[1;32mOK\033[0m" << std::endl;
 	}
 //==========================================================//
 //-------------------Preparing for Test 2-------------------//
@@ -57,12 +56,11 @@ void Tests::testHttpInterpreter() {
 //----------------------------------------------------------//
 //======================Running Test 2======================//
 //----------------------------------------------------------//
-	std::cout << "Correct Partial Path: ";
 	findRoute(testRequest, testSettings);
 	if (testRequest.RequestIntegrity != OK_HTTP || testRequest.RoutedPath != "/folder/everything/") {
-		std::cout << "\033[1;31mFAILED\033[0m" << std::endl;
-	} else {
-		std::cout << "\033[1;32mOK\033[0m" << std::endl;
+		std::cout << "Correct Partial Path: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent != 1) {
+		std::cout << "Correct Partial Path: \033[1;32mOK\033[0m" << std::endl;
 	}
 //==========================================================//
 //-------------------Preparing for Test 3-------------------//
@@ -74,12 +72,11 @@ void Tests::testHttpInterpreter() {
 //----------------------------------------------------------//
 //======================Running Test 3======================//
 //----------------------------------------------------------//
-	std::cout << "Empty Path: ";
 	findRoute(testRequest, testSettings);
 	if (testRequest.RequestIntegrity != NOT_FOUND || testRequest.RoutedPath != "") {
-		std::cout << "\033[1;31mFAILED\033[0m" << std::endl;
-	} else {
-		std::cout << "\033[1;32mOK\033[0m" << std::endl;
+		std::cout << "Empty Path: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent != 1) {
+		std::cout << "Empty Path: \033[1;32mOK\033[0m" << std::endl;
 	}
 //==========================================================//
 //-------------------Preparing for Test 4-------------------//
@@ -91,12 +88,11 @@ void Tests::testHttpInterpreter() {
 //----------------------------------------------------------//
 //======================Running Test 4======================//
 //----------------------------------------------------------//
-	std::cout << "Incorrect Path: ";
 	findRoute(testRequest, testSettings);
 	if (testRequest.RequestIntegrity != NOT_FOUND || testRequest.RoutedPath != "") {
-		std::cout << "\033[1;31mFAILED\033[0m" << std::endl;
-	} else {
-		std::cout << "\033[1;32mOK\033[0m" << std::endl;
+		std::cout << "Incorrect Path: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent != 1) {
+		std::cout << "Incorrect Path: \033[1;32mOK\033[0m" << std::endl;
 	}
 //==========================================================//
 //-------------------Preparing for Test 5-------------------//
@@ -108,12 +104,11 @@ void Tests::testHttpInterpreter() {
 //----------------------------------------------------------//
 //======================Running Test 5======================//
 //----------------------------------------------------------//
-	std::cout << "requested file with same name as location: ";
 	findRoute(testRequest, testSettings);
 	if (testRequest.RequestIntegrity != OK_HTTP || testRequest.RoutedPath != "/ha/ha/ha/testing.html") {
-		std::cout << "\033[1;31mFAILED\033[0m" << std::endl;
-	} else {
-		std::cout << "\033[1;32mOK\033[0m" << std::endl;
+		std::cout << "requested file with same name as location: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent != 1) {
+		std::cout << "requested file with same name as location: \033[1;32mOK\033[0m" << std::endl;
 	}
 
 //==========================================================//
@@ -126,12 +121,11 @@ void Tests::testHttpInterpreter() {
 //----------------------------------------------------------//
 //======================Running Test 6======================//
 //----------------------------------------------------------//
-	std::cout << "requested file with other (longer) path possible: ";
 	findRoute(testRequest, testSettings);
 	if (testRequest.RequestIntegrity != OK_HTTP || testRequest.RoutedPath != "/gerhard/content.html") {
-		std::cout << "\033[1;31mFAILED\033[0m" << std::endl;
-	} else {
-		std::cout << "\033[1;32mOK\033[0m" << std::endl;
+		std::cout << "requested file with other (longer) path possible: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent != 1) {
+		std::cout << "requested file with other (longer) path possible: \033[1;32mOK\033[0m" << std::endl;
 	}
 
 	//==========================================================//
@@ -144,12 +138,11 @@ void Tests::testHttpInterpreter() {
 //----------------------------------------------------------//
 //======================Running Test 7======================//
 //----------------------------------------------------------//
-	std::cout << "requested file with other longer path: ";
 	findRoute(testRequest, testSettings);
 	if (testRequest.RequestIntegrity != OK_HTTP || testRequest.RoutedPath != "/content/braunbär.html") {
-		std::cout << "\033[1;31mFAILED\033[0m" << std::endl;
-	} else {
-		std::cout << "\033[1;32mOK\033[0m" << std::endl;
+		std::cout << "requested file with other longer path: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent != 1) {
+		std::cout << "requested file with other longer path: \033[1;32mOK\033[0m" << std::endl;
 	}
 
 
@@ -163,12 +156,11 @@ void Tests::testHttpInterpreter() {
 //----------------------------------------------------------//
 //======================Running Test 1======================//
 //----------------------------------------------------------//
-	std::cout << "Allowed Method (one is allowed): ";
 	checkIfMethodIsAllowedOnRoute(testRequest);
 	if (testRequest.RequestIntegrity != OK_HTTP) {
-		std::cout << "\033[1;31mFAILED\033[0m" << std::endl;
-	} else {
-		std::cout << "\033[1;32mOK\033[0m" << std::endl;
+		std::cout << "Allowed Method (one is allowed): \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent != 1) {
+		std::cout << "Allowed Method (one is allowed): \033[1;32mOK\033[0m" << std::endl;
 	}
 //==========================================================//
 //-------------------Preparing for Test 2-------------------//
@@ -179,12 +171,11 @@ void Tests::testHttpInterpreter() {
 //----------------------------------------------------------//
 //======================Running Test 2======================//
 //----------------------------------------------------------//
-	std::cout << "Allowed Method (multiple are allowed): ";
 	checkIfMethodIsAllowedOnRoute(testRequest);
 	if (testRequest.RequestIntegrity != OK_HTTP) {
-		std::cout << "\033[1;31mFAILED\033[0m" << std::endl;
-	} else {
-		std::cout << "\033[1;32mOK\033[0m" << std::endl;
+		std::cout << "Allowed Method (multiple are allowed): \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent != 1) {
+		std::cout << "Allowed Method (multiple are allowed): \033[1;32mOK\033[0m" << std::endl;
 	}
 //==========================================================//
 //-------------------Preparing for Test 3-------------------//
@@ -195,12 +186,11 @@ void Tests::testHttpInterpreter() {
 //----------------------------------------------------------//
 //======================Running Test 3======================//
 //----------------------------------------------------------//
-	std::cout << "Disallowed Method (one is allowed): ";
 	checkIfMethodIsAllowedOnRoute(testRequest);
 	if (testRequest.RequestIntegrity != METHOD_NOT_ALLOWED) {
-		std::cout << "\033[1;31mFAILED\033[0m" << std::endl;
-	} else {
-		std::cout << "\033[1;32mOK\033[0m" << std::endl;
+		std::cout << "Disallowed Method (one is allowed): \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent != 1) {
+		std::cout << "Disallowed Method (one is allowed): \033[1;32mOK\033[0m" << std::endl;
 	}
 //==========================================================//
 //-------------------Preparing for Test 4-------------------//
@@ -211,12 +201,11 @@ void Tests::testHttpInterpreter() {
 //----------------------------------------------------------//
 //======================Running Test 4======================//
 //----------------------------------------------------------//
-	std::cout << "Disallowed Method (multiple are allowed): ";
 	checkIfMethodIsAllowedOnRoute(testRequest);
 	if (testRequest.RequestIntegrity != METHOD_NOT_ALLOWED) {
-		std::cout << "\033[1;31mFAILED\033[0m" << std::endl;
-	} else {
-		std::cout << "\033[1;32mOK\033[0m" << std::endl;
+		std::cout << "Disallowed Method (multiple are allowed): \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent != 1) {
+		std::cout << "Disallowed Method (multiple are allowed): \033[1;32mOK\033[0m" << std::endl;
 	}
 
 	std::cout <<"[1;34m-------------checkBodySize-------------[0m" << std::endl;
@@ -229,12 +218,11 @@ void Tests::testHttpInterpreter() {
 //----------------------------------------------------------//
 //======================Running Test 1======================//
 //----------------------------------------------------------//
-	std::cout << "Body size ok:  ";
 	checkBodySize(testRequest,testSettings);
 	if (testRequest.RequestIntegrity != OK_HTTP) {
-		std::cout << "\033[1;31mFAILED\033[0m" << std::endl;
-	} else {
-		std::cout << "\033[1;32mOK\033[0m" << std::endl;
+		std::cout << "Body size ok: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent != 1) {
+		std::cout << "Body size ok: \033[1;32mOK\033[0m" << std::endl;
 	}
 //==========================================================//
 //-------------------Preparing for Test 2-------------------//
@@ -245,12 +233,11 @@ void Tests::testHttpInterpreter() {
 //----------------------------------------------------------//
 //======================Running Test 2======================//
 //----------------------------------------------------------//
-	std::cout << "Body size to big:  ";
 	checkBodySize(testRequest,testSettings);
 	if (testRequest.RequestIntegrity != PAYLOAD_TO_LARGE) {
-		std::cout << "\033[1;31mFAILED\033[0m" << std::endl;
-	} else {
-		std::cout << "\033[1;32mOK\033[0m" << std::endl;
+		std::cout << "Body size to big: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent != 1) {
+		std::cout << "Body size to big: \033[1;32mOK\033[0m" << std::endl;
 	}
 //==========================================================//
 //-------------------Preparing for Test 3-------------------//
@@ -261,12 +248,11 @@ void Tests::testHttpInterpreter() {
 //----------------------------------------------------------//
 //======================Running Test 3======================//
 //----------------------------------------------------------//
-	std::cout << "Body size same as clientMaxBodySize: ";
 	checkBodySize(testRequest,testSettings);
 	if (testRequest.RequestIntegrity != OK_HTTP) {
-		std::cout << "\033[1;31mFAILED\033[0m" << std::endl;
-	} else {
-		std::cout << "\033[1;32mOK\033[0m" << std::endl;
+		std::cout << "Body size same as clientMaxBodySize: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent != 1) {
+		std::cout << "Body size same as clientMaxBodySize: \033[1;32mOK\033[0m" << std::endl;
 	}
 
 	std::cout <<"[1;34m-----------redirectionChecker-----------[0m" << std::endl;
@@ -278,12 +264,11 @@ void Tests::testHttpInterpreter() {
 //----------------------------------------------------------//
 //======================Running Test 1======================//
 //----------------------------------------------------------//
-	std::cout << "Redirect empty: ";
 	redirectionChecker(testRequest);
 	if (testRequest.RequestIntegrity != OK_HTTP) {
-		std::cout << "\033[1;31mFAILED\033[0m" << std::endl;
-	} else {
-		std::cout << "\033[1;32mOK\033[0m" << std::endl;
+		std::cout << "Redirect empty: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent != 1) {
+		std::cout << "Redirect empty: \033[1;32mOK\033[0m" << std::endl;
 	}
 //==========================================================//
 //-------------------Preparing for Test 2-------------------//
@@ -293,12 +278,11 @@ void Tests::testHttpInterpreter() {
 //----------------------------------------------------------//
 //======================Running Test 2======================//
 //----------------------------------------------------------//
-	std::cout << "Redirect not empty: ";
 	redirectionChecker(testRequest);
 	if (testRequest.RequestIntegrity != MOVED_PERMANENTLY) {
-		std::cout << "\033[1;31mFAILED\033[0m" << std::endl;
-	} else {
-		std::cout << "\033[1;32mOK\033[0m" << std::endl;
+		std::cout << "Redirect not empty: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent != 1) {
+		std::cout << "Redirect not empty: \033[1;32mOK\033[0m" << std::endl;
 	}
 
 	std::cout <<"[1;34m------------checkContentType------------[0m" << std::endl;
@@ -310,12 +294,11 @@ void Tests::testHttpInterpreter() {
 //----------------------------------------------------------//
 //======================Running Test 1======================//
 //----------------------------------------------------------//
-	std::cout << "No content type: ";
 	checkContentType(testRequest);
 	if (testRequest.RequestIntegrity != OK_HTTP) {
-		std::cout << "\033[1;31mFAILED\033[0m" << std::endl;
-	} else {
-		std::cout << "\033[1;32mOK\033[0m" << std::endl;
+		std::cout << "No content type: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent != 1) {
+		std::cout << "No content type: \033[1;32mOK\033[0m" << std::endl;
 	}
 //==========================================================//
 //-------------------Preparing for Test 2-------------------//
@@ -326,12 +309,11 @@ void Tests::testHttpInterpreter() {
 //----------------------------------------------------------//
 //======================Running Test 2======================//
 //----------------------------------------------------------//
-	std::cout << "accepted content & subcontent type: ";
 	checkContentType(testRequest);
 	if (testRequest.RequestIntegrity != OK_HTTP) {
-		std::cout << "\033[1;31mFAILED\033[0m" << std::endl;
-	} else {
-		std::cout << "\033[1;32mOK\033[0m" << std::endl;
+		std::cout << "accepted content & subcontent type: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent != 1) {
+		std::cout << "accepted content & subcontent type: \033[1;32mOK\033[0m" << std::endl;
 	}
 //==========================================================//
 //-------------------Preparing for Test 3-------------------//
@@ -342,12 +324,11 @@ void Tests::testHttpInterpreter() {
 //----------------------------------------------------------//
 //======================Running Test 3======================//
 //----------------------------------------------------------//
-	std::cout << "not accepted content type: ";
 	checkContentType(testRequest);
 	if (testRequest.RequestIntegrity != UNSUPPORTED_MEDIA_TYPE) {
-		std::cout << "\033[1;31mFAILED\033[0m" << std::endl;
-	} else {
-		std::cout << "\033[1;32mOK\033[0m" << std::endl;
+		std::cout << "not accepted content type: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent != 1) {
+		std::cout << "not accepted content type: \033[1;32mOK\033[0m" << std::endl;
 	}
 //==========================================================//
 //-------------------Preparing for Test 4-------------------//
@@ -358,12 +339,11 @@ void Tests::testHttpInterpreter() {
 //----------------------------------------------------------//
 //======================Running Test 5======================//
 //----------------------------------------------------------//
-	std::cout << "not accepted subContent type: ";
 	checkContentType(testRequest);
 	if (testRequest.RequestIntegrity != UNSUPPORTED_MEDIA_TYPE) {
-		std::cout << "\033[1;31mFAILED\033[0m" << std::endl;
-	} else {
-		std::cout << "\033[1;32mOK\033[0m" << std::endl;
+		std::cout << "not accepted subContent type: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent != 1) {
+		std::cout << "not accepted subContent type: \033[1;32mOK\033[0m" << std::endl;
 	}
 }
 
@@ -386,12 +366,11 @@ void Tests::testHttpParser() {
 	//----------------------------------------------------------//
 	//======================Running Test 1======================//
 	//----------------------------------------------------------//
-	std::cout << "invalid request: ";
 	GetRequestType(this->testRequest);
 	if (testRequest.ReqType != INVALID) {
-		std::cout << "\033[1;31mFAILED\033[0m" << std::endl;
-	} else {
-		std::cout << "\033[1;32mOK\033[0m" << std::endl;
+		std::cout << "invalid request: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent != 1) {
+		std::cout << "invalid request: \033[1;32mOK\033[0m" << std::endl;
 	}
 	//==========================================================//
 	//-------------------Preparing for Test 2-------------------//
@@ -401,12 +380,11 @@ void Tests::testHttpParser() {
 	//----------------------------------------------------------//
 	//======================Running Test 2======================//
 	//----------------------------------------------------------//
-	std::cout << "GET: ";
 	GetRequestType(this->testRequest);
 	if (testRequest.ReqType != GET) {
-		std::cout << "\033[1;31mFAILED\033[0m" << std::endl;
-	} else {
-		std::cout << "\033[1;32mOK\033[0m" << std::endl;
+		std::cout << "GET: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent != 1) {
+		std::cout << "GET: \033[1;32mOK\033[0m" << std::endl;
 	}
 	//==========================================================//
 	//-------------------Preparing for Test 3-------------------//
@@ -416,12 +394,11 @@ void Tests::testHttpParser() {
 	//----------------------------------------------------------//
 	//======================Running Test 3======================//
 	//----------------------------------------------------------//
-	std::cout << "HEAD: ";
 	GetRequestType(this->testRequest);
 	if (testRequest.ReqType != HEAD) {
-		std::cout << "\033[1;31mFAILED\033[0m" << std::endl;
-	} else {
-		std::cout << "\033[1;32mOK\033[0m" << std::endl;
+		std::cout << "HEAD: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent != 1) {
+		std::cout << "HEAD: \033[1;32mOK\033[0m" << std::endl;
 	}
 	//==========================================================//
 	//-------------------Preparing for Test 4-------------------//
@@ -431,12 +408,11 @@ void Tests::testHttpParser() {
 	//----------------------------------------------------------//
 	//======================Running Test 4======================//
 	//----------------------------------------------------------//
-	std::cout << "POST: ";
 	GetRequestType(this->testRequest);
 	if (testRequest.ReqType != POST) {
-		std::cout << "\033[1;31mFAILED\033[0m" << std::endl;
-	} else {
-		std::cout << "\033[1;32mOK\033[0m" << std::endl;
+		std::cout << "POST: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent != 1) {
+		std::cout << "POST: \033[1;32mOK\033[0m" << std::endl;
 	}
 	//==========================================================//
 	//-------------------Preparing for Test 5-------------------//
@@ -446,12 +422,11 @@ void Tests::testHttpParser() {
 	//----------------------------------------------------------//
 	//======================Running Test 5======================//
 	//----------------------------------------------------------//
-	std::cout << "PUT: ";
 	GetRequestType(this->testRequest);
 	if (testRequest.ReqType != PUT) {
-		std::cout << "\033[1;31mFAILED\033[0m" << std::endl;
-	} else {
-		std::cout << "\033[1;32mOK\033[0m" << std::endl;
+		std::cout << "PUT: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent != 1) {
+		std::cout << "PUT: \033[1;32mOK\033[0m" << std::endl;
 	}	//==========================================================//
 	//-------------------Preparing for Test 6-------------------//
 	//==========================================================//
@@ -460,12 +435,11 @@ void Tests::testHttpParser() {
 	//----------------------------------------------------------//
 	//======================Running Test 6======================//
 	//----------------------------------------------------------//
-	std::cout << "DELETE: ";
 	GetRequestType(this->testRequest);
 	if (testRequest.ReqType != DELETE) {
-		std::cout << "\033[1;31mFAILED\033[0m" << std::endl;
-	} else {
-		std::cout << "\033[1;32mOK\033[0m" << std::endl;
+		std::cout << "DELETE: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent != 1) {
+		std::cout << "DELETE: \033[1;32mOK\033[0m" << std::endl;
 	}
 	//==========================================================//
 	//-------------------Preparing for Test 7-------------------//
@@ -475,12 +449,11 @@ void Tests::testHttpParser() {
 	//----------------------------------------------------------//
 	//======================Running Test 7======================//
 	//----------------------------------------------------------//
-	std::cout << "CONNECT: ";
 	GetRequestType(this->testRequest);
 	if (testRequest.ReqType != CONNECT) {
-		std::cout << "\033[1;31mFAILED\033[0m" << std::endl;
-	} else {
-		std::cout << "\033[1;32mOK\033[0m" << std::endl;
+		std::cout << "CONNECT: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent != 1) {
+		std::cout << "CONNECT: \033[1;32mOK\033[0m" << std::endl;
 	}
 	//==========================================================//
 	//-------------------Preparing for Test 8-------------------//
@@ -490,12 +463,11 @@ void Tests::testHttpParser() {
 	//----------------------------------------------------------//
 	//======================Running Test 8======================//
 	//----------------------------------------------------------//
-	std::cout << "OPTIONS: ";
 	GetRequestType(this->testRequest);
 	if (testRequest.ReqType != OPTIONS) {
-		std::cout << "\033[1;31mFAILED\033[0m" << std::endl;
-	} else {
-		std::cout << "\033[1;32mOK\033[0m" << std::endl;
+		std::cout << "OPTIONS: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent != 1) {
+		std::cout << "OPTIONS: \033[1;32mOK\033[0m" << std::endl;
 	}
 	//==========================================================//
 	//-------------------Preparing for Test 9-------------------//
@@ -505,12 +477,11 @@ void Tests::testHttpParser() {
 	//----------------------------------------------------------//
 	//======================Running Test 9======================//
 	//----------------------------------------------------------//
-	std::cout << "TRACE: ";
 	GetRequestType(this->testRequest);
 	if (testRequest.ReqType != TRACE) {
-		std::cout << "\033[1;31mFAILED\033[0m" << std::endl;
-	} else {
-		std::cout << "\033[1;32mOK\033[0m" << std::endl;
+		std::cout << "TRACE: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent != 1) {
+		std::cout << "TRACE: \033[1;32mOK\033[0m" << std::endl;
 	}
 	//==========================================================//
 	//-------------------Preparing for Test 10-------------------//
@@ -520,191 +491,42 @@ void Tests::testHttpParser() {
 	//----------------------------------------------------------//
 	//======================Running Test 10======================//
 	//----------------------------------------------------------//
-	std::cout << "PATCH: ";
 	GetRequestType(this->testRequest);
 	if (testRequest.ReqType != PATCH) {
-		std::cout << "\033[1;31mFAILED\033[0m" << std::endl;
-	} else {
-		std::cout << "\033[1;32mOK\033[0m" << std::endl;
+		std::cout << "PATCH: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent != 1) {
+		std::cout << "PATCH: \033[1;32mOK\033[0m" << std::endl;
 	}
 
 	std::cout <<"[1;34m-------------GetRequestPath-------------[0m" << std::endl;
-
-
-
-	std::cout <<"[1;34m----Complete Header on empty struct----[0m" << std::endl;
-	this->testConnection.r.RequestBuffer = "GET /index.html HTTP/1.1\r\nHost: www.example.re\r\nUser-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.0; en-US; rv:1.1)\r\nAccept: text/html\r\nAccept-Language: en-US, en; q=0.5\r\nAccept-Encoding: gzip, deflate\r\n\r\n";
-	this->testConnectionMap.insert(std::make_pair(3, this->testConnection));
-	
-	this->testPair = this->testConnectionMap.find(3);
-	httpParser(this->testPair);
-	std::map<std::string, std::string> expectedHeaderFields;
-
-	this->testConnection.r.RequestBuffer = "GET /index.html HTTP/1.1\r\nHost: www.example.re\r\nUser-Agent: Mozi";
-	this->testConnectionMap.clear();
-	this->testConnectionMap.insert(std::make_pair(4, this->testConnection));
-
-	this->testPair = this->testConnectionMap.find(3);
-	httpParser(this->testPair);
-	expectedHeaderFields.clear();
-	
-//==========================================================//
-//-------------------Preparing for Test 1-------------------//
-//==========================================================//
-
-	expectedHeaderFields.insert(std::make_pair("user-agent", "Mozilla/5.0 (Windows; U; Windows NT 5.0; en-US; rv:1.1)"));
-//----------------------------------------------------------//
-//======================Running Test 1======================//
-//----------------------------------------------------------//
-//----------------------------------------------------------//
-//=========================Check 1==========================//
-//----------------------------------------------------------//
-	std::cout << "Request Buffer consumed: ";
-	if (this->testConnectionMap.find(3)->second.r.RequestBuffer.empty() == false) {
-		std::cout << "\033[1;31mFAILED\033[0m" << std::endl;
-	} else {
-		std::cout << "\033[1;32mOK\033[0m" << std::endl;
+	//==========================================================//
+	//-------------------Preparing for Test 1-------------------//
+	//==========================================================//
+	this->testRequest.HeaderBuffer = "GET /index.html HTTP/1.1\r\n";
+	this->testRequest.RoutedPath.clear();
+	//----------------------------------------------------------//
+	//======================Running Test 1======================//
+	//----------------------------------------------------------//
+	GetRequestedPath(this->testRequest);
+	if (testRequest.RequestedPath != "/index.html") {
+		std::cout << "Valid Request: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent != 1) {
+		std::cout << "Valid Request: \033[1;32mOK\033[0m" << std::endl;
 	}
-//----------------------------------------------------------//
-//=========================Check 2==========================//
-//----------------------------------------------------------//
-	std::cout << "Header Buffer filled: ";
-	if (this->testConnectionMap.find(3)->second.r.HeaderBuffer.empty() == true) {
-		std::cout << "\033[1;31mFAILED\033[0m" << std::endl;
-	} else {
-		std::cout << "\033[1;32mOK\033[0m" << std::endl;
-	}
-//----------------------------------------------------------//
-//=========================Check 3==========================//
-//----------------------------------------------------------//
-	std::cout << "Request Type found: ";
-	if (this->testConnectionMap.find(3)->second.r.ReqType != GET) {
-		std::cout << "\033[1;31mFAILED\033[0m" << std::endl;
-	} else {
-		std::cout << "\033[1;32mOK\033[0m" << std::endl;
-	}
-//----------------------------------------------------------//
-//=========================Check 4==========================//
-//----------------------------------------------------------//
-	std::cout << "Request Path found: ";
-	if (this->testConnectionMap.find(3)->second.r.RequestedPath != "/index.html") {
-		std::cout << "\033[1;31mFAILED\033[0m" << std::endl;
-	} else {
-		std::cout << "\033[1;32mOK\033[0m" << std::endl;
-	}
-//----------------------------------------------------------//
-//=========================Check 5==========================//
-//----------------------------------------------------------//
-	std::cout << "Header fields decapitalized correctly: ";
-	if (this->testConnectionMap.find(3)->second.r.HeaderBuffer != "GET /index.html HTTP/1.1\r\nhost: www.example.re\r\nuser-agent: Mozilla/5.0 (Windows; U; Windows NT 5.0; en-US; rv:1.1)\r\naccept: text/html\r\naccept-language: en-US, en; q=0.5\r\naccept-encoding: gzip, deflate\r\n\r\n") {
-		std::cout << "\033[1;31mFAILED\033[0m" << std::endl;
-	} else {
-		std::cout << "\033[1;32mOK\033[0m" << std::endl;
-	}
-//----------------------------------------------------------//
-//=========================Check 6==========================//
-//----------------------------------------------------------//
-	std::cout << "Header fields extracted correctly: ";
-	if(this->testConnectionMap.find(3)->second.r.HeaderFields != expectedHeaderFields) {
-		std::cout << "\033[1;31mFAILED\033[0m" << std::endl;
-	} else {
-		std::cout << "\033[1;32mOK\033[0m" << std::endl;
-	}
-//----------------------------------------------------------//
-//=========================Check 7==========================//
-//----------------------------------------------------------//
-	std::cout << "Body empty: ";
-	if(this->testConnectionMap.find(3)->second.r.Body.empty() == false) {
-		std::cout << "\033[1;31mFAILED\033[0m" << std::endl;
-	} else {
-		std::cout << "\033[1;32mOK\033[0m" << std::endl;
-	}
-
-
-
-	std::cout <<"[1;34m----Incomplete Header on empty struct----[0m" << std::endl;
-//==========================================================//
-//-------------------Preparing for Test 1-------------------//
-//==========================================================//
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//----------------------------------------------------------//
-//======================Running Test 1======================//
-//----------------------------------------------------------//
-//----------------------------------------------------------//
-//=========================Check 1==========================//
-//----------------------------------------------------------//
-	std::cout << "Request Buffer consumed: ";
-	if (this->testConnectionMap.find(3)->second.r.RequestBuffer.empty() == false) {
-		std::cout << "\033[1;31mFAILED\033[0m" << std::endl;
-	} else {
-		std::cout << "\033[1;32mOK\033[0m" << std::endl;
-	}
-//----------------------------------------------------------//
-//=========================Check 2==========================//
-//----------------------------------------------------------//
-	std::cout << "Header Buffer filled: ";
-	if (this->testConnectionMap.find(3)->second.r.HeaderBuffer.empty() == true) {
-		std::cout << "\033[1;31mFAILED\033[0m" << std::endl;
-	} else {
-		std::cout << "\033[1;32mOK\033[0m" << std::endl;
-	}
-//----------------------------------------------------------//
-//=========================Check 3==========================//
-//----------------------------------------------------------//
-	std::cout << "Request Type found: ";
-	if (this->testConnectionMap.find(3)->second.r.ReqType != GET) {
-		std::cout << "\033[1;31mFAILED\033[0m" << std::endl;
-	} else {
-		std::cout << "\033[1;32mOK\033[0m" << std::endl;
-	}
-//----------------------------------------------------------//
-//=========================Check 4==========================//
-//----------------------------------------------------------//
-	std::cout << "Request Path found: ";
-	if (this->testConnectionMap.find(3)->second.r.RequestedPath != "/index.html") {
-		std::cout << "\033[1;31mFAILED\033[0m" << std::endl;
-	} else {
-		std::cout << "\033[1;32mOK\033[0m" << std::endl;
-	}
-//----------------------------------------------------------//
-//=========================Check 5==========================//
-//----------------------------------------------------------//
-	std::cout << "Header fields decapitalized correctly: ";
-	if (this->testConnectionMap.find(3)->second.r.HeaderBuffer != "GET /index.html HTTP/1.1\r\nhost: www.example.re\r\nuser-agent: Mozilla/5.0 (Windows; U; Windows NT 5.0; en-US; rv:1.1)\r\naccept: text/html\r\naccept-language: en-US, en; q=0.5\r\naccept-encoding: gzip, deflate\r\n\r\n") {
-		std::cout << "\033[1;31mFAILED\033[0m" << std::endl;
-	} else {
-		std::cout << "\033[1;32mOK\033[0m" << std::endl;
-	}
-//----------------------------------------------------------//
-//=========================Check 6==========================//
-//----------------------------------------------------------//
-	std::cout << "Header fields extracted correctly: ";
-	if(this->testConnectionMap.find(3)->second.r.HeaderFields != expectedHeaderFields) {
-		std::cout << "\033[1;31mFAILED\033[0m" << std::endl;
-	} else {
-		std::cout << "\033[1;32mOK\033[0m" << std::endl;
-	}
-//----------------------------------------------------------//
-//=========================Check 7==========================//
-//----------------------------------------------------------//
-	std::cout << "Body empty: ";
-	if(this->testConnectionMap.find(3)->second.r.Body.empty() == false) {
-		std::cout << "\033[1;31mFAILED\033[0m" << std::endl;
-	} else {
-		std::cout << "\033[1;32mOK\033[0m" << std::endl;
+	//==========================================================//
+	//-------------------Preparing for Test 2-------------------//
+	//==========================================================//
+	this->testRequest.HeaderBuffer = "GET/index.htmlHTTP/1.1\r\n";
+	this->testRequest.RoutedPath.clear();
+	//----------------------------------------------------------//
+	//======================Running Test 2======================//
+	//----------------------------------------------------------//
+	GetRequestedPath(this->testRequest);
+	if (testRequest.RequestedPath != "") {
+		std::cout << "Invalid Request: \033[1;31mFAILED\033[0m" << std::endl;
+		std::cout << testRequest.RequestedPath << std::endl;
+	} else if (this->silent != 1) {
+		std::cout << "Invalid Request: \033[1;32mOK\033[0m" << std::endl;
 	}
 }
 
@@ -728,4 +550,10 @@ void Tests::testing() {
 	testMethodExecutor();
 	testServer();
 	testStatusCodes();
+}
+
+Tests::Tests(int argument) {
+	if (argument == SILENT) {
+		this->silent = 1;
+	}
 }

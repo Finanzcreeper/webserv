@@ -6,6 +6,11 @@
 #include "../interpreters/httpInterpreter.hpp"
 #include "../parsers/httpParser.hpp"
 
+enum DebugArgs {
+	SILENT = 1 << 0,		//1
+	VERBOSE = 1 << 1,		//2
+};
+
 class Tests {
 
 private:
@@ -18,6 +23,8 @@ private:
 	t_server testSettings;
 	location testLocation;
 
+	int silent;
+
 	void testHttpInterpreter();
 	void testConfigParser();
 	void testConfigLocationParser();
@@ -27,6 +34,7 @@ private:
 	void testStatusCodes();
 public:
 	void testing();
+	Tests(int argument);
 };
 
 
