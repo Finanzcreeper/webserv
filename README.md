@@ -11,4 +11,15 @@ To serve static websites, the GET method is used. I use the brave brave to conne
 ```
 http://localhost:8080/example.html
 ```
-in the browser should display the website which is stored in `content/example.html`.
+in the browser should display the website which is stored in `content/example.html`, since `/example.html` is mapped to the location `/` which has the path `/content`. Instead of files one can also display directories, if dirlisting is set to ON in the server config. The URL
+```
+http://localhost:8080/templates
+```
+will show the files which are contained in the folder `content/templates`. **You can put own html files in the folder `content` and easily reach them with the browser.**
+
+## PUT method
+Uploading files to the webserver is implemented via PULL requests. To test it in the browser, we need the webpage `content/file_upload_test.html`. So we start by requesting
+```
+http://localhost:8080/file_upload_test.html
+```
+This page allows to upload files. Right now any textfile can be uploaded and by configuration of the page `content/file_upload_test.html`, the file then is uploaded to `content/upload` because the url is mapped to the location `upload` which has the path `/content/upload` and you should be able to see it in the file tree. **A file can be uploaded only once, since files on the webserver are not overwritten if they already exist.**

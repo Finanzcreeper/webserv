@@ -101,6 +101,7 @@ void Server::CheckForConnections() {
 							executor.wrapperRequest(mt->second.r, resps->second);
 							mt->second.r.HeaderBuffer.clear();
 							mt->second.r.RequestBuffer.clear();
+							mt->second.r.requestCompletlyRecieved = false;
 						}
 					} else {
 						//cleanup
