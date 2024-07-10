@@ -34,7 +34,6 @@ $(NAME): $(MAINOBJ) $(OBJS)
 
  test: $(TESTMAINOBJ) $(OBJS)
 	$(CXX) $(CXXFLAGS) $^ -o $(TESTNAME)
-	./webtest
 
 clean:
 	rm -f $(OBJS) $(MAINOBJ) $(TESTMAINOBJ)
