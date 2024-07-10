@@ -30,6 +30,9 @@ void handleHeader(Request &request, size_t endOfBlock) {
 	GetRequestedPath(request);
 	decapitalizeHeaderFields(request.HeaderBuffer);
 	extractHeaderFields(request);
+	if (request.HeaderFields.find("content-length") == request.HeaderFields.end() && request.HeaderFields.find("transfer-encoding") == request.HeaderFields.end()) {
+		request.requestCompletlyRecieved = true;
+	}
 }
 
 void GetRequestType(Request& request) {
@@ -85,6 +88,7 @@ void extractHeaderFields(Request& request) {
 	SearchedHeaderFields.push_back("transfer-encoding");
 	SearchedHeaderFields.push_back("user-agent");
 	SearchedHeaderFields.push_back("content-type");
+	SearchedHeaderFields.push_back("content-length");
 
 
 	long unsigned int i = 0;
