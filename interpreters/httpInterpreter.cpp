@@ -19,24 +19,34 @@ void interpretRequest(Request& request, const t_server& settings) {
 	}
 }
 
+#include <iostream>
+#include <algorithm>
+
 void findRoute(Request& request,  const t_server& settings) {
 	std::map<std::string, location>::const_iterator RouteIterator;
+	std::vector<std::string> possiblePaths;
+	std::vector<std::string>::iterator reqPathPartsIt;
+	size_t back = 0;
 	bool routeSet = false;
 
-	RouteIterator = settings.locations.find(request.RequestedPath);
-	if (RouteIterator != settings.locations.end()) {
-		request.UsedRoute = RouteIterator->second;
-		routeSet = true;
-		return;
-	} else {
-		RouteIterator = settings.locations.begin();
-		while (RouteIterator != settings.locations.end()) {
-			if (request.RequestedPath.substr(0,RouteIterator->first.size()) == RouteIterator->first && request.UsedRoute.locationName.size() < RouteIterator->first.size()){
-				request.UsedRoute = RouteIterator->second;
-				routeSet = true;
-			}
-			++RouteIterator;
+	while (back < request.RequestedPath.size()) {
+		back = request.RequestedPath.find('/',back);
+		if (back != std::string::npos) {
+			possiblePaths.push_back(request.RequestedPath.substr(0, back + 1));
+			++back;
+		} else {
+			possiblePaths.push_back(request.RequestedPath.substr(0, request.RequestedPath.size()));
+			break;
 		}
+	}
+	reqPathPartsIt = possiblePaths.begin();
+	while (reqPathPartsIt != possiblePaths.end() && reqPathPartsIt->empty() == false){
+		RouteIterator = settings.locations.find(*reqPathPartsIt);
+		if (RouteIterator != settings.locations.end()) {
+ 			request.UsedRoute = RouteIterator->second;
+			routeSet = true;
+		}
+		++reqPathPartsIt;
 	}
 	if (routeSet == false) {
 		request.RequestIntegrity = NOT_FOUND;
