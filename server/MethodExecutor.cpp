@@ -105,8 +105,6 @@ void	MethodExecutor::_executeGet(Request &requ, Response &resp)
     struct stat s;
 
     // default page if no path specified
-    std::cout << "Index page: " << requ.RequestedPath.length() << std::endl;
-    std::cout << "Index page: " << requ.RoutedPath.length() << std::endl;
     if ((requ.RequestedPath.length() == requ.RoutedPath.length()) && (requ.UsedRoute.index.length() > 0))
         path = requ.UsedRoute.root + requ.UsedRoute.index;
     else {
