@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <dirent.h>
 #include <iostream>
+#include <cstdio>
 
 std::string		defaultPage = "index.html";
 
@@ -43,9 +44,9 @@ void	MethodExecutor::wrapperRequest(Request &requ, Response &resp)
 			case (POST):
 				_executePost(requ, resp);
 				break ;
-			//case (DELETE):
-			//	_executeDelete(requ, resp);
-			//	break ;
+			case (DELETE):
+				_executeDelete(requ, resp);
+				break ;
 			default:
 				std::cerr << "Method type not found\n";
 		}
@@ -108,11 +109,8 @@ void	MethodExecutor::_executeGet(Request &requ, Response &resp)
 	if (path.length() == _serverSettings->workingDir.length() + 1)
 		path.append(requ.UsedRoute.index);
 	if (stat(path.c_str(), &s) == -1)
-	{
 		resp.httpStatus = NOT_FOUND;
-		return ;
-	}
-	if (!(s.st_mode & S_IRGRP))
+	else if (!(s.st_mode & S_IRGRP))
 		resp.httpStatus = UNAUTHORIZED;
 	else if ((s.st_mode & S_IFDIR))
 	{
@@ -147,6 +145,67 @@ void	MethodExecutor::_executeGet(Request &requ, Response &resp)
 		}
 		ifs.close();
 	}
+}
+
+void	MethodExecutor::_executePost(Request &requ, Response &resp)
+{
+	std::string	path = requ.RoutedPath;
+	struct stat	s;
+	// check if file already exists
+	if (stat(path.c_str(), &s) == 0)
+	{
+		resp.httpStatus = FORBIDDEN;
+		return ;
+	}
+	std::ofstream	ofs(path.c_str(), std::ios::out);
+	if (ofs.good())
+	{
+		ofs << requ.Body;
+		if(ofs.fail())
+		{
+			std::cout << "Error while creating requested file: \'" + requ.RoutedPath + "\'"<< std::endl;
+			resp.httpStatus = INTERNAL_SERVER_ERROR;
+		}
+		else
+		{
+			resp.httpStatus = CREATED;
+			resp.headerFields["location"] = requ.RequestedPath;
+		}
+	}
+	else
+	{
+		std::cout << "Error while creating requested file: \'" + requ.RoutedPath + "\'"<< std::endl;
+		resp.httpStatus = INTERNAL_SERVER_ERROR;
+	}
+	ofs.close();
+}
+
+void	MethodExecutor::_executeDelete(Request &requ, Response &resp)
+{
+	std::string	path = requ.RoutedPath;
+	std::string	dir_path;
+	size_t pos = path.find_last_of("/");
+    if (pos != std::string::npos)
+        dir_path =  path.substr(0, pos + 1);
+	else
+	{
+		resp.httpStatus = INTERNAL_SERVER_ERROR;
+		std::cout << "Directory for deletion not found" << std::endl;
+		return;
+	}
+	struct stat	file_stat;
+	struct stat dir_stat;
+
+	if (stat(path.c_str(), &dir_stat) == -1)
+		resp.httpStatus = NOT_FOUND;
+	else if (!(dir_stat.st_mode & S_IRWXG))
+		resp.httpStatus = UNAUTHORIZED;
+	else if (stat(path.c_str(), &file_stat) == -1)
+		resp.httpStatus = NOT_FOUND;
+	else if (std::remove(path.c_str()) == 0)
+		resp.httpStatus = NO_CONTENT;
+	else
+		resp.httpStatus = INTERNAL_SERVER_ERROR;
 }
 
 // creates the status line for an http response and adds it to the output buffer
