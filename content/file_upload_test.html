@@ -27,12 +27,13 @@
                 xhr.open('POST', url, true);
                 xhr.setRequestHeader('Content-Type', 'text/plain');
                 xhr.onreadystatechange = function () {
-                    if (xhr.readyState === 4 && xhr.status === 201) {
-                        alert('File uploaded successfully');
+                    if (xhr.readyState === 4) {
+                        if (xhr.status === 201) {
+                            alert('File uploaded successfully');
+                        } else {
+                            alert('File upload failed');
+                        }
                     }
-					else {
-						alert('File uploaded failed');
-					}
                 };
                 xhr.send(fileContent);
             };
