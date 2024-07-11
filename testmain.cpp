@@ -9,9 +9,9 @@ int main(int argn, char *argv[]) {
 	std::vector<t_server>	Config;
 	std::string				path;
 	if (argn == 2)
-		path = std::getenv("OLDPWD") + std::string("/") + std::string(argv[1]);
+		path = std::getenv("PWD") + std::string("/") + std::string(argv[1]);
 	else
-		path = std::getenv("OLDPWD") + std::string("/parsers/sampleConfig.conf");
+		path = std::getenv("PWD") + std::string("/parsers/sampleConfig.conf");
 
 	try {
 		Config = configParse(path);
