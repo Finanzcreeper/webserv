@@ -64,40 +64,7 @@ void	MethodExecutor::wrapperRequest(Request &requ, Response &resp)
 	if (requ.ReqType != HEAD)
 		resp.responseBuffer.append(resp.body);
 	resp.isReady = true;
-	std::cout << "**** RESPONSE: ****\n" << resp.responseBuffer << "**** END OF RESPONSE ****" << std::endl;
-}
-
-void	MethodExecutor::_executePost(Request &requ, Response &resp)
-{
-	std::string	path = requ.RoutedPath;
-	struct stat	s;
-	// check if file already exists
-	if (stat(path.c_str(), &s) == 0)
-	{
-		resp.httpStatus = FORBIDDEN;
-		return ;
-	}
-	std::ofstream	ofs(path.c_str(), std::ios::out);
-	if (ofs.good())
-	{
-		ofs << requ.Body;
-		if(ofs.fail())
-		{
-			std::cout << "Error while creating requested file: \'" + requ.RoutedPath + "\'"<< std::endl;
-			resp.httpStatus = INTERNAL_SERVER_ERROR;
-		}
-		else
-		{
-			resp.httpStatus = CREATED;
-			resp.headerFields["location"] = requ.RequestedPath;
-		}
-	}
-	else
-	{
-		std::cout << "Error while creating requested file: \'" + requ.RoutedPath + "\'"<< std::endl;
-		resp.httpStatus = INTERNAL_SERVER_ERROR;
-	}
-	ofs.close();
+	//std::cout << "**** RESPONSE: ****\n" << resp.responseBuffer << "**** END OF RESPONSE ****" << std::endl;
 }
 
 void	MethodExecutor::_executeGet(Request &requ, Response &resp)
