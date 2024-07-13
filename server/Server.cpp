@@ -95,12 +95,14 @@ void Server::CheckForConnections() {
 						if (mt->second.t.msgAmt > settings.timeoutReads) {
 							mt->second.r.RequestIntegrity = REQUEST_TIMEOUT;
 						}
+						std::cout << mt->second.r.RequestBuffer << std::endl;
 						httpParser(mt);
 						if (mt->second.r.requestCompletlyRecieved == true){
 							interpretRequest(mt->second.r, settings); 
 							executor.wrapperRequest(mt->second.r, resps->second);
 							mt->second.r.HeaderBuffer.clear();
 							mt->second.r.RequestBuffer.clear();
+							mt->second.r.requestCompletlyRecieved = false;
 						}
 					} else {
 						//cleanup

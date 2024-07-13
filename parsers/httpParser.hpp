@@ -22,5 +22,6 @@
 	void extractHeaderFields(Request& req);
 	void handleHeader(Request &request, size_t endOfBlock);
 	void handleBody(Request &request, size_t endOfBlock);
+	size_t findEndOfBlock(std::string buffer);
 
 #endif //HTTPPARSER_HPP

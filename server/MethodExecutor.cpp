@@ -23,7 +23,7 @@ void	MethodExecutor::wrapperRequest(Request &requ, Response &resp)
 	std::cout << "Used path: " + requ.RoutedPath << std::endl;
 	//std::cout << "**** HEADER OF REQUEST: ****\n" << requ.HeaderBuffer << std::endl << "**** END OF HEADER ****" << std::endl;
 	//std::cout << "**** BODY OF REQUEST: ****\n" << requ.Body << std::endl << "**** END OF BODY ****" << std::endl;
-	std::cout << "REQUEST TYPE: " << requ.ReqType << std::endl;
+	//std::cout << "REQUEST TYPE: " << requ.ReqType << std::endl;
 	resp.body.clear();
 	resp.responseBuffer.clear();
 	resp.headerFields.clear();

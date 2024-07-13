@@ -2,14 +2,11 @@
 #include <sstream>
 
 void httpParser(std::map<int, connection>::iterator& req) {
-	size_t endOfBlock = req->second.r.RequestBuffer.find("\r\n\r\n");
-	if ( endOfBlock == std::string::npos) {
-		return;
-	}
+	size_t endOfBlock = findEndOfBlock(req->second.r.RequestBuffer);
 	if (req->second.r.HeaderBuffer.empty() == true) {
 		handleHeader(req->second.r, endOfBlock);
 	}
-	endOfBlock = req->second.r.RequestBuffer.find("\r\n\r\n");
+	endOfBlock = findEndOfBlock(req->second.r.RequestBuffer);
 	if ( endOfBlock == std::string::npos) {
 		return;
 	}
@@ -21,6 +18,14 @@ void httpParser(std::map<int, connection>::iterator& req) {
 		req->second.r.RequestIntegrity = BAD_REQUEST;
 		return;
 	}
+}
+
+size_t findEndOfBlock(std::string buffer) {
+	size_t endOfBlock = buffer.find("\r\n\r\n");
+	if (endOfBlock == std::string::npos) {
+		endOfBlock = buffer.find("\n\n");
+	}
+	return (endOfBlock);
 }
 
 void handleHeader(Request &request, size_t endOfBlock) {
