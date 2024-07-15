@@ -65,9 +65,9 @@ std::vector<std::vector<std::pair<std::string, int> > > findChunck(std::vector<s
 				++ end;
 			}
 			if (end < indents.end())
-				multiChunck.push_back(std::vector<std::pair<std::string, int> >(start, end - 1));
+				multiChunck.push_back(std::vector<std::pair<std::string, int> >(start, end));
 			else
-				multiChunck.push_back(std::vector<std::pair<std::string, int> >(start, indents.end() - 1));
+				multiChunck.push_back(std::vector<std::pair<std::string, int> >(start, indents.end()));
 			start = end;
 		}
 		else
@@ -151,43 +151,44 @@ std::vector <t_server> configParse(std::string configFilePath)
 	return std::vector<t_server>();
 }
 
-/*
-int main() {
-	std::string configFilePath = "parsers/sampleConfig.conf";
-	std::vector<t_server> servers = configParse(configFilePath);
+
+// int main() {
+// 	std::string configFilePath = "parsers/sampleConfig.conf";
+// 	std::vector<t_server> servers = configParse(configFilePath);
 	
-	if (servers.empty()) {
-		std::cout << "Failed to parse the configuration file." << std::endl;
-		return 1;
-	}
+// 	if (servers.empty()) {
+// 		std::cout << "Failed to parse the configuration file." << std::endl;
+// 		return 1;
+// 	}
 	
-	// Print the parsed server configurations
-	for (const auto& server : servers) {
-		std::cout << "Server Configuration:" << std::endl;
-		std::cout << "Port: " << server.port << std::endl;
-		std::cout << "Host: " << server.host << std::endl;
-		std::cout << "Server Name: " << server.serverName << std::endl;
-		std::cout << "Client Max Body Size: " << server.clientMaxBodySize << std::endl;
-		std::cout << "Timeout Time: " << server.timeoutTime << std::endl;
-		std::cout << "Timeout Reads: " << server.timeoutReads << std::endl;
+// 	//Print the parsed server configurations
+// 	for (const auto& server : servers) {
+// 		std::cout << "Server Configuration:" << std::endl;
+// 		std::cout << "Port: " << server.port << std::endl;
+// 		std::cout << "Host: " << server.host << std::endl;
+// 		std::cout << "Server Name: " << server.serverName << std::endl;
+// 		std::cout << "Client Max Body Size: " << server.clientMaxBodySize << std::endl;
+// 		std::cout << "Timeout Time: " << server.timeoutTime << std::endl;
+// 		std::cout << "Timeout Reads: " << server.timeoutReads << std::endl;
 		
-		std::cout << "Error Pages:" << std::endl;
-		for (const auto& errorPage : server.errorPages) {
-			std::cout << "Error Code: " << errorPage.first << ", Page: " << errorPage.second << std::endl;
-		}
+// 		std::cout << "Error Pages:" << std::endl;
+// 		for (const auto& errorPage : server.errorPages) {
+// 			std::cout << "Error Code: " << errorPage.first << ", Page: " << errorPage.second << std::endl;
+// 		}
 		
-		std::cout << "Locations:" << std::endl;
-		for (const auto& location : server.locations) {
-			//std::cout << "Location Path: " << location.path << std::endl;
-			std::cout << "Location Root: " << location.second.root << std::endl;
-			std::cout << "Location Index: " << location.second.index << std::endl;
-			std::cout << "Location Methods: ";
-			std::cout << location.second.httpMethods << std::endl;
-			std::cout << std::endl;
-		}
+// 		std::cout << "Locations:" << std::endl;
+// 		for (const auto& location : server.locations) {
+// 			//std::cout << "Location Path: " << location.path << std::endl;
+// 			std::cout << "Location Root: " << location.second.root << std::endl;
+// 			std::cout << "Location Index: " << location.second.index << std::endl;
+// 			std::cout << "Location Methods: ";
+// 			std::cout << location.second.httpMethods << std::endl;
+// 			std::cout << "Dir Listing: " << location.second.dirListing << std::endl;
+// 			std::cout << std::endl;
+// 		}
 		
-		std::cout << std::endl;
-	}
+// 		std::cout << std::endl;
+// 	}
 	
-	return 0;
-}*/
+// 	return 0;
+// }
