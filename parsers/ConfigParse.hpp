@@ -15,6 +15,8 @@
 #include "../CommonIncludes.hpp"
 #define PATH_MAX 1024
 
+#define PATH_MAX 1024
+
 
 t_server												parseServerConfig(const std::vector<std::pair<std::string, int> >chunck);
 std::string												openFile(std::string path);

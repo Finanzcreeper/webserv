@@ -4,25 +4,29 @@
 #include <vector>
 #include <map>
 #include"server/statusCodes.h"
+#include <ctime>
+
+#define HTTP_PROTOCOL "HTTP/1.1"
 
 struct location {
-	int					httpMethods;
-	std::string				redirect;
-	bool					dirListing;
-	std::string				index;
+	int									httpMethods;
+	std::string							redirect;
+	bool								dirListing;
+	std::string							index;
 	std::map<std::string, std::string>	cgi;
-	std::string				root;
-	std::string	 			locationName;
+	std::string							root;
+	std::string	 						locationName;
 };
 
 typedef struct s_server {
-	std::string	 			port;
-	std::string 				host;
-	std::string				serverName;
+	std::string							port;
+	std::string							host;
+	std::string							serverName;
+	std::string							workingDir;
 	std::map<statusCode, std::string>	errorPages;
-	long unsigned int			clientMaxBodySize;
-	int					timeoutTime;
-	int					timeoutReads;
+	long unsigned int					clientMaxBodySize;
+	int									timeoutTime;
+	unsigned int						timeoutReads;
 	std::map<std::string, location>		locations;
 }t_server;
 
@@ -52,16 +56,29 @@ struct Request {
 	RequestType ReqType;
 	statusCode RequestIntegrity;
 	std::string RequestedPath;
+	std::string RoutedPath;
 	std::string BodyBuffer;
+	location	UsedRoute;
 	std::string Body;
+	bool requestCompletlyRecieved;
 };
 
 struct Response {
-	std::string 	responseBuffer;
-	std::string 	headerBuffer;
-	statusCode	ResponseIntegrity;
-	std::string 	body;
-	bool		isReady;
+	std::string 						responseBuffer;
+	std::map<std::string,std::string>	headerFields;
+	statusCode							httpStatus;
+	std::string 						body;
+	bool								isReady;
+};
+
+struct timeoutHandler {
+	time_t lastMsg;
+	unsigned int msgAmt;
+};
+
+struct connection {
+	timeoutHandler t;
+	Request r;
 };
 
 #endif //WEBSERV_COMMONINCLUDES_HPP

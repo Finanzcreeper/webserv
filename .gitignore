@@ -2,5 +2,11 @@ CMakeLists.txt
 cmake-build-debug
 .idea
 a.out
+.vscode
+#all .o files
+*.o
+*/*.o
 
 Settings.hpp
+
+webserv

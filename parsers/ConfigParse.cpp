@@ -189,6 +189,5 @@ std::vector <t_server> configParse(std::string configFilePath)
 		
 // 		std::cout << std::endl;
 // 	}
-	
 // 	return 0;
 // }
