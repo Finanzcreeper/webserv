@@ -52,7 +52,7 @@ void findRoute(Request& request,  const t_server& settings) {
 		request.RequestIntegrity = NOT_FOUND;
 	} else {
 		request.RoutedPath = request.RequestedPath;
-		request.RoutedPath = request.RoutedPath.replace(0,request.UsedRoute.locationName.size(),request.UsedRoute.root);
+		request.RoutedPath.replace(0,request.UsedRoute.locationName.size(),request.UsedRoute.root);
 	}
 }
 
