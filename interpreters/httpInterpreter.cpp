@@ -84,8 +84,8 @@ void checkContentType(Request& request) {
 	std::vector<std::string> allowedContentTypes;
 	std::vector<std::string> allowedContentSubtypes;
 
-	allowedContentTypes.push_back("hey/");
-	allowedContentSubtypes.push_back("ho");
+	allowedContentTypes.push_back("text/");
+	allowedContentSubtypes.push_back("plain");
 
 	std::string foundContentType;
 	std::string foundContentSubtype;
