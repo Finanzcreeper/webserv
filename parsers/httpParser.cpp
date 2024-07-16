@@ -9,11 +9,9 @@ void httpParser(std::map<int, connection>::iterator& req) {
 	if (req->second.r.HeaderBuffer.empty() == true) {
 		handleHeader(req->second.r, endOfBlock);
 	}
-	endOfBlock = req->second.r.RequestBuffer.find("\r\n\r\n");
-	if ( endOfBlock == std::string::npos) {
+	if (hasBody(req->second.r) == false) {
 		return;
-	}
-	if (req->second.r.Body.empty() == true) {
+	} else if (req->second.r.Body.empty() == true) {
 		handleBody(req->second.r, endOfBlock);
 	}
 	req->second.r.requestCompletlyRecieved = true;
@@ -21,6 +19,13 @@ void httpParser(std::map<int, connection>::iterator& req) {
 		req->second.r.RequestIntegrity = BAD_REQUEST;
 		return;
 	}
+}
+
+bool hasBody(Request& request) {
+	if (request.HeaderFields.find("content-length") == request.HeaderFields.end() && request.HeaderFields.find("transfer-encoding") == request.HeaderFields.end()) {
+		return (false);
+	}
+	return (true);
 }
 
 void handleHeader(Request &request, size_t endOfBlock) {
@@ -103,8 +108,10 @@ void extractHeaderFields(Request& request) {
 
 void handleBody(Request &request, size_t endOfBlock) {
 	std::map<std::string ,std::string>::iterator TransferCoding;
+	std::map<std::string ,std::string>::iterator ContentLenght;
 	int ChunkSize = 0;
 	TransferCoding = request.HeaderFields.find("transfer-encoding");
+	ContentLenght = request.HeaderFields.find("content-length");
 	if (TransferCoding != request.HeaderFields.end() && TransferCoding->second == "chunked") {
 		while (request.RequestBuffer.empty() == false) {
 			std::string ChunkHexSize = request.RequestBuffer.substr(
@@ -115,9 +122,11 @@ void handleBody(Request &request, size_t endOfBlock) {
 			request.Body.append(request.RequestBuffer.substr(0, ChunkSize));
 			request.RequestBuffer.erase(0, ChunkSize + 2);
 		}
+	} else if(ContentLenght != request.HeaderFields.end()) {
+		request.Body.append(request.RequestBuffer.substr(0,std::stoi(ContentLenght->second)));
+		request.RequestBuffer.clear();
 	} else {
-		request.Body.append(request.RequestBuffer.substr(0,endOfBlock + 4));
-		request.RequestBuffer.erase(0, endOfBlock + 4);
+		request.RequestIntegrity = LENGTH_REQUIRED;
 	}
 }
 
