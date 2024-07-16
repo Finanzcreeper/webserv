@@ -2,23 +2,33 @@
 #include <sstream>
 
 void httpParser(std::map<int, connection>::iterator& req) {
-	size_t endOfBlock = req->second.r.RequestBuffer.find("\r\n\r\n");
-	if ( endOfBlock == std::string::npos) {
-		return;
-	}
+	size_t endOfBlock;
 	if (req->second.r.HeaderBuffer.empty() == true) {
+		endOfBlock = findEndOfBlock(req->second.r.RequestBuffer);
+		if (endOfBlock == std::string::npos) {
+			return;
+		}
 		handleHeader(req->second.r, endOfBlock);
 	}
 	if (hasBody(req->second.r) == false) {
+		req->second.r.requestCompletlyRecieved = true;
 		return;
 	} else if (req->second.r.Body.empty() == true) {
 		handleBody(req->second.r, endOfBlock);
 	}
-	req->second.r.requestCompletlyRecieved = true;
+	
 	if (req->second.r.RequestBuffer.empty() == false) {
 		req->second.r.RequestIntegrity = BAD_REQUEST;
 		return;
 	}
+}
+
+size_t findEndOfBlock(std::string buffer) {
+	size_t endOfBlock = buffer.find("\r\n\r\n");
+	if (endOfBlock == std::string::npos) {
+		endOfBlock = buffer.find("\n\n");
+	}
+	return (endOfBlock);
 }
 
 bool hasBody(Request& request) {
@@ -123,8 +133,13 @@ void handleBody(Request &request, size_t endOfBlock) {
 			request.RequestBuffer.erase(0, ChunkSize + 2);
 		}
 	} else if(ContentLenght != request.HeaderFields.end()) {
+		if (request.RequestBuffer.size() < std::stoi(ContentLenght->second)) {
+			request.requestCompletlyRecieved = false;
+			return;
+		}
 		request.Body.append(request.RequestBuffer.substr(0,std::stoi(ContentLenght->second)));
 		request.RequestBuffer.clear();
+		request.requestCompletlyRecieved = true;
 	} else {
 		request.RequestIntegrity = LENGTH_REQUIRED;
 	}
