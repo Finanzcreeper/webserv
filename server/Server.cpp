@@ -95,14 +95,16 @@ void Server::CheckForConnections() {
 						if (mt->second.t.msgAmt > settings.timeoutReads) {
 							mt->second.r.RequestIntegrity = REQUEST_TIMEOUT;
 						}
+						std::cout << mt->second.r.RequestBuffer << std::endl;
 						httpParser(mt);
+						std::cout << "after parser: " << mt->second.r.RequestIntegrity << std::endl;
 						if (mt->second.r.requestCompletlyRecieved == true){
 							interpretRequest(mt->second.r, settings); 
 							executor.wrapperRequest(mt->second.r, resps->second);
 							mt->second.r.HeaderBuffer.clear();
 							mt->second.r.RequestBuffer.clear();
 						}
-					} else {
+					} else if (mt->second.r.RequestIntegrity == REQUEST_TIMEOUT){
 						//cleanup
 						std::cout << mt->first << " disconnected" << std::endl;
 						Fds.erase(it);
@@ -150,5 +152,3 @@ void Server::checkConnectionsForTimeout() {
 Server::~Server() {
 	freeaddrinfo(serverInfo);
 }
-
-

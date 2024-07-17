@@ -14,13 +14,13 @@ void httpParser(std::map<int, connection>::iterator& req) {
 		req->second.r.requestCompletlyRecieved = true;
 		return;
 	} else if (req->second.r.Body.empty() == true) {
-		handleBody(req->second.r, endOfBlock);
+		handleBody(req->second.r);
 	}
 	
-	if (req->second.r.RequestBuffer.empty() == false) {
+	/*if (req->second.r.RequestBuffer.empty() == false) {
 		req->second.r.RequestIntegrity = BAD_REQUEST;
 		return;
-	}
+	}*/
 }
 
 size_t findEndOfBlock(std::string buffer) {
@@ -116,7 +116,7 @@ void extractHeaderFields(Request& request) {
 }
 
 
-void handleBody(Request &request, size_t endOfBlock) {
+void handleBody(Request &request) {
 	std::map<std::string ,std::string>::iterator TransferCoding;
 	std::map<std::string ,std::string>::iterator ContentLenght;
 	int ChunkSize = 0;
@@ -133,15 +133,17 @@ void handleBody(Request &request, size_t endOfBlock) {
 			request.RequestBuffer.erase(0, ChunkSize + 2);
 		}
 	} else if(ContentLenght != request.HeaderFields.end()) {
-		if (request.RequestBuffer.size() < std::stoi(ContentLenght->second)) {
+		std::istringstream iss(ContentLenght->second);
+		size_t contentLength;
+		iss >> contentLength;
+		if (request.RequestBuffer.size() < contentLength) {
 			request.requestCompletlyRecieved = false;
 			return;
 		}
-		request.Body.append(request.RequestBuffer.substr(0,std::stoi(ContentLenght->second)));
+		request.Body.append(request.RequestBuffer.substr(0,contentLength));
 		request.RequestBuffer.clear();
 		request.requestCompletlyRecieved = true;
 	} else {
 		request.RequestIntegrity = LENGTH_REQUIRED;
 	}
 }
-
