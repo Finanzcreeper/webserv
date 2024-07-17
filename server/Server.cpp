@@ -103,6 +103,15 @@ void Server::CheckForConnections() {
 							executor.wrapperRequest(mt->second.r, resps->second);
 							mt->second.r.HeaderBuffer.clear();
 							mt->second.r.RequestBuffer.clear();
+							if (mt->second.r.HeaderFields.find("connection") != mt->second.r.HeaderFields.end()) {
+								std::string connection = mt->second.r.HeaderFields.find("connection")->second;
+								if (connection == "close") {
+									std::cout << mt->first << " disconnected" << std::endl;
+									Fds.erase(it);
+									connectionMsgs.erase(mt);
+									--it;
+								}
+							}
 						}
 					} else if (mt->second.r.RequestIntegrity == REQUEST_TIMEOUT){
 						//cleanup
