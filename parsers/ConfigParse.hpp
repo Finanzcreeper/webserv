@@ -13,6 +13,7 @@
 # include <map>
 # include <unistd.h>
 #include "../CommonIncludes.hpp"
+#define PATH_MAX 1024
 
 #define PATH_MAX 1024
 
