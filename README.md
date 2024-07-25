@@ -17,7 +17,7 @@ http://localhost:8080/templates
 ```
 will show the files which are contained in the folder `content/templates`. **You can put own html files in the folder `content` and easily reach them with the browser.**
 
-## PUT method
+## POST method
 Uploading files to the webserver is implemented via PULL requests. To test it in the browser, we need the webpage `content/file_upload_test.html`. So we start by requesting
 ```
 http://localhost:8080/file_upload_test.html
