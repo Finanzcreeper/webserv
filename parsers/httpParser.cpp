@@ -2,25 +2,40 @@
 #include <sstream>
 
 void httpParser(std::map<int, connection>::iterator& req) {
-	size_t endOfBlock = req->second.r.RequestBuffer.find("\r\n\r\n");
-	if ( endOfBlock == std::string::npos) {
-		return;
-	}
+	size_t endOfBlock;
 	if (req->second.r.HeaderBuffer.empty() == true) {
+		endOfBlock = findEndOfBlock(req->second.r.RequestBuffer);
+		if (endOfBlock == std::string::npos) {
+			return;
+		}
 		handleHeader(req->second.r, endOfBlock);
 	}
-	endOfBlock = req->second.r.RequestBuffer.find("\r\n\r\n");
-	if ( endOfBlock == std::string::npos) {
+	if (hasBody(req->second.r) == false) {
+		req->second.r.requestCompletlyRecieved = true;
 		return;
+	} else if (req->second.r.Body.empty() == true) {
+		handleBody(req->second.r);
 	}
-	if (req->second.r.Body.empty() == true) {
-		handleBody(req->second.r, endOfBlock);
-	}
-	req->second.r.requestCompletlyRecieved = true;
-	if (req->second.r.RequestBuffer.empty() == false) {
+	
+	/*if (req->second.r.RequestBuffer.empty() == false) {
 		req->second.r.RequestIntegrity = BAD_REQUEST;
 		return;
+	}*/
+}
+
+size_t findEndOfBlock(std::string buffer) {
+	size_t endOfBlock = buffer.find("\r\n\r\n");
+	if (endOfBlock == std::string::npos) {
+		endOfBlock = buffer.find("\n\n");
 	}
+	return (endOfBlock);
+}
+
+bool hasBody(Request& request) {
+	if (request.HeaderFields.find("content-length") == request.HeaderFields.end() && request.HeaderFields.find("transfer-encoding") == request.HeaderFields.end()) {
+		return (false);
+	}
+	return (true);
 }
 
 void handleHeader(Request &request, size_t endOfBlock) {
@@ -101,10 +116,12 @@ void extractHeaderFields(Request& request) {
 }
 
 
-void handleBody(Request &request, size_t endOfBlock) {
+void handleBody(Request &request) {
 	std::map<std::string ,std::string>::iterator TransferCoding;
+	std::map<std::string ,std::string>::iterator ContentLenght;
 	int ChunkSize = 0;
 	TransferCoding = request.HeaderFields.find("transfer-encoding");
+	ContentLenght = request.HeaderFields.find("content-length");
 	if (TransferCoding != request.HeaderFields.end() && TransferCoding->second == "chunked") {
 		while (request.RequestBuffer.empty() == false) {
 			std::string ChunkHexSize = request.RequestBuffer.substr(
@@ -115,9 +132,18 @@ void handleBody(Request &request, size_t endOfBlock) {
 			request.Body.append(request.RequestBuffer.substr(0, ChunkSize));
 			request.RequestBuffer.erase(0, ChunkSize + 2);
 		}
+	} else if(ContentLenght != request.HeaderFields.end()) {
+		std::istringstream iss(ContentLenght->second);
+		size_t contentLength;
+		iss >> contentLength;
+		if (request.RequestBuffer.size() < contentLength) {
+			request.requestCompletlyRecieved = false;
+			return;
+		}
+		request.Body.append(request.RequestBuffer.substr(0,contentLength));
+		request.RequestBuffer.clear();
+		request.requestCompletlyRecieved = true;
 	} else {
-		request.Body.append(request.RequestBuffer.substr(0,endOfBlock + 4));
-		request.RequestBuffer.erase(0, endOfBlock + 4);
+		request.RequestIntegrity = LENGTH_REQUIRED;
 	}
 }
-
