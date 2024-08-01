@@ -598,9 +598,9 @@ void Tests::testHttpParser() {
 	//----------------------------------------------------------//
 	decapitalizeHeaderFields(this->testRequest.HeaderBuffer);
 	if (testRequest.HeaderBuffer != "InVaLid StUfF") {
-		std::cout << "Invalid Header Pattern: \033[1;31mFAILED\033[0m" << std::endl;
+		std::cout << "Single Line: \033[1;31mFAILED\033[0m" << std::endl;
 	} else if (this->silent == false) {
-		std::cout << "Invalid Header Pattern: \033[1;32mOK\033[0m" << std::endl;
+		std::cout << "Single Line: \033[1;32mOK\033[0m" << std::endl;
 	}
 	//==========================================================//
 	//-------------------Preparing for Test 3-------------------//
@@ -611,22 +611,35 @@ void Tests::testHttpParser() {
 	//----------------------------------------------------------//
 	decapitalizeHeaderFields(this->testRequest.HeaderBuffer);
 	if (testRequest.HeaderBuffer != "") {
-		std::cout << "Empty Header Pattern: \033[1;31mFAILED\033[0m" << std::endl;
+		std::cout << "Empty Line: \033[1;31mFAILED\033[0m" << std::endl;
 	} else if (this->silent == false) {
-		std::cout << "Empty Header Pattern: \033[1;32mOK\033[0m" << std::endl;
+		std::cout << "Empty Line: \033[1;32mOK\033[0m" << std::endl;
 	}
 	//==========================================================//
 	//-------------------Preparing for Test 4-------------------//
 	//==========================================================//
-	this->testRequest.HeaderBuffer = "AAAAAAAAAAAAA AAAAAAA AAAAA AAAA\nBBBBB BBBBB: BBBBB: BBBBB";
+	this->testRequest.HeaderBuffer = "AAAAAAAAAAAAA AAAAAAA AAAAA AAAA\nBBBBB BBBBB: BBBBB: BBBBB\n";
 	//----------------------------------------------------------//
 	//======================Running Test 4======================//
 	//----------------------------------------------------------//
 	decapitalizeHeaderFields(this->testRequest.HeaderBuffer);
-	if (testRequest.HeaderBuffer != "AAAAAAAAAAAAA AAAAAAA AAAAA AAAA\nbbbbb bbbbb: BBBBB: BBBBB") {
-		std::cout << "Corrupted Header Pattern: \033[1;31mFAILED\033[0m" << std::endl;
+	if (testRequest.HeaderBuffer != "AAAAAAAAAAAAA AAAAAAA AAAAA AAAA\nbbbbb bbbbb: BBBBB: BBBBB\n") {
+		std::cout << "Multiple \":\"on line: \033[1;31mFAILED\033[0m" << std::endl;
 	} else if (this->silent == false) {
-		std::cout << "Corrupted Header Pattern: \033[1;32mOK\033[0m" << std::endl;
+		std::cout << "Multiple \":\"on line: \033[1;32mOK\033[0m" << std::endl;
+	}
+	//==========================================================//
+	//-------------------Preparing for Test 5-------------------//
+	//==========================================================//
+	this->testRequest.HeaderBuffer = "a\nb:c";
+	//----------------------------------------------------------//
+	//======================Running Test 5======================//
+	//----------------------------------------------------------//
+	decapitalizeHeaderFields(this->testRequest.HeaderBuffer);
+	if (testRequest.HeaderBuffer != "a\nb:c") {
+		std::cout << "No \\n on end of line: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent == false) {
+		std::cout << "No \\n on end of line: \033[1;32mOK\033[0m" << std::endl;
 	}
 
 	std::cout <<"[1;34m-----------extractHeaderFields----------[0m" << std::endl;
