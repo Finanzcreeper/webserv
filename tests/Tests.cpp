@@ -504,6 +504,7 @@ void Tests::testHttpParser() {
 	//==========================================================//
 	this->testRequest.HeaderBuffer = "GET /index.html HTTP/1.1\r\n";
 	this->testRequest.RoutedPath.clear();
+	this->testRequest.RequestedPath.clear();
 	//----------------------------------------------------------//
 	//======================Running Test 1======================//
 	//----------------------------------------------------------//
@@ -516,24 +517,11 @@ void Tests::testHttpParser() {
 	//==========================================================//
 	//-------------------Preparing for Test 2-------------------//
 	//==========================================================//
-	this->testRequest.HeaderBuffer = "GET/index.htmlHTTP/1.1\r\n";
-	this->testRequest.RoutedPath.clear();
-	//----------------------------------------------------------//
-	//======================Running Test 2======================//
-	//----------------------------------------------------------//
-	GetRequestedPath(this->testRequest);
-	if (testRequest.RequestedPath != "") {
-		std::cout << "Invalid Request Pattern: \033[1;31mFAILED\033[0m" << std::endl;
-	} else if (this->silent == false) {
-		std::cout << "Invalid Request Pattern: \033[1;32mOK\033[0m" << std::endl;
-	}
-	//==========================================================//
-	//-------------------Preparing for Test 3-------------------//
-	//==========================================================//
 	this->testRequest.HeaderBuffer = "";
 	this->testRequest.RoutedPath.clear();
+	this->testRequest.RequestedPath.clear();
 	//----------------------------------------------------------//
-	//======================Running Test 3======================//
+	//======================Running Test 2======================//
 	//----------------------------------------------------------//
 	GetRequestedPath(this->testRequest);
 	if (testRequest.RequestedPath != "") {
@@ -541,13 +529,57 @@ void Tests::testHttpParser() {
 	} else if (this->silent == false) {
 		std::cout << "Empty Request Pattern: \033[1;32mOK\033[0m" << std::endl;
 	}
+	//==========================================================//
+	//-------------------Preparing for Test 3-------------------//
+	//==========================================================//
+	this->testRequest.HeaderBuffer = "NoSpacesInThisTest\r\n";
+	this->testRequest.RoutedPath.clear();
+	this->testRequest.RequestedPath.clear();
+	//----------------------------------------------------------//
+	//======================Running Test 3======================//
+	//----------------------------------------------------------//
+	GetRequestedPath(this->testRequest);
+	if (testRequest.RequestedPath != "") {
+		std::cout << "Invalid Request Pattern 1: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent == false) {
+		std::cout << "Invalid Request Pattern 1: \033[1;32mOK\033[0m" << std::endl;
+	}
+	//==========================================================//
+	//-------------------Preparing for Test 4-------------------//
+	//==========================================================//
+	this->testRequest.HeaderBuffer = "IHDEB MultipleSpaces in this test) wue0v";
+	this->testRequest.RoutedPath.clear();
+	this->testRequest.RequestedPath.clear();
+	//----------------------------------------------------------//
+	//======================Running Test 4======================//
+	//----------------------------------------------------------//
+	GetRequestedPath(this->testRequest);
+	if (testRequest.RequestedPath != "MultipleSpaces") {
+		std::cout << "Invalid Request Pattern 2: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent == false) {
+		std::cout << "Invalid Request Pattern 2: \033[1;32mOK\033[0m" << std::endl;
+	}
+	//==========================================================//
+	//-------------------Preparing for Test 5-------------------//
+	//==========================================================//
+	this->testRequest.HeaderBuffer = "Only OneSpaceInThisTest!";
+	this->testRequest.RoutedPath.clear();
+	this->testRequest.RequestedPath.clear();
+	//----------------------------------------------------------//
+	//======================Running Test 5======================//
+	//----------------------------------------------------------//
+	GetRequestedPath(this->testRequest);
+	if (testRequest.RequestedPath != "OneSpaceInThisTest!") {
+		std::cout << "Invalid Request Pattern 3: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent == false) {
+		std::cout << "Invalid Request Pattern 3: \033[1;32mOK\033[0m" << std::endl;
+	}
 
 	std::cout <<"[1;34m--------decapitalizeHeaderFields--------[0m" << std::endl;
 	//==========================================================//
 	//-------------------Preparing for Test 1-------------------//
 	//==========================================================//
 	this->testRequest.HeaderBuffer = "GET / HTTP/1.1\r\nHost: www.example.com\r\nConnection: close\r\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8\r\nAccept-Language: en-US,en;q=0.9\r\n\r\n";
-	this->testRequest.RoutedPath.clear();
 	//----------------------------------------------------------//
 	//======================Running Test 1======================//
 	//----------------------------------------------------------//
@@ -557,6 +589,46 @@ void Tests::testHttpParser() {
 	} else if (this->silent == false) {
 		std::cout << "Valid Header Pattern: \033[1;32mOK\033[0m" << std::endl;
 	}
+	//==========================================================//
+	//-------------------Preparing for Test 2-------------------//
+	//==========================================================//
+	this->testRequest.HeaderBuffer = "InVaLid StUfF";
+	//----------------------------------------------------------//
+	//======================Running Test 2======================//
+	//----------------------------------------------------------//
+	decapitalizeHeaderFields(this->testRequest.HeaderBuffer);
+	if (testRequest.HeaderBuffer != "InVaLid StUfF") {
+		std::cout << "Invalid Header Pattern: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent == false) {
+		std::cout << "Invalid Header Pattern: \033[1;32mOK\033[0m" << std::endl;
+	}
+	//==========================================================//
+	//-------------------Preparing for Test 3-------------------//
+	//==========================================================//
+	this->testRequest.HeaderBuffer = "";
+	//----------------------------------------------------------//
+	//======================Running Test 3======================//
+	//----------------------------------------------------------//
+	decapitalizeHeaderFields(this->testRequest.HeaderBuffer);
+	if (testRequest.HeaderBuffer != "") {
+		std::cout << "Empty Header Pattern: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent == false) {
+		std::cout << "Empty Header Pattern: \033[1;32mOK\033[0m" << std::endl;
+	}
+	//==========================================================//
+	//-------------------Preparing for Test 4-------------------//
+	//==========================================================//
+	this->testRequest.HeaderBuffer = "AAAAAAAAAAAAA AAAAAAA AAAAA AAAA\nBBBBB BBBBB: BBBBB: BBBBB";
+	//----------------------------------------------------------//
+	//======================Running Test 4======================//
+	//----------------------------------------------------------//
+	decapitalizeHeaderFields(this->testRequest.HeaderBuffer);
+	if (testRequest.HeaderBuffer != "AAAAAAAAAAAAA AAAAAAA AAAAA AAAA\nbbbbb bbbbb: BBBBB: BBBBB") {
+		std::cout << "Corrupted Header Pattern: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent == false) {
+		std::cout << "Corrupted Header Pattern: \033[1;32mOK\033[0m" << std::endl;
+	}
+
 	std::cout <<"[1;34m-----------extractHeaderFields----------[0m" << std::endl;
 	//==========================================================//
 	//-------------------Preparing for Test 1-------------------//
@@ -566,8 +638,7 @@ void Tests::testHttpParser() {
 	std::map<std::string,std::string> testHeaderFieldMap;
 	testHeaderFieldMap.insert(std::make_pair("connection","close"));
 	testHeaderFieldMap.insert(std::make_pair("user-agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"));
-
-			//----------------------------------------------------------//
+	//----------------------------------------------------------//
 	//======================Running Test 1======================//
 	//----------------------------------------------------------//
 	extractHeaderFields(this->testRequest);
