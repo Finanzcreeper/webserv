@@ -57,7 +57,7 @@ void findRoute(Request& request,  const t_server& settings) {
 }
 
 void checkIfMethodIsAllowedOnRoute(Request& request) {
-	if ((request.ReqType &  request.UsedRoute.httpMethods) == 0) {
+	if ((request.ReqType & request.UsedRoute.httpMethods) == 0) {
 		request.RequestIntegrity = METHOD_NOT_ALLOWED;
 	}
 }
@@ -90,8 +90,8 @@ void checkContentType(Request& request) {
 	std::string foundContentType;
 	std::string foundContentSubtype;
 
-	foundContentType = headerField->second.substr(0,headerField->second.find('/'));
-	foundContentSubtype = headerField->second.substr(headerField->second.find('/'),headerField->second.size());
+	foundContentType = headerField->second.substr(0,headerField->second.find('/') + 1);
+	foundContentSubtype = headerField->second.substr(headerField->second.find('/') + 1,headerField->second.size());
 	bool contentTypeFound = false;
 	bool contentSubtypeFound = false;
 

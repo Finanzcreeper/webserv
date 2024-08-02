@@ -1,29 +1,21 @@
-#include "server/Server.hpp"
-#include <vector>
-#include "parsers/ConfigParse.hpp"
-#include <cstdlib>
+#include "tests/Tests.hpp"
 
-int main(int argn, char *argv[]) {
-	//std::vector<t_server> configs;
-	//std::vector<t_server>::iterator servernbr = configs.begin();
-	std::vector<t_server>	Config;
-	std::string				path;
-	if (argn == 2)
-		path = std::getenv("PWD") + std::string("/") + std::string(argv[1]);
-	else
-		path = std::getenv("PWD") + std::string("/parsers/sampleConfig.conf");
+int main(int argc, char*argv[]) {
+	int args = 0;
 
-	try {
-		Config = configParse(path);
-	} 
-	catch (std::runtime_error &e) {
-		std::cout <<e.what() << std::endl;
-		return (1);
+	switch (argc) {
+		case 2:
+			if (argv[1][0] == 's') {
+				args = SILENT;
+			} else {
+				std::cout << "allowed args are: s" << std::endl;
+				return(1);
+			}
+			break;
+		default:
+			break;
 	}
-	Server *sock = new Server(Config[0]);
-	sock->CheckForConnections();
-	//servernbr++;
-	//}
-
-	delete sock;
+	Tests testing(args);
+	std::cout << "Running tests: " << std::endl;
+	testing.testing();
 }

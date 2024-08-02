@@ -51,7 +51,7 @@ void handleHeader(Request &request, size_t endOfBlock) {
 }
 
 void GetRequestType(Request& request) {
-	std::string firstLine = request.HeaderBuffer.substr(0,request.HeaderBuffer.find('\r'));
+	std::string firstLine = request.HeaderBuffer.substr(0,request.HeaderBuffer.find('\n'));
 	if (firstLine.find("GET ") == 0) {
 		request.ReqType = GET;
 	} else if (firstLine.find("HEAD ") == 0) {
@@ -76,20 +76,24 @@ void GetRequestType(Request& request) {
 }
 
 void GetRequestedPath(Request& request) {
+	if (request.HeaderBuffer.find(' ') == std::string::npos) {
+		request.RequestedPath.clear();
+		return;
+	}
 	size_t startOfPath = request.HeaderBuffer.find(' ') + 1;
 	request.RequestedPath = request.HeaderBuffer.substr(startOfPath, request.HeaderBuffer.find(' ', startOfPath) - startOfPath);
 }
 
 void decapitalizeHeaderFields(std::string& Header) {
-	int i = 0;
-	while(Header[i] != '\n') {
+	size_t i = 0;
+	while(Header[i] != '\n' && i < Header.size()) {
 		i++;
 	}
-	while (Header[i]) {
+	while (i < Header.size()) {
 		Header[i] = static_cast<char>(tolower(Header[i]));
 		i++;
 		if ( Header[i] == ':') {
-			while (Header[i] != '\n') {
+			while (Header[i] != '\n' && i < Header.size()) {
 				++i;
 			}
 		}
