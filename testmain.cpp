@@ -15,7 +15,6 @@ int main(int argc, char*argv[]) {
 		default:
 			break;
 	}
-
 	Tests testing(args);
 	std::cout << "Running tests: " << std::endl;
 	testing.testing();
