@@ -7,7 +7,7 @@ int main() {
 	//std::vector<t_server>::iterator servernbr = configs.begin();
 	std::vector<t_server> Config;
 	std::vector<Server*> Servers;
-	std::vector<Server*>::iterator ServerCrawler = Servers.begin();
+	std::vector<Server*>::iterator ServerCrawler;
 
 	try  {
 		Config = configParse("/home/nreher/dev/webserv/parsers/sampleConfig.conf");
@@ -17,6 +17,7 @@ int main() {
 	for (size_t i = 0; i < Config.size(); ++i) {
 		Servers.push_back(new Server(Config[i]));
 	}
+	ServerCrawler = Servers.begin();
 	while(true) {
 		if (ServerCrawler == Servers.end()) {
 			ServerCrawler = Servers.begin();
