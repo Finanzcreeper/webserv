@@ -11,8 +11,7 @@ static void	checkAndReplace(std::string& line, std::string subStr, std::string n
 // Creates the body when a directory is requested
 int	MethodExecutor::_createIndexPage(std::string path, Response &resp)
 {
-	std::ifstream is((_serverSettings->workingDir \
-		+ "/content/templates/dir_listing_page.html").c_str());
+	std::ifstream is("content/templates/dir_listing_page.html");
 	if (!is.good())
 	{
 		resp.httpStatus = INTERNAL_SERVER_ERROR;
@@ -60,10 +59,8 @@ int	MethodExecutor::_generateErrorBody(Response &resp)
 	iter = _serverSettings->errorPages.find(resp.httpStatus);
 	if (iter != _serverSettings->errorPages.end())
 	{
-		std::ifstream	errorPage((_serverSettings->workingDir \
-			+ iter->second).c_str());
-		std::cout << "ERROR PAGE PATH: " << _serverSettings->workingDir \
-			+ iter->second << std::endl;
+		std::ifstream	errorPage((iter->second).c_str());
+		std::cout << "ERROR PAGE PATH: " << iter->second << std::endl;
 		if (errorPage.good())
 		{
 			std::ostringstream ss;
@@ -78,8 +75,7 @@ int	MethodExecutor::_generateErrorBody(Response &resp)
 	std::string	statusMessage = getStatusCodeMessage(resp.httpStatus);
 	std::string statusDescription = getStatusCodeDescription(resp.httpStatus);
 
-	std::ifstream is((_serverSettings->workingDir \
-		+ "/content/templates/error_page.html").c_str());
+	std::ifstream is("content/templates/error_page.html");
 	if (!is.good())
 	{
 		resp.httpStatus = INTERNAL_SERVER_ERROR;
