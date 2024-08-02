@@ -23,3 +23,10 @@ Uploading files to the webserver is implemented via POST requests. To test it in
 http://localhost:8080/file_upload_test.html
 ```
 This page allows to upload files. Right now any textfile can be uploaded and by configuration of the page `content/file_upload_test.html`, the file then is uploaded to `content/upload` because the url is mapped to the location `upload` which has the path `/content/upload` and you should be able to see it in the file tree. **A file can be uploaded only once, since files on the webserver are not overwritten if they already exist.**
+
+## DELETE method
+Deleting files on the webserver can be executed with a DELETE request. The link 
+```
+http://localhost:8080/file_delete_test.html
+```
+provides an example. Pressing the button sends a DELETE request with the path `/delete/text.txt`.

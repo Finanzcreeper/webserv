@@ -15,7 +15,7 @@ class MethodExecutor
 		const t_server*	_serverSettings;
 		void			_executeGet(Request &requ, Response &resp);
 		void			_executePost(Request &requ, Response &resp);
-		//void			_executeDelete(Request &requ, Response &resp);
+		void			_executeDelete(Request &requ, Response &resp);
 		void			_writeStatusLine(Response &resp);
 		void			_writeHeaderFields(Response &resp);
 		void			_generateCommonHeaderFields(Response &resp);
