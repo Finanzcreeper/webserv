@@ -101,12 +101,15 @@ void	MethodExecutor::_executePost(Request &requ, Response &resp)
 
 void	MethodExecutor::_executeGet(Request &requ, Response &resp)
 {
-	std::string	path = requ.RoutedPath;
-	struct stat	s;
+	std::string path;
+    struct stat s;
 
-	// default page if no path specified
-	if (path.length() == _serverSettings->workingDir.length() + 1)
-		path.append(requ.UsedRoute.index);
+    // default page if no path specified
+    if ((requ.RequestedPath.length() == requ.RoutedPath.length()) && (requ.UsedRoute.index.length() > 0))
+        path = requ.UsedRoute.root + requ.UsedRoute.index;
+    else {
+        path = requ.RoutedPath;
+	}
 	if (stat(path.c_str(), &s) == -1)
 	{
 		resp.httpStatus = NOT_FOUND;
