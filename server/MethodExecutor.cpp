@@ -7,7 +7,6 @@
 #include <unistd.h>
 #include <dirent.h>
 #include <iostream>
-#include <cstdio>
 
 std::string		defaultPage = "index.html";
 
@@ -73,15 +72,23 @@ void	MethodExecutor::_executeGet(Request &requ, Response &resp)
     struct stat s;
 
     // default page if no path specified
-    if ((requ.RequestedPath.length() == requ.RoutedPath.length()) && (requ.UsedRoute.index.length() > 0))
+    if ((requ.RequestedPath.length() == requ.RoutedPath.length()) && \
+		(requ.UsedRoute.index.length() > 0))
+	{
         path = requ.UsedRoute.root + requ.UsedRoute.index;
-    else {
+	}
+    else
+	{
         path = requ.RoutedPath;
 	}
 	if (stat(path.c_str(), &s) == -1)
+	{
 		resp.httpStatus = NOT_FOUND;
+	}
 	else if (!(s.st_mode & S_IRGRP))
+	{
 		resp.httpStatus = UNAUTHORIZED;
+	}
 	else if ((s.st_mode & S_IFDIR))
 	{
 		if (requ.UsedRoute.dirListing)
@@ -136,7 +143,7 @@ void	MethodExecutor::_executePost(Request &requ, Response &resp)
 			std::cout << "Error while creating requested file: \'" + requ.RoutedPath + "\'"<< std::endl;
 			resp.httpStatus = INTERNAL_SERVER_ERROR;
 		}
-		else
+		else 
 		{
 			resp.httpStatus = CREATED;
 			resp.headerFields["location"] = requ.RequestedPath;
