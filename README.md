@@ -7,7 +7,7 @@ To successfully setup the server one needs a cofiguration file. It can be given 
 ```
 or runs currently by default with the configuration `parsers/sampleConfig.conf`. This tutorial is based on the configuration `tutorialConfig.conf`. I used the brave browser to execute the next steps.
 ## GET method
-To serve static websites, the GET method is used. I use the brave brave to connect with the server. For example typing the URL
+To serve static websites, the GET method is used. I use the brave browser to connect with the server. For example typing the URL
 ```
 http://localhost:8080/example.html
 ```
@@ -18,7 +18,7 @@ http://localhost:8080/templates
 will show the files which are contained in the folder `content/templates`. **You can put own html files in the folder `content` and easily reach them with the browser.**
 
 ## POST method
-Uploading files to the webserver is implemented via PULL requests. To test it in the browser, we need the webpage `content/file_upload_test.html`. So we start by requesting
+Uploading files to the webserver is implemented via POST requests. To test it in the browser, we need the webpage `content/file_upload_test.html`. So we start by requesting
 ```
 http://localhost:8080/file_upload_test.html
 ```
