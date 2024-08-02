@@ -6,7 +6,6 @@
 #include <map>
 #include <algorithm>
 #include <fstream>
-#include "Server.hpp"
 #include "../CommonIncludes.hpp"
 
 class MethodExecutor
