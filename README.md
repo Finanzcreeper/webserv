@@ -7,7 +7,7 @@ To successfully setup the server one needs a cofiguration file. It can be given 
 ```
 or runs currently by default with the configuration `parsers/sampleConfig.conf`. This tutorial is based on the configuration `tutorialConfig.conf`. I used the brave browser to execute the next steps.
 ## GET method
-To serve static websites, the GET method is used. I use the brave brave to connect with the server. For example typing the URL
+To serve static websites, the GET method is used. I use the brave browser to connect with the server. For example typing the URL
 ```
 http://localhost:8080/example.html
 ```
