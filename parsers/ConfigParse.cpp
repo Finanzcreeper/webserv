@@ -120,7 +120,7 @@ t_server parseServerConfig(const std::vector<std::pair<std::string, int> > chunc
 	server.timeoutReads = std::atoi(parseString(chunck, "timeoutReads").c_str());
 	server.errorPages = parseErrorPages(chunck);
 	server.locations = parseLocations(chunck);
-	server.workingDir = std::getenv("PWD");
+	server.workingDir = "";//std::getenv("PWD");
 	return server;
 }
 
