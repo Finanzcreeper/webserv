@@ -15,9 +15,18 @@ int main() {
 		std::cout <<e.what() << std::endl;
 	}
 	for (size_t i = 0; i < Config.size(); ++i) {
-		Servers.push_back(new Server(Config[i]));
+		try {
+			Servers.push_back(new Server(Config[i]));
+		} catch (std::runtime_error &e) {
+			std::cout << "Server: " << Config[i].host << ":" << Config[i].port << " not created!" << std::endl;
+			std::cout << "-------------------------------------------------------------------------" << std::endl;
+		}
 	}
 	ServerCrawler = Servers.begin();
+	if (Servers.empty() == true) {
+		std::cerr <<"\033[1;31mNo servers got Created ... Exiting now!"  << "\033[0m" << std::endl;
+		return(0);
+	}
 	while(true) {
 		if (ServerCrawler == Servers.end()) {
 			ServerCrawler = Servers.begin();
