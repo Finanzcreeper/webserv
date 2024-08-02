@@ -4,8 +4,6 @@
 #include <cstring>
 #include "../parsers/httpParser.hpp"
 #include "../interpreters/httpInterpreter.hpp"
-#include <unistd.h>
-#include "MethodExecutor.hpp"
 
 Server::Server(t_server sett) : settings(sett), socketOption(ON){
 	this->lastTimeoutCheck = time(NULL);
@@ -40,18 +38,14 @@ Server::Server(t_server sett) : settings(sett), socketOption(ON){
 		//throw socket listening error exception
 		std::cerr << "error making the socket listen: "<< std::strerror(errno) << std::endl;
 	}
+	setUpServer();
 }
 
-void Server::CheckForConnections() {
-	std::vector<pollfd>::iterator it;
-	std::map<int, connection>::iterator mt;
-	std::map<int, Response>::iterator resps;
+void Server::setUpServer() {
 
-	MethodExecutor executor = MethodExecutor(&(this->settings));
+	executor = MethodExecutor(&(this->settings));
 
-	connection request;
 	request.r.requestCompletlyRecieved = false;
-	Response response;
 
 	request.r.ReqType = NONE;
 	request.r.RequestIntegrity = OK_HTTP;
@@ -60,9 +54,12 @@ void Server::CheckForConnections() {
 	Fds.push_back(listening_socket);
 
 	std::cout << "listening on socket: " << Fds[0].fd << std::endl;
-	int i = 0;
+	connectionAmount = 0;
+}
+
+void Server::CheckForConnections() {
 	while (true) {
- 		i = poll(Fds.data(), Fds.size(), 0);
+		connectionAmount = poll(Fds.data(), Fds.size(), 0);
 		//accepting new connection if there is one
 		if ((Fds[0].revents & POLLIN)!= 0) {
 			client.fd = accept(listening_socket.fd, NULL, NULL);
@@ -77,10 +74,10 @@ void Server::CheckForConnections() {
 			connectionMsgs.find(client.fd)->second.t.msgAmt = 0;
 			connectionMsgs.find(client.fd)->second.t.lastMsg = time(NULL);
 			answerMsgs.find(client.fd)->second.isReady = true;
-			--i;
+			--connectionAmount;
 		}
 		//reading from connection (reading into buffers, or closing connections
-		if (i > 0) {
+		if (connectionAmount > 0) {
 			it = Fds.begin() + 1;
 			mt = connectionMsgs.begin();
 			while (it != Fds.end()) {
