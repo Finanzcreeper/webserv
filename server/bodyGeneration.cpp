@@ -19,18 +19,18 @@ int	MethodExecutor::_createIndexPage(std::string path, Response &resp)
 		return (-1);
 	}
 	std::string	line;
+	DIR	*dir = opendir(path.c_str());
+	if (!dir)
+	{
+		resp.httpStatus = INTERNAL_SERVER_ERROR;
+		is.close();
+		return (-1);
+	}
 	while (std::getline(is, line))
 	{
 		size_t	idx_start = line.find("__DIR_ENTRY__");
 		if (idx_start != std::string::npos)
 		{
-			DIR	*dir = opendir(path.c_str());
-			if (!dir)
-			{
-				resp.httpStatus = INTERNAL_SERVER_ERROR;
-				is.close();
-				return (-1);
-			}
 			dirent *entry = readdir(dir);
 			std::string	start = line.substr(0, idx_start);
 			size_t	idx_end = idx_start + std::string("__DIR_ENTRY__").length();
@@ -186,7 +186,6 @@ void	MethodExecutor::testCreateIndexPage(){
 	//----------------------------------------------------------//
 	resp.body.clear();
 	_createIndexPage(path, resp);
-	std::cout << resp.body << std::endl;
 	if (resp.httpStatus != INTERNAL_SERVER_ERROR || resp.body != "") {
 		std::cout << "Invalid directory path: \033[1;31mFAILED\033[0m" << std::endl;
 	} else {

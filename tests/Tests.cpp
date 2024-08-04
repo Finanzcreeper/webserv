@@ -717,7 +717,7 @@ void Tests::testStatusCodes() {
 	} else if (this->silent == false) {
 		std::cout << "Return right message to input status code: \033[1;32mOK\033[0m" << std::endl;
 	}
-	std::cout <<"[1;34m-----------getStatusCodeMessage----------[0m" << std::endl;
+	std::cout <<"[1;34m-----------getStatusCodeDescription----------[0m" << std::endl;
 	//==========================================================//
 	//-------------------Preparing for Test 1-------------------//
 	//==========================================================//
@@ -746,13 +746,13 @@ void Tests::testBodyGeneration(){
 }
 
 void Tests::testing() {
-	//testConfigLocationParser();
-	//testConfigParser();
-	//testHttpInterpreter();
-	//testHttpParser();
+	testConfigLocationParser();
+	testConfigParser();
+	testHttpInterpreter();
+	testHttpParser();
 	testMethodExecutor();
 	testBodyGeneration();
-	//testServer();
+	testServer();
 	testStatusCodes();
 }
 
