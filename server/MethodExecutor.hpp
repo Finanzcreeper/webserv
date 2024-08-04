@@ -29,6 +29,11 @@ class MethodExecutor
 		MethodExecutor(const t_server *serverSettings);
 		~MethodExecutor(){};
 		void	wrapperRequest(Request &requ, Response &resp);
+
+		// unit tests
+		void testCheckandReplace(void);
+		void testCreateIndexPage(void);
+		void testGenerateErrorBody(void);
 };
 
 #endif

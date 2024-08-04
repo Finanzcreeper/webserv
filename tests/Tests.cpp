@@ -694,25 +694,65 @@ void Tests::testHttpParser() {
 	}
 }
 
-void Tests::testMethodExecutor() {
-
-}
-
 void Tests::testServer() {
 
 }
 
 void Tests::testStatusCodes() {
+	statusCode	testCode;
+	std::string	expectedOutput;
+	std::string	output;
+	std::cout <<"[1;34m-----------getStatusCodeMessage----------[0m" << std::endl;
+	//==========================================================//
+	//-------------------Preparing for Test 1-------------------//
+	//==========================================================//
+	testCode = OK_HTTP;
+	expectedOutput = "OK";
+	//----------------------------------------------------------//
+	//======================Running Test 1======================//
+	//----------------------------------------------------------//
+	output = getStatusCodeMessage(testCode);
+	if (expectedOutput != output) {
+		std::cout << "Return right message to input status code: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent == false) {
+		std::cout << "Return right message to input status code: \033[1;32mOK\033[0m" << std::endl;
+	}
+	std::cout <<"[1;34m-----------getStatusCodeMessage----------[0m" << std::endl;
+	//==========================================================//
+	//-------------------Preparing for Test 1-------------------//
+	//==========================================================//
+	testCode = HTTP_VERSION_NOT_SUPPORTED;
+	expectedOutput = "HTTP Version Not Supported";
+	//----------------------------------------------------------//
+	//======================Running Test 1======================//
+	//----------------------------------------------------------//
+	output = getStatusCodeDescription(testCode);
+	if (expectedOutput != output) {
+		std::cout << "Return right description to input status code: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent == false) {
+		std::cout << "Return right description to input status code: \033[1;32mOK\033[0m" << std::endl;
+	}
+}
 
+void Tests::testBodyGeneration(){
+	MethodExecutor testObj = MethodExecutor(&(this->testSettings));
+	testSettings.workingDir = std::getenv("PWD");
+	std::cout <<"[1;34m-----------checkAndReplace----------[0m" << std::endl;
+	// unit tests implemented in source file, since static function
+	testObj.testCheckandReplace();
+	std::cout <<"[1;34m-----------createIndexPage----------[0m" << std::endl;
+	testObj.testCreateIndexPage();
+	//testObj.testGenerateErrorBody();
 }
 
 void Tests::testing() {
-	testConfigLocationParser();
-	testConfigParser();
-	testHttpInterpreter();
-	testHttpParser();
+	//testConfigLocationParser();
+	//testConfigParser();
+	//testHttpInterpreter();
+	//testHttpParser();
 	testMethodExecutor();
-	testServer();
+	testBodyGeneration();
+	//testServer();
 	testStatusCodes();
 }
 

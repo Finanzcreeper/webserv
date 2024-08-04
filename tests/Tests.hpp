@@ -3,8 +3,11 @@
 
 #include <iostream>
 #include <cstring>
+#include <cstdlib>
 #include "../interpreters/httpInterpreter.hpp"
 #include "../parsers/httpParser.hpp"
+#include "../server/statusCodes.h"
+#include "../server/MethodExecutor.hpp"
 
 enum DebugArgs {
 	SILENT = 1 << 0,		//1
@@ -30,6 +33,7 @@ private:
 	void testConfigLocationParser();
 	void testHttpParser();
 	void testMethodExecutor();
+	void testBodyGeneration();
 	void testServer();
 	void testStatusCodes();
 public:
