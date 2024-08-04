@@ -8,7 +8,7 @@ int main(int argn, char *argv[]) {
 	if (argn == 2)
 		path = std::string(argv[1]);
 	else
-		std::string("parsers/sampleConfig.conf");
+		path = std::string("parsers/sampleConfig.conf");
 
 	try {
 		Config = configParse(path);
