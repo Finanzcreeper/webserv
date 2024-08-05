@@ -21,7 +21,7 @@ class MethodExecutor
 		void			_generateCommonHeaderFields(Response &resp);
 		void			_generateSpecialErrorFields(Request &req, Response &resp);
 
-		int		_generateErrorBody(Response &resp);
+		void	_generateErrorBody(Response &resp);
 		int		_createIndexPage(std::string path, Response &resp);
 
 	public:
@@ -34,6 +34,19 @@ class MethodExecutor
 		void testCheckandReplace(void);
 		void testCreateIndexPage(void);
 		void testGenerateErrorBody(void);
+
+		void testGenerateCommonHeaderField(void);
+		void testGenerateSpecialErrorFields(void);
+		void testGenerateDateField(void);
+		void testGenerateContentLengthField(void);
+		void testGenerateAllowField(void);
+
+		void testWrapperRequest(void);
+		void testExecuteGet(void);
+		void testExecutePost(void);
+		void testExecuteDelete(void);
+		void testWriteStatusLine(void);
+		void testWriteHeaderFields(void);
 };
 
 #endif

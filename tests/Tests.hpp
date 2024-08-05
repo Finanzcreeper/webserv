@@ -4,6 +4,10 @@
 #include <iostream>
 #include <cstring>
 #include <cstdlib>
+#include <cstdio>
+#include <fstream>
+#include <sstream>
+#include <unistd.h>
 #include "../interpreters/httpInterpreter.hpp"
 #include "../parsers/httpParser.hpp"
 #include "../server/statusCodes.h"
@@ -34,6 +38,7 @@ private:
 	void testHttpParser();
 	void testMethodExecutor();
 	void testBodyGeneration();
+	void testHeaderGeneration();
 	void testServer();
 	void testStatusCodes();
 public:

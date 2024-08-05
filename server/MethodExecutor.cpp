@@ -165,15 +165,12 @@ void	MethodExecutor::_executeDelete(Request &requ, Response &resp)
     if (pos != std::string::npos)
         dir_path =  path.substr(0, pos + 1);
 	else
-	{
-		resp.httpStatus = INTERNAL_SERVER_ERROR;
-		std::cout << "Directory for deletion not found" << std::endl;
-		return;
-	}
+		dir_path = "";
+
 	struct stat	file_stat;
 	struct stat dir_stat;
 
-	if (stat(path.c_str(), &dir_stat) == -1)
+	if (dir_path != "" && stat(dir_path.c_str(), &dir_stat) == -1)
 		resp.httpStatus = NOT_FOUND;
 	else if (!(dir_stat.st_mode & S_IRWXG))
 		resp.httpStatus = UNAUTHORIZED;
@@ -200,8 +197,9 @@ void	MethodExecutor::_writeStatusLine(Response &resp)
 void	MethodExecutor::_writeHeaderFields(Response &resp)
 {
 	std::map<std::string,std::string>::iterator iter;
-	for(iter = resp.headerFields.begin(); iter != resp.headerFields.end(); ++iter)
+	for(iter = resp.headerFields.begin(); iter != resp.headerFields.end(); ++iter){
 		resp.responseBuffer.append(iter->first + ": " + iter->second + "\n");
+	}
 	resp.responseBuffer.append("\r\n\r\n");
 	return ;
 }

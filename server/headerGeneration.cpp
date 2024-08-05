@@ -69,3 +69,94 @@ static std::string	generateAllowField(int allowedTypes)
 		typesAsString.erase(typesAsString.begin());
 	return (typesAsString);
 }
+
+void MethodExecutor::testGenerateDateField(void) {
+	//==========================================================//
+	//-------------------Preparing for Test 1-------------------//
+	//==========================================================//
+	std::string	date;
+	//----------------------------------------------------------//
+	//======================Running Test 1======================//
+	//----------------------------------------------------------//
+	date = generateDateField();
+	if (date.length() != 29) {
+		std::cout << "Time format correct: \033[1;31mFAILED\033[0m" << std::endl;
+	} else {
+		std::cout << "Time format correct: \033[1;32mOK\033[0m" << std::endl;
+	}
+}
+
+void MethodExecutor::testGenerateContentLengthField(void){
+	std::string	body;
+	std::string length;
+	//==========================================================//
+	//-------------------Preparing for Test 1-------------------//
+	//==========================================================//
+	body = "this string has 29 characters";
+	//----------------------------------------------------------//
+	//======================Running Test 1======================//
+	//----------------------------------------------------------//
+	length = generateContentLengthField(body);
+	if (length != "29") {
+		std::cout << "Simple length: \033[1;31mFAILED\033[0m" << std::endl;
+	} else {
+		std::cout << "Simple length: \033[1;32mOK\033[0m" << std::endl;
+	}
+	//==========================================================//
+	//-------------------Preparing for Test 2-------------------//
+	//==========================================================//
+	body = "";
+	//----------------------------------------------------------//
+	//======================Running Test 2======================//
+	//----------------------------------------------------------//
+	length = generateContentLengthField(body);
+	if (length != "0") {
+		std::cout << "Empty string: \033[1;31mFAILED\033[0m" << std::endl;
+	} else {
+		std::cout << "Empty string: \033[1;32mOK\033[0m" << std::endl;
+	}
+}
+
+void MethodExecutor::testGenerateAllowField(void) {
+	int			allowedMethods;
+	std::string	output;
+	//==========================================================//
+	//-------------------Preparing for Test 1-------------------//
+	//==========================================================//
+	allowedMethods = 0;
+	//----------------------------------------------------------//
+	//======================Running Test 1======================//
+	//----------------------------------------------------------//
+	output = generateAllowField(allowedMethods);
+	if (output != "") {
+		std::cout << "No methods allowed: \033[1;31mFAILED\033[0m" << std::endl;
+	} else {
+		std::cout << "No methods allowed: \033[1;32mOK\033[0m" << std::endl;
+	}
+	//==========================================================//
+	//-------------------Preparing for Test 2-------------------//
+	//==========================================================//
+	allowedMethods = GET | POST;
+	//----------------------------------------------------------//
+	//======================Running Test 2======================//
+	//----------------------------------------------------------//
+	output = generateAllowField(allowedMethods);
+	if (output != "GET POST") {
+		std::cout << "Get and Post: \033[1;31mFAILED\033[0m" << std::endl;
+	} else {
+		std::cout << "Get and Post: \033[1;32mOK\033[0m" << std::endl;
+	}
+	//==========================================================//
+	//-------------------Preparing for Test 3-------------------//
+	//==========================================================//
+	allowedMethods = GET | HEAD| POST | DELETE | PUT | CONNECT | OPTIONS | TRACE | PATCH;
+	//----------------------------------------------------------//
+	//======================Running Test 3======================//
+	//----------------------------------------------------------//
+	output = generateAllowField(allowedMethods);
+	if (output != "GET HEAD POST PUT DELETE CONNECT OPTIONS TRACE PATCH") {
+		std::cout << "All methods: \033[1;31mFAILED\033[0m" << std::endl;
+	} else {
+		std::cout << "All methods: \033[1;32mOK\033[0m" << std::endl;
+	}
+}

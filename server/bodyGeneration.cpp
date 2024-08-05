@@ -1,10 +1,11 @@
-#include "MethodExecutor.hpp"
+#include"MethodExecutor.hpp"
 #include<fstream>
 #include<sstream>
-#include <string>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <dirent.h>
+#include<string>
+#include<cstring>
+#include<sys/stat.h>
+#include<unistd.h>
+#include<dirent.h>
 
 static void	checkAndReplace(std::string& line, std::string subStr, std::string& newStr);
 
@@ -37,22 +38,26 @@ int	MethodExecutor::_createIndexPage(std::string path, Response &resp)
 			std::string	end = line.substr(idx_end, line.length() - idx_end);
 			while (entry)
 			{
+				if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
+            		entry = readdir(dir);
+					continue;
+        		}
 				resp.body.append(start);
 				resp.body.append(entry->d_name);
-				resp.body.append(end);
+				resp.body.append(end + "\n");
 				entry = readdir(dir);
 			}
 			closedir(dir);
 		}
 		else
-			resp.body.append(line);
+			resp.body.append(line + "\n");
 	}
 	is.close();
 	return (0);
 }
 
 // Creates the body of the response in case an error occured
-int	MethodExecutor::_generateErrorBody(Response &resp)
+void	MethodExecutor::_generateErrorBody(Response &resp)
 {
 	std::stringstream	statusCode_str;
 	statusCode_str << resp.httpStatus;
@@ -70,7 +75,7 @@ int	MethodExecutor::_generateErrorBody(Response &resp)
 			ss << errorPage.rdbuf();
 			resp.body.append(ss.str());
 			errorPage.close();
-			return (0);
+			return ;
 		}
 		errorPage.close();
 	}
@@ -80,10 +85,8 @@ int	MethodExecutor::_generateErrorBody(Response &resp)
 
 	std::ifstream is((_serverSettings->workingDir \
 		+ "/content/templates/error_page.html").c_str());
-	if (!is.good())
-	{
-		resp.httpStatus = INTERNAL_SERVER_ERROR;
-		return (-1);
+	if (!is.good()){
+		return ;
 	}
 	std::string	line;
 	while (std::getline(is, line))
@@ -91,10 +94,9 @@ int	MethodExecutor::_generateErrorBody(Response &resp)
 		checkAndReplace(line, "__STATUS_CODE__", statusCode);
 		checkAndReplace(line, "__STATUS_MESSAGE__", statusMessage);
 		checkAndReplace(line, "__STATUS_DESCRIPTION__", statusDescription);
-		resp.body.append(line);
+		resp.body.append(line + "\n");
 	}
 	is.close();
-	return (0);
 }
 
 // replaces a substring in the first argument by a new string if founded
@@ -157,38 +159,5 @@ void MethodExecutor::testCheckandReplace(void) {
 		std::cout << "Empty string inputs: \033[1;31mFAILED\033[0m" << std::endl;
 	} else {
 		std::cout << "Empty string inputs: \033[1;32mOK\033[0m" << std::endl;
-	}
-}
-
-void	MethodExecutor::testCreateIndexPage(){
-	Response resp;
-	std::string path;
-	//==========================================================//
-	//-------------------Preparing for Test 1-------------------//
-	//==========================================================//
-	path = _serverSettings->workingDir + "/tests/testDir";
-	resp.httpStatus = OK_HTTP;
-	//----------------------------------------------------------//
-	//======================Running Test 1======================//
-	//----------------------------------------------------------//
-	_createIndexPage(path, resp);
-	if (resp.httpStatus != OK_HTTP || resp.body.find("veryUniqueFileName") == std::string::npos) {
-		std::cout << "Simple index page: \033[1;31mFAILED\033[0m" << std::endl;
-	} else {
-		std::cout << "Simple index page: \033[1;32mOK\033[0m" << std::endl;
-	}
-	//==========================================================//
-	//-------------------Preparing for Test 2-------------------//
-	//==========================================================//
-	path = "/tests/invalidPath";
-	//----------------------------------------------------------//
-	//======================Running Test 2======================//
-	//----------------------------------------------------------//
-	resp.body.clear();
-	_createIndexPage(path, resp);
-	if (resp.httpStatus != INTERNAL_SERVER_ERROR || resp.body != "") {
-		std::cout << "Invalid directory path: \033[1;31mFAILED\033[0m" << std::endl;
-	} else {
-		std::cout << "Invalid directory path: \033[1;32mOK\033[0m" << std::endl;
 	}
 }

@@ -735,6 +735,7 @@ void Tests::testStatusCodes() {
 }
 
 void Tests::testBodyGeneration(){
+	std::cout << "\033[1;95mTesting the bodyGeneration:\033[0m " << std::endl;
 	MethodExecutor testObj = MethodExecutor(&(this->testSettings));
 	testSettings.workingDir = std::getenv("PWD");
 	std::cout <<"[1;34m-----------checkAndReplace----------[0m" << std::endl;
@@ -742,7 +743,36 @@ void Tests::testBodyGeneration(){
 	testObj.testCheckandReplace();
 	std::cout <<"[1;34m-----------createIndexPage----------[0m" << std::endl;
 	testObj.testCreateIndexPage();
-	//testObj.testGenerateErrorBody();
+	std::cout <<"[1;34m-----------generateErrorBody----------[0m" << std::endl;
+	std::string errorPagePath1 = "/tests/testContent/dummyErrorPage.txt";
+	std::string errorPagePath2 = "/tests/testContent/notExisting.txt";
+	testSettings.errorPages.insert(std::make_pair(INTERNAL_SERVER_ERROR, errorPagePath1));
+	testSettings.errorPages.insert(std::make_pair(NOT_FOUND, errorPagePath2));
+	testObj.testGenerateErrorBody();
+}
+
+void Tests::testHeaderGeneration(){
+	std::cout << "\033[1;95mTesting the headerGeneration:\033[0m " << std::endl;
+	MethodExecutor testObj = MethodExecutor(&(this->testSettings));
+	testSettings.workingDir = std::getenv("PWD");
+	std::cout <<"[1;34m-----------generateDateField----------[0m" << std::endl;
+	// unit tests implemented in source file, since static function
+	testObj.testGenerateDateField();
+	std::cout <<"[1;34m-----------generateContentLengthField----------[0m" << std::endl;
+	testObj.testGenerateContentLengthField();
+	std::cout <<"[1;34m-----------testGenerateAllowField----------[0m" << std::endl;
+	testObj.testGenerateAllowField();
+	std::cout <<"[1;34m-----------testGenerateSpecialErrorFields----------[0m" << std::endl;
+	testObj.testGenerateSpecialErrorFields();
+	std::cout <<"[1;34m-----------testGenerateCommonHeaderField----------[0m" << std::endl;
+	testSettings.serverName = "example-name";
+	testObj.testGenerateCommonHeaderField();
+	std::cout <<"[1;34m-----------testWriteHeaderFields----------[0m" << std::endl;
+	testObj.testWriteHeaderFields();
+	std::cout <<"[1;34m-----------testWriteStatusLine----------[0m" << std::endl;
+	testObj.testWriteStatusLine();
+	std::cout <<"[1;34m-----------testExecuteDelete----------[0m" << std::endl;
+	testObj.testExecuteDelete();
 }
 
 void Tests::testing() {
@@ -752,6 +782,7 @@ void Tests::testing() {
 	testHttpParser();
 	testMethodExecutor();
 	testBodyGeneration();
+	testHeaderGeneration();
 	testServer();
 	testStatusCodes();
 }
