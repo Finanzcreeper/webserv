@@ -11,20 +11,25 @@ void WebKill(int signal) {
 	}
 }
 
-int main() {
-	//std::vector<t_server> configs;
-	//std::vector<t_server>::iterator servernbr = configs.begin();
-	std::vector<t_server> Config;
+
+int main(int argn, char *argv[]) {
 	std::vector<Server*> Servers;
 	std::vector<Server*>::iterator ServerCrawler;
-
-
+	std::vector<t_server>	Config;
+ 
 	signal(SIGINT, WebKill);
+	std::string				path;
+	if (argn == 2)
+		path = std::string(argv[1]);
+	else
+		path = std::string("parsers/sampleConfig.conf");
 
-	try  {
-		Config = configParse("/home/nreher/dev/webserv/parsers/sampleConfig.conf");
-	} catch (std::runtime_error &e) {
+	try {
+		Config = configParse(path);
+	} 
+	catch (std::runtime_error &e) {
 		std::cout <<e.what() << std::endl;
+		return (1);
 	}
 	for (size_t i = 0; i < Config.size(); ++i) {
 		try {
