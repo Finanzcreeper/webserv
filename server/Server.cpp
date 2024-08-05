@@ -24,24 +24,28 @@ Server::Server(t_server sett) : settings(sett), socketOption(ON){
 	listening_socket.fd = socket(serverInfo->ai_family, serverInfo->ai_socktype, serverInfo->ai_protocol);
 	if (listening_socket.fd == -1) {
 		std::cerr << "\033[1;31msocket creation failure: "<< std::strerror(errno)  << "\033[0m"<< std::endl;
+		freeaddrinfo(serverInfo);
 		throw std::runtime_error("");
 		//throw socket creation failure exception
 	}
 
 	if (setsockopt(listening_socket.fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &socketOption, sizeof(socketOption)) == -1) {
 		std::cerr << "\033[1;31msocket option could not be applied: " << std::strerror(errno)  << "\033[0m"<< std::endl;
+		freeaddrinfo(serverInfo);
 		throw std::runtime_error("");
 		//throw socket settings exception
 	}
 
 	if (bind(listening_socket.fd, serverInfo->ai_addr, serverInfo->ai_addrlen) == -1) {
 		std::cerr << "\033[1;31msocked binding failure: "<< std::strerror(errno)  << "\033[0m"<< std::endl;
+		freeaddrinfo(serverInfo);
 		throw std::runtime_error("");
 		// throw socked binding failure exception
 	}
 
 	if (listen(listening_socket.fd, 1000) == -1) {
 		std::cerr << "\033[1;31merror making the socket listen: "<< std::strerror(errno)  << "\033[0m"<< std::endl;
+		freeaddrinfo(serverInfo);
 		throw std::runtime_error("");
 		//throw socket listening error exception
 	}
