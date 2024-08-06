@@ -138,7 +138,7 @@ void Server::CheckForConnections() {
 		}
 	}
 	if (difftime(time(NULL), lastTimeoutCheck) > settings.timeoutTime) {
-	checkConnectionsForTimeout();
+		checkConnectionsForTimeout();
 	}
 }
 
