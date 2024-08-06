@@ -6,7 +6,7 @@
 bool endserver = false;
 
 void WebKill(int signal) {
-	if (signal > 0) {
+	if (signal == 2) {
 		endserver = true;
 	}
 }
@@ -23,7 +23,6 @@ int main(int argn, char *argv[]) {
 		path = std::string(argv[1]);
 	else
 		path = std::string("parsers/sampleConfig.conf");
-
 	try {
 		Config = configParse(path);
 	} 
