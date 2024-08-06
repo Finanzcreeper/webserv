@@ -88,7 +88,8 @@ void Server::CheckForConnections() {
 					bzero(buffer, sizeof(buffer));
 					mt = connectionMsgs.find(it->fd);
 					resps = answerMsgs.find(it->fd);
-					if (recv(it->fd, buffer, 1000, 0) != 0) {
+					this->recievedBytes = recv(it->fd, buffer, 1000, 0);
+					if (this->recievedBytes > 0 ) {
 						mt->second.r.RequestBuffer.append(buffer);
 						time(&mt->second.t.lastMsg);
 						++mt->second.t.msgAmt;
@@ -97,7 +98,7 @@ void Server::CheckForConnections() {
 						}
 						std::cout << mt->second.r.RequestBuffer << std::endl;
 						httpParser(mt);
-						std::cout << "after parser: " << mt->second.r.RequestIntegrity << std::endl;
+						//std::cout << "after parser: " << mt->second.r.RequestIntegrity << std::endl;
 						if (mt->second.r.requestCompletlyRecieved == true){
 							interpretRequest(mt->second.r, settings); 
 							executor.wrapperRequest(mt->second.r, resps->second);
@@ -113,12 +114,15 @@ void Server::CheckForConnections() {
 								}
 							}
 						}
-					} else if (mt->second.r.RequestIntegrity == REQUEST_TIMEOUT){
+					} else if (this->recievedBytes == 0 || mt->second.r.RequestIntegrity == REQUEST_TIMEOUT){
 						//cleanup
-						std::cout << mt->first << " disconnected" << std::endl;
+						std::cout << mt->first << " \033[1;31mdisconnected\033[0m" << std::endl;
+						close(mt->first);
 						Fds.erase(it);
 						connectionMsgs.erase(mt);
 						--it;
+					} else if (this->recievedBytes == -1) {
+						revcErrorHandler();
 					}
 				}
 				//int b = 0;
@@ -133,6 +137,13 @@ void Server::CheckForConnections() {
 		if (difftime(time(NULL), lastTimeoutCheck) > settings.timeoutTime) {
 		checkConnectionsForTimeout();
 		}
+	}
+}
+
+void Server::revcErrorHandler() {
+	std::cout << "\033[1;34m" << std::strerror(errno) << "\033[0m" << std::endl;
+	if (errno == EWOULDBLOCK || errno == EAGAIN) {
+		return;
 	}
 }
 
@@ -161,3 +172,4 @@ void Server::checkConnectionsForTimeout() {
 Server::~Server() {
 	freeaddrinfo(serverInfo);
 }
+

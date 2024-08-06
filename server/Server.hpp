@@ -32,6 +32,8 @@ private:
 
 	int socketOption;
 
+	long int recievedBytes;
+
 	addrinfo hints;
 	addrinfo *serverInfo;
 
@@ -52,6 +54,7 @@ private:
 
 	void checkConnectionsForTimeout();
 
+	void revcErrorHandler();
 
 public:
 	Server(t_server sett);
