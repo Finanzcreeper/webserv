@@ -73,39 +73,28 @@ void	MethodExecutor::_executeGet(Request &requ, Response &resp)
 
     // default page if no path specified
     if ((requ.RequestedPath.length() == requ.RoutedPath.length()) && \
-		(requ.UsedRoute.index.length() > 0))
-	{
+		(requ.UsedRoute.index.length() > 0)) {
         path = requ.UsedRoute.root + requ.UsedRoute.index;
-	}
-    else
-	{
+	} else {
         path = requ.RoutedPath;
 	}
-	if (stat(path.c_str(), &s) == -1)
-	{
+	if (stat(path.c_str(), &s) == -1) {
 		resp.httpStatus = NOT_FOUND;
-	}
-	else if (!(s.st_mode & S_IRGRP))
-	{
+	} else if (!(s.st_mode & S_IRGRP)) {
 		resp.httpStatus = UNAUTHORIZED;
-	}
-	else if ((s.st_mode & S_IFDIR))
-	{
-		if (requ.UsedRoute.dirListing)
-		{
-			if (_createIndexPage(path, resp) == -1)
+	} else if ((s.st_mode & S_IFDIR)) {
+		if (requ.UsedRoute.dirListing) {
+			if (_createIndexPage(path, resp) == -1) {
 				resp.httpStatus = INTERNAL_SERVER_ERROR;
+			}
 			return;
-		}
-		std::cout << path + " is directory!" << std::endl;
+		} else {
 		resp.httpStatus = NOT_FOUND;
-	}
-	else if (s.st_mode & S_IFREG)
-	{
+		}
+	} else if (s.st_mode & S_IFREG) {
 		std::ifstream	ifs(path.c_str());
-		if (ifs.good())
-		{
-			std::ostringstream ss;
+		if (ifs.good()) {
+			std::stringstream ss;
 			ss << ifs.rdbuf();
 			resp.body.append(ss.str());
 
@@ -114,13 +103,13 @@ void	MethodExecutor::_executeGet(Request &requ, Response &resp)
 			char buf[100];
     		std::strftime(buf, sizeof(buf), "%a, %d %b %Y %H:%M:%S GMT", gmt);
 			resp.headerFields["last-modified"] = std::string(buf);
-		}
-		else
-		{
+		} else {
 			std::cout << "Error while opening requested file: \'" + requ.RoutedPath + "\'"<< std::endl;
 			resp.httpStatus = INTERNAL_SERVER_ERROR;
 		}
 		ifs.close();
+	} else {
+		resp.httpStatus = INTERNAL_SERVER_ERROR;
 	}
 }
 
@@ -129,28 +118,21 @@ void	MethodExecutor::_executePost(Request &requ, Response &resp)
 	std::string	path = requ.RoutedPath;
 	struct stat	s;
 	// check if file already exists
-	if (stat(path.c_str(), &s) == 0)
-	{
+	if (stat(path.c_str(), &s) == 0) {
 		resp.httpStatus = FORBIDDEN;
 		return ;
 	}
 	std::ofstream	ofs(path.c_str(), std::ios::out);
-	if (ofs.good())
-	{
+	if (ofs.good()) {
 		ofs << requ.Body;
-		if(ofs.fail())
-		{
+		if(ofs.fail()) {
 			std::cout << "Error while creating requested file: \'" + requ.RoutedPath + "\'"<< std::endl;
 			resp.httpStatus = INTERNAL_SERVER_ERROR;
-		}
-		else 
-		{
+		} else {
 			resp.httpStatus = CREATED;
 			resp.headerFields["location"] = requ.RequestedPath;
 		}
-	}
-	else
-	{
+	} else {
 		std::cout << "Error while creating requested file: \'" + requ.RoutedPath + "\'"<< std::endl;
 		resp.httpStatus = INTERNAL_SERVER_ERROR;
 	}
@@ -170,16 +152,17 @@ void	MethodExecutor::_executeDelete(Request &requ, Response &resp)
 	struct stat	file_stat;
 	struct stat dir_stat;
 
-	if (dir_path != "" && stat(dir_path.c_str(), &dir_stat) == -1)
+	if (dir_path != "" && stat(dir_path.c_str(), &dir_stat) == -1){
 		resp.httpStatus = NOT_FOUND;
-	else if (!(dir_stat.st_mode & S_IRWXG))
+	} else if (!(dir_stat.st_mode & S_IRWXG)) {
 		resp.httpStatus = UNAUTHORIZED;
-	else if (stat(path.c_str(), &file_stat) == -1)
+	} else if (stat(path.c_str(), &file_stat) == -1) {
 		resp.httpStatus = NOT_FOUND;
-	else if (std::remove(path.c_str()) == 0)
+	} else if (std::remove(path.c_str()) == 0) {
 		resp.httpStatus = NO_CONTENT;
-	else
+	} else {
 		resp.httpStatus = INTERNAL_SERVER_ERROR;
+	}
 }
 
 // creates the status line for an http response and adds it to the output buffer

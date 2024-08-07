@@ -762,17 +762,23 @@ void Tests::testHeaderGeneration(){
 	testObj.testGenerateContentLengthField();
 	std::cout <<"[1;34m-----------testGenerateAllowField----------[0m" << std::endl;
 	testObj.testGenerateAllowField();
-	std::cout <<"[1;34m-----------testGenerateSpecialErrorFields----------[0m" << std::endl;
+	std::cout <<"[1;34m-----------generateSpecialErrorFields----------[0m" << std::endl;
 	testObj.testGenerateSpecialErrorFields();
-	std::cout <<"[1;34m-----------testGenerateCommonHeaderField----------[0m" << std::endl;
+	std::cout <<"[1;34m-----------generateCommonHeaderField----------[0m" << std::endl;
 	testSettings.serverName = "example-name";
 	testObj.testGenerateCommonHeaderField();
-	std::cout <<"[1;34m-----------testWriteHeaderFields----------[0m" << std::endl;
+	std::cout <<"[1;34m-----------writeHeaderFields----------[0m" << std::endl;
 	testObj.testWriteHeaderFields();
-	std::cout <<"[1;34m-----------testWriteStatusLine----------[0m" << std::endl;
+	std::cout <<"[1;34m-----------writeStatusLine----------[0m" << std::endl;
 	testObj.testWriteStatusLine();
-	std::cout <<"[1;34m-----------testExecuteDelete----------[0m" << std::endl;
+	std::cout <<"[1;34m-----------executeDelete----------[0m" << std::endl;
 	testObj.testExecuteDelete();
+	std::cout <<"[1;34m-----------executePost----------[0m" << std::endl;
+	testObj.testExecutePost();
+	std::cout <<"[1;34m-----------executeGet----------[0m" << std::endl;
+	testObj.testExecuteGet();
+	std::cout <<"[1;34m-----------wrapperRequest----------[0m" << std::endl;
+	testObj.testWrapperRequest();
 }
 
 void Tests::testing() {
