@@ -81,7 +81,7 @@ void MethodExecutor::testGenerateDateField(void) {
 	date = generateDateField();
 	if (date.length() != 29) {
 		std::cout << "Time format correct: \033[1;31mFAILED\033[0m" << std::endl;
-	} else {
+	} else if (this->silent == false) {
 		std::cout << "Time format correct: \033[1;32mOK\033[0m" << std::endl;
 	}
 }
@@ -99,7 +99,7 @@ void MethodExecutor::testGenerateContentLengthField(void){
 	length = generateContentLengthField(body);
 	if (length != "29") {
 		std::cout << "Simple length: \033[1;31mFAILED\033[0m" << std::endl;
-	} else {
+	} else if (this->silent == false) {
 		std::cout << "Simple length: \033[1;32mOK\033[0m" << std::endl;
 	}
 	//==========================================================//
@@ -112,7 +112,7 @@ void MethodExecutor::testGenerateContentLengthField(void){
 	length = generateContentLengthField(body);
 	if (length != "0") {
 		std::cout << "Empty string: \033[1;31mFAILED\033[0m" << std::endl;
-	} else {
+	} else if (this->silent == false) {
 		std::cout << "Empty string: \033[1;32mOK\033[0m" << std::endl;
 	}
 }
@@ -130,7 +130,7 @@ void MethodExecutor::testGenerateAllowField(void) {
 	output = generateAllowField(allowedMethods);
 	if (output != "") {
 		std::cout << "No methods allowed: \033[1;31mFAILED\033[0m" << std::endl;
-	} else {
+	} else if (this->silent == false) {
 		std::cout << "No methods allowed: \033[1;32mOK\033[0m" << std::endl;
 	}
 	//==========================================================//
@@ -143,7 +143,7 @@ void MethodExecutor::testGenerateAllowField(void) {
 	output = generateAllowField(allowedMethods);
 	if (output != "GET POST") {
 		std::cout << "Get and Post: \033[1;31mFAILED\033[0m" << std::endl;
-	} else {
+	} else if (this->silent == false) {
 		std::cout << "Get and Post: \033[1;32mOK\033[0m" << std::endl;
 	}
 	//==========================================================//
@@ -156,7 +156,7 @@ void MethodExecutor::testGenerateAllowField(void) {
 	output = generateAllowField(allowedMethods);
 	if (output != "GET HEAD POST PUT DELETE CONNECT OPTIONS TRACE PATCH") {
 		std::cout << "All methods: \033[1;31mFAILED\033[0m" << std::endl;
-	} else {
+	} else if (this->silent == false) {
 		std::cout << "All methods: \033[1;32mOK\033[0m" << std::endl;
 	}
 }

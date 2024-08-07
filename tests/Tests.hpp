@@ -46,5 +46,4 @@ public:
 	Tests(int argument);
 };
 
-
 #endif //WEBSERV_TESTS_HPP

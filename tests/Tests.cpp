@@ -1,6 +1,4 @@
-
 #include "Tests.hpp"
-
 
 void Tests::testHttpInterpreter() {
 	std::cout << "\033[1;95mTesting the httpInterpreter:\033[0m " << std::endl;
@@ -737,6 +735,7 @@ void Tests::testStatusCodes() {
 void Tests::testBodyGeneration(){
 	std::cout << "\033[1;95mTesting the bodyGeneration:\033[0m " << std::endl;
 	MethodExecutor testObj = MethodExecutor(&(this->testSettings));
+	testObj.silent = this->silent;
 	testSettings.workingDir = std::getenv("PWD");
 	std::cout <<"[1;34m-----------checkAndReplace----------[0m" << std::endl;
 	// unit tests implemented in source file, since static function
@@ -754,6 +753,7 @@ void Tests::testBodyGeneration(){
 void Tests::testHeaderGeneration(){
 	std::cout << "\033[1;95mTesting the headerGeneration:\033[0m " << std::endl;
 	MethodExecutor testObj = MethodExecutor(&(this->testSettings));
+	testObj.silent = this->silent;
 	testSettings.workingDir = std::getenv("PWD");
 	std::cout <<"[1;34m-----------generateDateField----------[0m" << std::endl;
 	// unit tests implemented in source file, since static function

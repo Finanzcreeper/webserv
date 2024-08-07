@@ -125,7 +125,7 @@ void MethodExecutor::testCheckandReplace(void) {
 	checkAndReplace(line, subStr, newString);
 	if (expectedOutput != line) {
 		std::cout << "Replace simple substring: \033[1;31mFAILED\033[0m" << std::endl;
-	} else {
+	} else if (this->silent == false) {
 		std::cout << "Replace simple substring: \033[1;32mOK\033[0m" << std::endl;
 	}
 	//==========================================================//
@@ -141,7 +141,7 @@ void MethodExecutor::testCheckandReplace(void) {
 	checkAndReplace(line, subStr, newString);
 	if (expectedOutput != line) {
 		std::cout << "No replace possible: \033[1;31mFAILED\033[0m" << std::endl;
-	} else {
+	} else if (this->silent == false) {
 		std::cout << "No replace possible: \033[1;32mOK\033[0m" << std::endl;
 	}
 	//==========================================================//
@@ -157,7 +157,7 @@ void MethodExecutor::testCheckandReplace(void) {
 	checkAndReplace(line, subStr, newString);
 	if (expectedOutput != line) {
 		std::cout << "Empty string inputs: \033[1;31mFAILED\033[0m" << std::endl;
-	} else {
+	} else if (this->silent == false) {
 		std::cout << "Empty string inputs: \033[1;32mOK\033[0m" << std::endl;
 	}
 }

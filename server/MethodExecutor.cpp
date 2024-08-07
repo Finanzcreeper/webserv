@@ -13,7 +13,7 @@ std::string		defaultPage = "index.html";
 MethodExecutor::MethodExecutor( void ): _serverSettings(0) {
 };
 
-MethodExecutor::MethodExecutor(const t_server *serverSettings): _serverSettings(serverSettings) {}
+MethodExecutor::MethodExecutor(const t_server *serverSettings): _serverSettings(serverSettings) , silent(false) {}
 
 void	MethodExecutor::wrapperRequest(Request &requ, Response &resp)
 {

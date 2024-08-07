@@ -31,6 +31,7 @@ class MethodExecutor
 		void	wrapperRequest(Request &requ, Response &resp);
 
 		// unit tests
+		bool silent;
 		void testCheckandReplace(void);
 		void testCreateIndexPage(void);
 		void testGenerateErrorBody(void);
