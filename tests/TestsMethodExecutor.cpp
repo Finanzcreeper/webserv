@@ -193,7 +193,25 @@ void	MethodExecutor::testGenerateSpecialErrorFields(){
 }
 
 void MethodExecutor::testWrapperRequest(void){
-
+	Request		requ;
+	Response	resp;
+	//==========================================================//
+	//-------------------Preparing for Test 1-------------------//
+	//==========================================================//
+	requ.UsedRoute.redirect = "hallohallo";
+	resp.httpStatus = MOVED_PERMANENTLY;
+	resp.responseBuffer.clear();
+	//----------------------------------------------------------//
+	//======================Running Test 1======================//
+	//----------------------------------------------------------//
+	wrapperRequest(requ, resp);
+	std::cout << resp.responseBuffer << std::endl;
+	if (resp.httpStatus != MOVED_PERMANENTLY || \
+		resp.responseBuffer != "hallohallo") {
+		std::cout << "Simple download: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent == false) {
+		std::cout << "Simple download: \033[1;32mOK\033[0m" << std::endl;
+	}
 }
 
 void MethodExecutor::testExecuteGet(void){

@@ -17,9 +17,9 @@ MethodExecutor::MethodExecutor(const t_server *serverSettings): _serverSettings(
 
 void	MethodExecutor::wrapperRequest(Request &requ, Response &resp)
 {
-	std::cout << "Used route: " + requ.UsedRoute.locationName << std::endl;
-	std::cout << "Used redirect: " + requ.UsedRoute.root << std::endl;
-	std::cout << "Used path: " + requ.RoutedPath << std::endl;
+	//std::cout << "Used route: " + requ.UsedRoute.locationName << std::endl;
+	//std::cout << "Used redirect: " + requ.UsedRoute.root << std::endl;
+	//std::cout << "Used path: " + requ.RoutedPath << std::endl;
 	//std::cout << "**** HEADER OF REQUEST: ****\n" << requ.HeaderBuffer << std::endl << "**** END OF HEADER ****" << std::endl;
 	//std::cout << "**** BODY OF REQUEST: ****\n" << requ.Body << std::endl << "**** END OF BODY ****" << std::endl;
 	//std::cout << "REQUEST TYPE: " << requ.ReqType << std::endl;
