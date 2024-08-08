@@ -165,6 +165,5 @@ void Server::checkConnectionsForTimeout() {
 }
 
 Server::~Server() {
-	std::cout << "IM DEAD" << std::endl;
 	freeaddrinfo(serverInfo);
 }
