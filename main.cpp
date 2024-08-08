@@ -6,7 +6,7 @@
 bool endserver = false;
 
 void WebKill(int signal) {
-	if (signal == 2) {
+	if (signal == SIGINT) {
 		endserver = true;
 	}
 }
