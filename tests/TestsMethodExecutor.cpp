@@ -1,5 +1,23 @@
 #include "Tests.hpp"
 
+void Tests::testMethodExecutor(void){
+	std::cout << "\033[1;95mTesting the headerGeneration:\033[0m " << std::endl;
+	MethodExecutor testObj = MethodExecutor(&(this->testSettings));
+	testObj.silent = this->silent;
+	testSettings.workingDir = std::getenv("PWD");
+	std::cout << "\033[1;95mTesting the methodExecutor:\033[0m " << std::endl;
+	std::cout <<"[1;34m-----------writeStatusLine----------[0m" << std::endl;
+	testObj.testWriteStatusLine();
+	std::cout <<"[1;34m-----------executeDelete----------[0m" << std::endl;
+	testObj.testExecuteDelete();
+	std::cout <<"[1;34m-----------executePost----------[0m" << std::endl;
+	testObj.testExecutePost();
+	std::cout <<"[1;34m-----------executeGet----------[0m" << std::endl;
+	testObj.testExecuteGet();
+	std::cout <<"[1;34m-----------wrapperRequest----------[0m" << std::endl;
+	testObj.testWrapperRequest();
+}
+
 void	MethodExecutor::testCreateIndexPage(){
 	Response resp;
 	std::string path;
@@ -193,25 +211,132 @@ void	MethodExecutor::testGenerateSpecialErrorFields(){
 }
 
 void MethodExecutor::testWrapperRequest(void){
-	Request		requ;
-	Response	resp;
+	Request			requ;
+	Response		resp;
+	std::string		suffix;
+	std::ifstream	is;
+	std::ofstream	os;
+
 	//==========================================================//
 	//-------------------Preparing for Test 1-------------------//
 	//==========================================================//
 	requ.UsedRoute.redirect = "hallohallo";
-	resp.httpStatus = MOVED_PERMANENTLY;
-	resp.responseBuffer.clear();
+	requ.RequestIntegrity = MOVED_PERMANENTLY;
 	//----------------------------------------------------------//
 	//======================Running Test 1======================//
 	//----------------------------------------------------------//
 	wrapperRequest(requ, resp);
-	std::cout << resp.responseBuffer << std::endl;
 	if (resp.httpStatus != MOVED_PERMANENTLY || \
-		resp.responseBuffer != "hallohallo") {
-		std::cout << "Simple download: \033[1;31mFAILED\033[0m" << std::endl;
+		resp.responseBuffer.find("\nlocation: hallohallo\n") == std::string::npos) {
+		std::cout << "Redirection: \033[1;31mFAILED\033[0m" << std::endl;
 	} else if (this->silent == false) {
-		std::cout << "Simple download: \033[1;32mOK\033[0m" << std::endl;
+		std::cout << "Redirection: \033[1;32mOK\033[0m" << std::endl;
 	}
+	//==========================================================//
+	//-------------------Preparing for Test 2-------------------//
+	//==========================================================//
+	requ.RequestIntegrity = BAD_REQUEST;
+	requ.RoutedPath = "tests/testDir/dummy.txt";
+	requ.ReqType = GET;
+	//----------------------------------------------------------//
+	//======================Running Test 2======================//
+	//----------------------------------------------------------//
+	wrapperRequest(requ, resp);
+	if (resp.httpStatus != BAD_REQUEST || \
+		resp.responseBuffer.find("HTTP/1.1 400 Bad Request") != 0 || \
+		resp.responseBuffer.find("Server cannot process the request") == std::string::npos) {
+		std::cout << "Error page returned: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent == false) {
+		std::cout << "Error page returned: \033[1;32mOK\033[0m" << std::endl;
+	}
+	//==========================================================//
+	//-------------------Preparing for Test 3-------------------//
+	//==========================================================//
+	requ.RequestIntegrity = OK_HTTP;
+	requ.RoutedPath = "tests/testContent/dummy.txt";
+	requ.RequestedPath = "/dummy.txt";
+	requ.ReqType = HEAD;
+	suffix = "\r\n\r\n";
+	//----------------------------------------------------------//
+	//======================Running Test 3======================//
+	//----------------------------------------------------------//
+	wrapperRequest(requ, resp);
+	if (resp.httpStatus != OK_HTTP || \
+		resp.responseBuffer.find("HTTP/1.1 200 OK") != 0 || \
+		!std::equal(suffix.rbegin(), suffix.rend(), resp.responseBuffer.rbegin())) {
+		std::cout << "HEAD request: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent == false) {
+		std::cout << "HEAD request: \033[1;32mOK\033[0m" << std::endl;
+	}
+	//==========================================================//
+	//-------------------Preparing for Test 4-------------------//
+	//==========================================================//
+	requ.RequestIntegrity = OK_HTTP;
+	requ.RoutedPath = "tests/testContent/dummy.txt";
+	requ.RequestedPath = "/dummy.txt";
+	requ.ReqType = GET;
+	suffix = "hallihallo";
+	//----------------------------------------------------------//
+	//======================Running Test 4======================//
+	//----------------------------------------------------------//
+	wrapperRequest(requ, resp);
+	if (resp.httpStatus != OK_HTTP || \
+		resp.responseBuffer.find("HTTP/1.1 200 OK") != 0 || \
+		!std::equal(suffix.rbegin(), suffix.rend(), resp.responseBuffer.rbegin())) {
+		std::cout << "GET request: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent == false) {
+		std::cout << "GET request: \033[1;32mOK\033[0m" << std::endl;
+	}
+	//==========================================================//
+	//-------------------Preparing for Test 5-------------------//
+	//==========================================================//
+	requ.RequestIntegrity = OK_HTTP;
+	requ.RoutedPath = "tests/testContent/upload2.txt";
+	requ.RequestedPath = "/upload2.txt";
+	requ.Body = "anything";
+	requ.ReqType = POST;
+	suffix = "\r\n\r\n";
+	//----------------------------------------------------------//
+	//======================Running Test 5======================//
+	//----------------------------------------------------------//
+	wrapperRequest(requ, resp);
+	is.open("tests/testContent/upload2.txt");
+	std::stringstream buffer;
+	if (is)
+		buffer << is.rdbuf();
+	if (resp.httpStatus != CREATED || \
+		resp.responseBuffer.find("HTTP/1.1 201 Created") != 0 || \
+		buffer.str() != "anything") {
+		std::cout << "POST request: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent == false) {
+		std::cout << "POST request: \033[1;32mOK\033[0m" << std::endl;
+	}
+	is.close();
+	std::remove("tests/testContent/upload2.txt");
+	//==========================================================//
+	//-------------------Preparing for Test 6-------------------//
+	//==========================================================//
+	requ.RequestIntegrity = OK_HTTP;
+	os.open("tests/testContent/deletionFile.txt");
+	os << "Dummy stuff";
+	os.close();
+	requ.RoutedPath = "tests/testContent/deletionFile.txt";
+	requ.ReqType = DELETE;
+	suffix = "\r\n\r\n";
+	//----------------------------------------------------------//
+	//======================Running Test 6======================//
+	//----------------------------------------------------------//
+	wrapperRequest(requ, resp);
+	is.open("tests/testContent/deletionFile.txt");
+	if (resp.httpStatus != NO_CONTENT || \
+		resp.responseBuffer.find("HTTP/1.1 204 No Content") != 0 || \
+		is) {
+		std::cout << "DELETE request: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent == false) {
+		std::cout << "DELETE request: \033[1;32mOK\033[0m" << std::endl;
+	}
+	is.close();
+	std::remove("tests/testContent/deletionFile.txt");
 }
 
 void MethodExecutor::testExecuteGet(void){
@@ -561,8 +686,4 @@ void	MethodExecutor::testWriteHeaderFields(){
 	} else if (this->silent == false) {
 		std::cout << "Normal header fields: \033[1;32mOK\033[0m" << std::endl;
 	}
-}
-
-void	Tests::testMethodExecutor(){
-
 }

@@ -769,16 +769,6 @@ void Tests::testHeaderGeneration(){
 	testObj.testGenerateCommonHeaderField();
 	std::cout <<"[1;34m-----------writeHeaderFields----------[0m" << std::endl;
 	testObj.testWriteHeaderFields();
-	std::cout <<"[1;34m-----------writeStatusLine----------[0m" << std::endl;
-	testObj.testWriteStatusLine();
-	std::cout <<"[1;34m-----------executeDelete----------[0m" << std::endl;
-	testObj.testExecuteDelete();
-	std::cout <<"[1;34m-----------executePost----------[0m" << std::endl;
-	testObj.testExecutePost();
-	std::cout <<"[1;34m-----------executeGet----------[0m" << std::endl;
-	testObj.testExecuteGet();
-	std::cout <<"[1;34m-----------wrapperRequest----------[0m" << std::endl;
-	testObj.testWrapperRequest();
 }
 
 void Tests::testing() {

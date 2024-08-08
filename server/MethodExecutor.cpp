@@ -28,11 +28,9 @@ void	MethodExecutor::wrapperRequest(Request &requ, Response &resp)
 	resp.headerFields.clear();
 	resp.httpStatus = requ.RequestIntegrity;
 	requ.HeaderFields["content-type"] = "text/plain";
-
-	if (resp.httpStatus == MOVED_PERMANENTLY)
+	if (resp.httpStatus == MOVED_PERMANENTLY) {
 		resp.headerFields["location"] = requ.UsedRoute.redirect;
-	else if (resp.httpStatus == OK_HTTP)
-	{
+	} else if (resp.httpStatus == OK_HTTP) {
 		switch (requ.ReqType){
 			case (GET):
 				_executeGet(requ, resp);
@@ -50,8 +48,8 @@ void	MethodExecutor::wrapperRequest(Request &requ, Response &resp)
 				std::cerr << "Method type not found\n";
 		}
 	}
-	if ((int)resp.httpStatus >= MIN_CLIENT_ERROR && (int)resp.httpStatus <= MAX_SERVER_ERROR)
-	{
+	if ((int)resp.httpStatus >= MIN_CLIENT_ERROR && \
+		(int)resp.httpStatus <= MAX_SERVER_ERROR) {
 		_generateSpecialErrorFields(requ, resp);
 		_generateErrorBody(resp);
 	}
@@ -60,8 +58,9 @@ void	MethodExecutor::wrapperRequest(Request &requ, Response &resp)
 	_writeStatusLine(resp);
 	_writeHeaderFields(resp);
 	// Append body to response
-	if (requ.ReqType != HEAD)
+	if (requ.ReqType != HEAD) {
 		resp.responseBuffer.append(resp.body);
+	}
 	resp.isReady = true;
 	//std::cout << "**** RESPONSE: ****\n" << resp.responseBuffer << "**** END OF RESPONSE ****" << std::endl;
 }
@@ -95,9 +94,9 @@ void	MethodExecutor::_executeGet(Request &requ, Response &resp)
 		std::ifstream	ifs(path.c_str());
 		if (ifs.good()) {
 			std::stringstream ss;
+			//std::cout << ifs.rdbuf();
 			ss << ifs.rdbuf();
 			resp.body.append(ss.str());
-
 			// read modification time
 			struct tm* gmt = std::gmtime(&s.st_mtim.tv_sec);
 			char buf[100];
