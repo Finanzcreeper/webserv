@@ -1,7 +1,7 @@
 #include "Tests.hpp"
 
 void Tests::testMethodExecutor(void){
-	std::cout << "\033[1;95mTesting the headerGeneration:\033[0m " << std::endl;
+	std::cout << "\033[1;95mTesting the methodExecutor:\033[0m " << std::endl;
 	MethodExecutor testObj = MethodExecutor(&(this->testSettings));
 	testObj.silent = this->silent;
 	testSettings.workingDir = std::getenv("PWD");
