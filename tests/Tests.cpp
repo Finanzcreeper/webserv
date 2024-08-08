@@ -736,15 +736,14 @@ void Tests::testBodyGeneration(){
 	std::cout << "\033[1;95mTesting the bodyGeneration:\033[0m " << std::endl;
 	MethodExecutor testObj = MethodExecutor(&(this->testSettings));
 	testObj.silent = this->silent;
-	testSettings.workingDir = std::getenv("PWD");
 	std::cout <<"[1;34m-----------checkAndReplace----------[0m" << std::endl;
 	// unit tests implemented in source file, since static function
 	testObj.testCheckandReplace();
 	std::cout <<"[1;34m-----------createIndexPage----------[0m" << std::endl;
 	testObj.testCreateIndexPage();
 	std::cout <<"[1;34m-----------generateErrorBody----------[0m" << std::endl;
-	std::string errorPagePath1 = "/tests/testContent/dummyErrorPage.txt";
-	std::string errorPagePath2 = "/tests/testContent/notExisting.txt";
+	std::string errorPagePath1 = "tests/testContent/dummyErrorPage.txt";
+	std::string errorPagePath2 = "tests/testContent/notExisting.txt";
 	testSettings.errorPages.insert(std::make_pair(INTERNAL_SERVER_ERROR, errorPagePath1));
 	testSettings.errorPages.insert(std::make_pair(NOT_FOUND, errorPagePath2));
 	testObj.testGenerateErrorBody();
@@ -754,7 +753,6 @@ void Tests::testHeaderGeneration(){
 	std::cout << "\033[1;95mTesting the headerGeneration:\033[0m " << std::endl;
 	MethodExecutor testObj = MethodExecutor(&(this->testSettings));
 	testObj.silent = this->silent;
-	testSettings.workingDir = std::getenv("PWD");
 	std::cout <<"[1;34m-----------generateDateField----------[0m" << std::endl;
 	// unit tests implemented in source file, since static function
 	testObj.testGenerateDateField();

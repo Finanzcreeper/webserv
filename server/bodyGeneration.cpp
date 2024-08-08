@@ -81,10 +81,8 @@ void	MethodExecutor::_generateErrorBody(Response &resp)
 	std::string statusDescription = getStatusCodeDescription(resp.httpStatus);
 
 	std::ifstream is("content/templates/error_page.html");
-	if (!is.good())
-	{
-		resp.httpStatus = INTERNAL_SERVER_ERROR;
-		return (-1);
+	if (!is.good()) {
+		return ;
 	}
 	std::string	line;
 	while (std::getline(is, line))

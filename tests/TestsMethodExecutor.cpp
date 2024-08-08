@@ -4,7 +4,6 @@ void Tests::testMethodExecutor(void){
 	std::cout << "\033[1;95mTesting the methodExecutor:\033[0m " << std::endl;
 	MethodExecutor testObj = MethodExecutor(&(this->testSettings));
 	testObj.silent = this->silent;
-	testSettings.workingDir = std::getenv("PWD");
 	std::cout <<"[1;34m-----------writeStatusLine----------[0m" << std::endl;
 	testObj.testWriteStatusLine();
 	std::cout <<"[1;34m-----------executeDelete----------[0m" << std::endl;
@@ -23,7 +22,7 @@ void	MethodExecutor::testCreateIndexPage(){
 	//==========================================================//
 	//-------------------Preparing for Test 1-------------------//
 	//==========================================================//
-	path = _serverSettings->workingDir + "/tests/testContent/indexPageTestsDir";
+	path = "tests/testContent/indexPageTestsDir";
 	resp.httpStatus = OK_HTTP;
 	//----------------------------------------------------------//
 	//======================Running Test 1======================//
@@ -57,7 +56,7 @@ void	MethodExecutor::testCreateIndexPage(){
 	//==========================================================//
 	std::string templatePath = "content/templates/dir_listing_page.html";
 	std::string templatePathModified = "content/templates/dir_listing_page_temp___.html";
-	path = _serverSettings->workingDir + "/tests/testContent";
+	path = "tests/testContent";
 	std::rename(templatePath.c_str(), templatePathModified.c_str());
 	resp.body.clear();
 	//----------------------------------------------------------//
