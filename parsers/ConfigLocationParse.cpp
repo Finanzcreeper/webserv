@@ -33,7 +33,7 @@ int parseMethod(const std::vector<std::pair<std::string, int> >& chunck) {
 		} else if (method == "PATCH") {
 			methods = methods | PATCH;
 		} else {
-			methods = methods | INVALID;
+			methods = INVALID;
 		}
 	}
 	return (methods);
