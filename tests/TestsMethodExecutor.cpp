@@ -5,7 +5,6 @@ void Tests::testMethodExecutor(void){
 	MethodExecutor testObj = MethodExecutor(&(this->testSettings));
 	testObj.silent = this->silent;
 	testSettings.workingDir = std::getenv("PWD");
-	std::cout << "\033[1;95mTesting the methodExecutor:\033[0m " << std::endl;
 	std::cout <<"[1;34m-----------writeStatusLine----------[0m" << std::endl;
 	testObj.testWriteStatusLine();
 	std::cout <<"[1;34m-----------executeDelete----------[0m" << std::endl;
@@ -368,6 +367,15 @@ void MethodExecutor::testExecuteGet(void){
 	resp.httpStatus = OK_HTTP;
 	resp.body = "";
 	resp.headerFields["last-modified"] = "";
+	mode_t noAccessMode = 0000;
+	mode_t original;
+	struct stat st;
+	if (stat(requ.RoutedPath.c_str(), &st) == 0) {
+		original = st.st_mode;
+	}
+	if (chmod(requ.RoutedPath.c_str(), noAccessMode) != 0) {
+        std::cerr << "TEST ERROR: Failed to change permissions on " << requ.RoutedPath << std::endl;
+	} else {
 	//----------------------------------------------------------//
 	//======================Running Test 2======================//
 	//----------------------------------------------------------//
@@ -376,6 +384,10 @@ void MethodExecutor::testExecuteGet(void){
 		std::cout << "No permission: \033[1;31mFAILED\033[0m" << std::endl;
 	} else if (this->silent == false) {
 		std::cout << "No permission: \033[1;32mOK\033[0m" << std::endl;
+	}
+	if (chmod(requ.RoutedPath.c_str(), original) != 0) {
+        std::cerr << "TEST ERROR: Failed to change permissions on " << requ.RoutedPath << std::endl;
+	}
 	}
 	//==========================================================//
 	//-------------------Preparing for Test 3-------------------//
@@ -601,7 +613,17 @@ void MethodExecutor::testExecuteDelete(void){
 	//-------------------Preparing for Test 5-------------------//
 	//==========================================================//
 	requ.RoutedPath = "tests/testContent/noAccess/noDeletionPossible.txt";
+	std::string directory = "tests/testContent/noAccess";
 	resp.httpStatus = OK_HTTP;
+	mode_t noAccessMode = 0000;
+	mode_t original;
+	struct stat st;
+	if (stat(directory.c_str(), &st) == 0) {
+		original = st.st_mode;
+	}
+	if (chmod(directory.c_str(), noAccessMode) != 0) {
+        std::cerr << "TEST ERROR: Failed to change permissions on " << directory;
+	} else {
 	//----------------------------------------------------------//
 	//======================Running Test 5======================//
 	//----------------------------------------------------------//
@@ -611,6 +633,10 @@ void MethodExecutor::testExecuteDelete(void){
 		is.close();
 	} else if (this->silent == false) {
 		std::cout << "Wrong access rights: \033[1;32mOK\033[0m" << std::endl;
+	}
+	if (chmod(directory.c_str(), original) != 0) {
+        std::cerr << "TEST ERROR: Failed to change permissions on " << directory;
+	}
 	}
 }
 

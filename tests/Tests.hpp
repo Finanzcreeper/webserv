@@ -8,6 +8,7 @@
 #include <fstream>
 #include <sstream>
 #include <unistd.h>
+#include <sys/stat.h>
 #include "../interpreters/httpInterpreter.hpp"
 #include "../parsers/httpParser.hpp"
 #include "../server/statusCodes.h"
