@@ -103,7 +103,6 @@ void	MethodExecutor::_executeGet(Request &requ, Response &resp)
     		std::strftime(buf, sizeof(buf), "%a, %d %b %Y %H:%M:%S GMT", gmt);
 			resp.headerFields["last-modified"] = std::string(buf);
 		} else {
-			std::cout << "Error while opening requested file: \'" + requ.RoutedPath + "\'"<< std::endl;
 			resp.httpStatus = INTERNAL_SERVER_ERROR;
 		}
 		ifs.close();
@@ -125,14 +124,12 @@ void	MethodExecutor::_executePost(Request &requ, Response &resp)
 	if (ofs.good()) {
 		ofs << requ.Body;
 		if(ofs.fail()) {
-			std::cout << "Error while creating requested file: \'" + requ.RoutedPath + "\'"<< std::endl;
 			resp.httpStatus = INTERNAL_SERVER_ERROR;
 		} else {
 			resp.httpStatus = CREATED;
 			resp.headerFields["location"] = requ.RequestedPath;
 		}
 	} else {
-		std::cout << "Error while creating requested file: \'" + requ.RoutedPath + "\'"<< std::endl;
 		resp.httpStatus = INTERNAL_SERVER_ERROR;
 	}
 	ofs.close();
@@ -143,11 +140,11 @@ void	MethodExecutor::_executeDelete(Request &requ, Response &resp)
 	std::string	path = requ.RoutedPath;
 	std::string	dir_path;
 	size_t pos = path.find_last_of("/");
-    if (pos != std::string::npos)
+    if (pos != std::string::npos) {
         dir_path =  path.substr(0, pos + 1);
-	else
+	} else {
 		dir_path = "";
-
+	}
 	struct stat	file_stat;
 	struct stat dir_stat;
 

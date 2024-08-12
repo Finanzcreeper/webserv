@@ -65,7 +65,6 @@ void	MethodExecutor::_generateErrorBody(Response &resp)
 	if (iter != _serverSettings->errorPages.end())
 	{
 		std::ifstream	errorPage((iter->second).c_str());
-		std::cout << "ERROR PAGE PATH: " << iter->second << std::endl;
 		if (errorPage.good())
 		{
 			std::ostringstream ss;
