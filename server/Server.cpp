@@ -6,6 +6,7 @@
 #include "../interpreters/httpInterpreter.hpp"
 #include <unistd.h>
 #include "MethodExecutor.hpp"
+#include <fcntl.h>
 
 Server::Server(t_server sett) : settings(sett), socketOption(ON){
 	this->lastTimeoutCheck = time(NULL);
@@ -26,7 +27,17 @@ Server::Server(t_server sett) : settings(sett), socketOption(ON){
 		std::cerr << "socket creation failure: "<< std::strerror(errno) << std::endl;
 	}
 
-	if (setsockopt(listening_socket.fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &socketOption, sizeof(socketOption)) == -1) {
+	fcntl(listening_socket.fd, O_NONBLOCK);
+
+	int error;
+	error = setsockopt(listening_socket.fd, SOL_SOCKET, SO_REUSEPORT, &socketOption, sizeof(socketOption));
+	if (error == -1) {
+		std::cerr << "socket option could not be applied: " << std::strerror(errno) << std::endl;
+		//throw socket settings exception
+	}
+
+	error = setsockopt(listening_socket.fd, SOL_SOCKET, SO_REUSEADDR, &socketOption, sizeof(socketOption));
+	if (error == -1) {
 		std::cerr << "socket option could not be applied: " << std::strerror(errno) << std::endl;
 		//throw socket settings exception
 	}
@@ -43,9 +54,6 @@ Server::Server(t_server sett) : settings(sett), socketOption(ON){
 }
 
 void Server::CheckForConnections() {
-	std::vector<pollfd>::iterator it;
-	std::map<int, connection>::iterator mt;
-	std::map<int, Response>::iterator resps;
 
 	MethodExecutor executor = MethodExecutor(&(this->settings));
 
@@ -70,6 +78,7 @@ void Server::CheckForConnections() {
 				//throw accept connection exception
 				std::cerr << "a connection failed: " << std::strerror(errno) << std::endl;
 			}
+			fcntl(client.fd,O_NONBLOCK);
 			client.events = (POLLIN | POLLOUT);
 			connectionMsgs.insert(std::make_pair(client.fd, request));
 			answerMsgs.insert(std::make_pair(client.fd,response));
@@ -85,6 +94,10 @@ void Server::CheckForConnections() {
 			mt = connectionMsgs.begin();
 			while (it != Fds.end()) {
 				if ((it->revents & POLLIN) != 0){
+					//int errorCode;
+					//uint len = sizeof(errorCode);
+					//int result = getsockopt(it->fd, SOL_SOCKET, SO_ERROR,&errorCode, &len);
+					//std::cout << result <<" and " << errorCode << std::endl;
 					bzero(buffer, sizeof(buffer));
 					mt = connectionMsgs.find(it->fd);
 					resps = answerMsgs.find(it->fd);
@@ -107,20 +120,12 @@ void Server::CheckForConnections() {
 							if (mt->second.r.HeaderFields.find("connection") != mt->second.r.HeaderFields.end()) {
 								std::string connection = mt->second.r.HeaderFields.find("connection")->second;
 								if (connection == "close") {
-									std::cout << mt->first << " disconnected" << std::endl;
-									Fds.erase(it);
-									connectionMsgs.erase(mt);
-									--it;
+									cleanConnection();
 								}
 							}
 						}
 					} else if (this->recievedBytes == 0 || mt->second.r.RequestIntegrity == REQUEST_TIMEOUT){
-						//cleanup
-						std::cout << mt->first << " \033[1;31mdisconnected\033[0m" << std::endl;
-						close(mt->first);
-						Fds.erase(it);
-						connectionMsgs.erase(mt);
-						--it;
+						cleanConnection();
 					} else if (this->recievedBytes == -1) {
 						revcErrorHandler();
 					}
@@ -140,9 +145,21 @@ void Server::CheckForConnections() {
 	}
 }
 
+void Server::cleanConnection() {
+	std::cout << mt->first << " \033[1;31mdisconnected\033[0m" << std::endl;
+	close(mt->first);
+	Fds.erase(it);
+	connectionMsgs.erase(mt);
+	--it;
+}
+
 void Server::revcErrorHandler() {
 	std::cout << "\033[1;34m" << std::strerror(errno) << "\033[0m" << std::endl;
-	if (errno == EWOULDBLOCK || errno == EAGAIN) {
+	if(errno == ECONNRESET) {
+		std::cout << "hii" << std::endl;
+		cleanConnection();
+	}
+	if (errno != EWOULDBLOCK || errno != EAGAIN) {
 		return;
 	}
 }
