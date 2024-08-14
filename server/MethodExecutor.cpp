@@ -83,7 +83,7 @@ void	MethodExecutor::_executeGet(Request &requ, Response &resp)
 		resp.httpStatus = UNAUTHORIZED;
 	} else if ((s.st_mode & S_IFDIR)) {
 		if (requ.UsedRoute.dirListing) {
-			if (_createIndexPage(path, resp) == -1) {
+			if (_createIndexPage(path, requ.RequestedPath, resp) == -1) {
 				resp.httpStatus = INTERNAL_SERVER_ERROR;
 			}
 			return;
@@ -177,8 +177,8 @@ void	MethodExecutor::_writeHeaderFields(Response &resp)
 {
 	std::map<std::string,std::string>::iterator iter;
 	for(iter = resp.headerFields.begin(); iter != resp.headerFields.end(); ++iter){
-		resp.responseBuffer.append(iter->first + ": " + iter->second + "\n");
+		resp.responseBuffer.append(iter->first + ": " + iter->second + "\r\n");
 	}
-	resp.responseBuffer.append("\r\n\r\n");
+	resp.responseBuffer.append("\r\n");
 	return ;
 }
