@@ -54,7 +54,7 @@ private:
 	std::map<int, connection>::iterator mt;
 	std::map<int, Response>::iterator resps;
 
-	void responder(std::map <int, Response>::iterator& response);
+	void responder();
 
 	void checkConnectionsForTimeout();
 
