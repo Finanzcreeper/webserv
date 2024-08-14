@@ -62,10 +62,6 @@ private:
 	std::map<int, connection>connectionMsgs;
 	std::map<int, Response>answerMsgs;
 
-	std::vector<pollfd>::iterator it;
-	std::map<int, connection>::iterator mt;
-	std::map<int, Response>::iterator resps;
-
 	void responder();
 
 	void checkConnectionsForTimeout();
