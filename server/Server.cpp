@@ -88,18 +88,6 @@ void Server::setUpServer() {
 
 
 void Server::CheckForConnections() {
-
-	executor = MethodExecutor(&(this->settings));
-
-	request.r.requestCompletlyRecieved = false;
-
-	request.r.ReqType = NONE;
-	request.r.RequestIntegrity = OK_HTTP;
-
-	listening_socket.events = POLLIN;
-	Fds.push_back(listening_socket);
-
-	std::cout << "listening on socket: " << Fds[0].fd << std::endl;
 	int i = 0;
 	while (true) {
  		i = poll(Fds.data(), Fds.size(), 0);
