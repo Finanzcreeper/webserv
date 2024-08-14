@@ -10,7 +10,7 @@
 static void	checkAndReplace(std::string& line, std::string subStr, std::string& newStr);
 
 // Creates the body when a directory is requested
-int	MethodExecutor::_createIndexPage(std::string path, Response &resp)
+int	MethodExecutor::_createIndexPage(std::string& path, std::string requPath, Response &resp)
 {
 	std::ifstream is("content/templates/dir_listing_page.html");
 	if (!is.good())
@@ -28,13 +28,28 @@ int	MethodExecutor::_createIndexPage(std::string path, Response &resp)
 	}
 	while (std::getline(is, line))
 	{
-		size_t	idx_start = line.find("__DIR_ENTRY__");
-		if (idx_start != std::string::npos)
+		size_t	idxNameStart = line.find("__DIR_ENTRY__");
+		size_t	idxLinkStart = line.find("__ENTRY_LINK__");
+		if (idxNameStart != std::string::npos)
 		{
 			dirent *entry = readdir(dir);
-			std::string	start = line.substr(0, idx_start);
-			size_t	idx_end = idx_start + std::string("__DIR_ENTRY__").length();
-			std::string	end = line.substr(idx_end, line.length() - idx_end);
+			std::string	start;
+			std::string	middle;
+			std::string	end;
+			if (!requPath.empty() && requPath[requPath.size() - 1] != '/') {
+				requPath.append("/");
+			} else if (requPath.empty()) {
+				requPath = "/";
+			}
+			if (idxLinkStart != std::string::npos) {
+				start = line.substr(0, idxLinkStart);
+				size_t	idxLinkEnd = idxLinkStart + std::string("__ENTRY_LINK__").length();
+				middle = line.substr(idxLinkEnd, idxNameStart - idxLinkEnd);
+			} else {
+				start = line.substr(0, idxNameStart);
+			}
+			size_t	idxNameEnd = idxNameStart + std::string("__DIR_ENTRY__").length();
+			end = line.substr(idxNameEnd, line.length() - idxNameEnd);
 			while (entry)
 			{
 				if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
@@ -42,6 +57,10 @@ int	MethodExecutor::_createIndexPage(std::string path, Response &resp)
 					continue;
         		}
 				resp.body.append(start);
+				if (idxLinkStart != std::string::npos) {
+					resp.body.append(requPath + entry->d_name);
+					resp.body.append(middle);
+				}
 				resp.body.append(entry->d_name);
 				resp.body.append(end + "\n");
 				entry = readdir(dir);

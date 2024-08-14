@@ -21,7 +21,7 @@ class MethodExecutor
 		void			_generateSpecialErrorFields(Request &req, Response &resp);
 
 		void	_generateErrorBody(Response &resp);
-		int		_createIndexPage(std::string path, Response &resp);
+		int		_createIndexPage(std::string& path, std::string requPath, Response &resp);
 
 	public:
 		MethodExecutor( void );

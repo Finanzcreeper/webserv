@@ -83,7 +83,7 @@ void	MethodExecutor::_executeGet(Request &requ, Response &resp)
 		resp.httpStatus = UNAUTHORIZED;
 	} else if ((s.st_mode & S_IFDIR)) {
 		if (requ.UsedRoute.dirListing) {
-			if (_createIndexPage(path, resp) == -1) {
+			if (_createIndexPage(path, requ.RequestedPath, resp) == -1) {
 				resp.httpStatus = INTERNAL_SERVER_ERROR;
 			}
 			return;
