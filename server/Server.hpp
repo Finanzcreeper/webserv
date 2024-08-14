@@ -13,6 +13,8 @@
 #include <algorithm>
 #include <exception>
 #include <ctime>
+#include "MethodExecutor.hpp"
+#include <unistd.h>
 
 //#include "../parsers/ConfigParse.hpp"
 #include "../CommonIncludes.hpp"
@@ -28,11 +30,21 @@
 class Server {
 private:
 
+	std::vector<pollfd>::iterator it;
+	std::map<int, connection>::iterator mt;
+	std::map<int, Response>::iterator resps;
+
+	connection request;
+	Response response;
+
+	MethodExecutor executor;
 	const t_server settings;
 
 	int socketOption;
 
 	long int recievedBytes;
+
+	int connectionAmount;
 
 	addrinfo hints;
 	addrinfo *serverInfo;
@@ -61,6 +73,7 @@ private:
 	void cleanConnection();
 
 	void revcErrorHandler();
+	void setUpServer();
 
 public:
 	Server(t_server sett);
