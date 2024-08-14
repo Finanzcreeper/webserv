@@ -139,7 +139,7 @@ std::string getStatusCodeDescription(statusCode code){
 		case (PERMANENT_REDIRECT):
 			return ("Permanent Redirect");
 		case (BAD_REQUEST):
-			return ("Bad Request");
+			return ("Server cannot process the request");
 		case (UNAUTHORIZED):
 			return ("Unauthorized");
 		case (FORBIDDEN):

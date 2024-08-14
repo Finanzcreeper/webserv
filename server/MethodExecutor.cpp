@@ -13,13 +13,13 @@ std::string		defaultPage = "index.html";
 MethodExecutor::MethodExecutor( void ): _serverSettings(0) {
 };
 
-MethodExecutor::MethodExecutor(const t_server *serverSettings): _serverSettings(serverSettings) {}
+MethodExecutor::MethodExecutor(const t_server *serverSettings): _serverSettings(serverSettings) , silent(false) {}
 
 void	MethodExecutor::wrapperRequest(Request &requ, Response &resp)
 {
-	std::cout << "Used route: " + requ.UsedRoute.locationName << std::endl;
-	std::cout << "Used redirect: " + requ.UsedRoute.root << std::endl;
-	std::cout << "Used path: " + requ.RoutedPath << std::endl;
+	//std::cout << "Used route: " + requ.UsedRoute.locationName << std::endl;
+	//std::cout << "Used redirect: " + requ.UsedRoute.root << std::endl;
+	//std::cout << "Used path: " + requ.RoutedPath << std::endl;
 	//std::cout << "**** HEADER OF REQUEST: ****\n" << requ.HeaderBuffer << std::endl << "**** END OF HEADER ****" << std::endl;
 	//std::cout << "**** BODY OF REQUEST: ****\n" << requ.Body << std::endl << "**** END OF BODY ****" << std::endl;
 	//std::cout << "REQUEST TYPE: " << requ.ReqType << std::endl;
@@ -28,11 +28,9 @@ void	MethodExecutor::wrapperRequest(Request &requ, Response &resp)
 	resp.headerFields.clear();
 	resp.httpStatus = requ.RequestIntegrity;
 	requ.HeaderFields["content-type"] = "text/plain";
-
-	if (resp.httpStatus == MOVED_PERMANENTLY)
+	if (resp.httpStatus == MOVED_PERMANENTLY) {
 		resp.headerFields["location"] = requ.UsedRoute.redirect;
-	else if (resp.httpStatus == OK_HTTP)
-	{
+	} else if (resp.httpStatus == OK_HTTP) {
 		switch (requ.ReqType){
 			case (GET):
 				_executeGet(requ, resp);
@@ -50,8 +48,8 @@ void	MethodExecutor::wrapperRequest(Request &requ, Response &resp)
 				std::cerr << "Method type not found\n";
 		}
 	}
-	if ((int)resp.httpStatus >= MIN_CLIENT_ERROR && (int)resp.httpStatus <= MAX_SERVER_ERROR)
-	{
+	if ((int)resp.httpStatus >= MIN_CLIENT_ERROR && \
+		(int)resp.httpStatus <= MAX_SERVER_ERROR) {
 		_generateSpecialErrorFields(requ, resp);
 		_generateErrorBody(resp);
 	}
@@ -60,8 +58,9 @@ void	MethodExecutor::wrapperRequest(Request &requ, Response &resp)
 	_writeStatusLine(resp);
 	_writeHeaderFields(resp);
 	// Append body to response
-	if (requ.ReqType != HEAD)
+	if (requ.ReqType != HEAD) {
 		resp.responseBuffer.append(resp.body);
+	}
 	resp.isReady = true;
 	//std::cout << "**** RESPONSE: ****\n" << resp.responseBuffer << "**** END OF RESPONSE ****" << std::endl;
 }
@@ -73,54 +72,42 @@ void	MethodExecutor::_executeGet(Request &requ, Response &resp)
 
     // default page if no path specified
     if ((requ.RequestedPath.length() == requ.RoutedPath.length()) && \
-		(requ.UsedRoute.index.length() > 0))
-	{
+		(requ.UsedRoute.index.length() > 0)) {
         path = requ.UsedRoute.root + requ.UsedRoute.index;
-	}
-    else
-	{
+	} else {
         path = requ.RoutedPath;
 	}
-	if (stat(path.c_str(), &s) == -1)
-	{
+	if (stat(path.c_str(), &s) == -1) {
 		resp.httpStatus = NOT_FOUND;
-	}
-	else if (!(s.st_mode & S_IRGRP))
-	{
+	} else if (!(s.st_mode & S_IRGRP)) {
 		resp.httpStatus = UNAUTHORIZED;
-	}
-	else if ((s.st_mode & S_IFDIR))
-	{
-		if (requ.UsedRoute.dirListing)
-		{
-			if (_createIndexPage(path, resp) == -1)
+	} else if ((s.st_mode & S_IFDIR)) {
+		if (requ.UsedRoute.dirListing) {
+			if (_createIndexPage(path, requ.RequestedPath, resp) == -1) {
 				resp.httpStatus = INTERNAL_SERVER_ERROR;
+			}
 			return;
-		}
-		std::cout << path + " is directory!" << std::endl;
+		} else {
 		resp.httpStatus = NOT_FOUND;
-	}
-	else if (s.st_mode & S_IFREG)
-	{
+		}
+	} else if (s.st_mode & S_IFREG) {
 		std::ifstream	ifs(path.c_str());
-		if (ifs.good())
-		{
-			std::ostringstream ss;
+		if (ifs.good()) {
+			std::stringstream ss;
+			//std::cout << ifs.rdbuf();
 			ss << ifs.rdbuf();
 			resp.body.append(ss.str());
-
 			// read modification time
 			struct tm* gmt = std::gmtime(&s.st_mtim.tv_sec);
 			char buf[100];
     		std::strftime(buf, sizeof(buf), "%a, %d %b %Y %H:%M:%S GMT", gmt);
 			resp.headerFields["last-modified"] = std::string(buf);
-		}
-		else
-		{
-			std::cout << "Error while opening requested file: \'" + requ.RoutedPath + "\'"<< std::endl;
+		} else {
 			resp.httpStatus = INTERNAL_SERVER_ERROR;
 		}
 		ifs.close();
+	} else {
+		resp.httpStatus = INTERNAL_SERVER_ERROR;
 	}
 }
 
@@ -129,29 +116,20 @@ void	MethodExecutor::_executePost(Request &requ, Response &resp)
 	std::string	path = requ.RoutedPath;
 	struct stat	s;
 	// check if file already exists
-	if (stat(path.c_str(), &s) == 0)
-	{
+	if (stat(path.c_str(), &s) == 0) {
 		resp.httpStatus = FORBIDDEN;
 		return ;
 	}
 	std::ofstream	ofs(path.c_str(), std::ios::out);
-	if (ofs.good())
-	{
+	if (ofs.good()) {
 		ofs << requ.Body;
-		if(ofs.fail())
-		{
-			std::cout << "Error while creating requested file: \'" + requ.RoutedPath + "\'"<< std::endl;
+		if(ofs.fail()) {
 			resp.httpStatus = INTERNAL_SERVER_ERROR;
-		}
-		else 
-		{
+		} else {
 			resp.httpStatus = CREATED;
 			resp.headerFields["location"] = requ.RequestedPath;
 		}
-	}
-	else
-	{
-		std::cout << "Error while creating requested file: \'" + requ.RoutedPath + "\'"<< std::endl;
+	} else {
 		resp.httpStatus = INTERNAL_SERVER_ERROR;
 	}
 	ofs.close();
@@ -162,27 +140,25 @@ void	MethodExecutor::_executeDelete(Request &requ, Response &resp)
 	std::string	path = requ.RoutedPath;
 	std::string	dir_path;
 	size_t pos = path.find_last_of("/");
-    if (pos != std::string::npos)
+    if (pos != std::string::npos) {
         dir_path =  path.substr(0, pos + 1);
-	else
-	{
-		resp.httpStatus = INTERNAL_SERVER_ERROR;
-		std::cout << "Directory for deletion not found" << std::endl;
-		return;
+	} else {
+		dir_path = "";
 	}
 	struct stat	file_stat;
 	struct stat dir_stat;
 
-	if (stat(path.c_str(), &dir_stat) == -1)
+	if (dir_path != "" && stat(dir_path.c_str(), &dir_stat) == -1){
 		resp.httpStatus = NOT_FOUND;
-	else if (!(dir_stat.st_mode & S_IRWXG))
+	} else if (!(dir_stat.st_mode & S_IRWXG)) {
 		resp.httpStatus = UNAUTHORIZED;
-	else if (stat(path.c_str(), &file_stat) == -1)
+	} else if (stat(path.c_str(), &file_stat) == -1) {
 		resp.httpStatus = NOT_FOUND;
-	else if (std::remove(path.c_str()) == 0)
+	} else if (std::remove(path.c_str()) == 0) {
 		resp.httpStatus = NO_CONTENT;
-	else
+	} else {
 		resp.httpStatus = INTERNAL_SERVER_ERROR;
+	}
 }
 
 // creates the status line for an http response and adds it to the output buffer
@@ -200,8 +176,9 @@ void	MethodExecutor::_writeStatusLine(Response &resp)
 void	MethodExecutor::_writeHeaderFields(Response &resp)
 {
 	std::map<std::string,std::string>::iterator iter;
-	for(iter = resp.headerFields.begin(); iter != resp.headerFields.end(); ++iter)
-		resp.responseBuffer.append(iter->first + ": " + iter->second + "\n");
-	resp.responseBuffer.append("\r\n\r\n");
+	for(iter = resp.headerFields.begin(); iter != resp.headerFields.end(); ++iter){
+		resp.responseBuffer.append(iter->first + ": " + iter->second + "\r\n");
+	}
+	resp.responseBuffer.append("\r\n");
 	return ;
 }
