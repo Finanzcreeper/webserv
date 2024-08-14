@@ -19,20 +19,22 @@ void Tests::testMethodExecutor(void){
 void	MethodExecutor::testCreateIndexPage(){
 	Response resp;
 	std::string path;
+	std::string requPath;
 	//==========================================================//
 	//-------------------Preparing for Test 1-------------------//
 	//==========================================================//
 	path = "tests/testContent/indexPageTestsDir";
+	requPath = "/testDir/indexPageTestDir";
 	resp.httpStatus = OK_HTTP;
 	//----------------------------------------------------------//
 	//======================Running Test 1======================//
 	//----------------------------------------------------------//
-	_createIndexPage(path, resp);
-	if (resp.httpStatus != OK_HTTP || resp.body.find("veryUniqueFileName") != 767) {
+	_createIndexPage(path, requPath, resp);
+	if (resp.httpStatus != OK_HTTP || resp.body.find(">veryUniqueFileName.txt<") != 813) {
 		std::cout << "Simple index page: \033[1;31mFAILED\033[0m" << std::endl;
 		if (resp.httpStatus != OK_HTTP)
 			std::cout << "Status is not OK_HTTP" << std::endl;
-		if (resp.body.find("veryUniqueFileName") != 767)
+		if (resp.body.find(">veryUniqueFileName.txt<") != 813)
 			std::cout << "Position of filename in index template doesnt match hardcoded value" << std::endl;
 	} else if (this->silent == false) {
 		std::cout << "Simple index page: \033[1;32mOK\033[0m" << std::endl;
@@ -41,11 +43,12 @@ void	MethodExecutor::testCreateIndexPage(){
 	//-------------------Preparing for Test 2-------------------//
 	//==========================================================//
 	path = "/tests/invalidPath";
+	requPath = "/invalidPath";
 	resp.body.clear();
 	//----------------------------------------------------------//
 	//======================Running Test 2======================//
 	//----------------------------------------------------------//
-	_createIndexPage(path, resp);
+	_createIndexPage(path, requPath, resp);
 	if (resp.httpStatus != INTERNAL_SERVER_ERROR || resp.body != "") {
 		std::cout << "Invalid directory path: \033[1;31mFAILED\033[0m" << std::endl;
 	} else if (this->silent == false) {
@@ -57,12 +60,13 @@ void	MethodExecutor::testCreateIndexPage(){
 	std::string templatePath = "content/templates/dir_listing_page.html";
 	std::string templatePathModified = "content/templates/dir_listing_page_temp___.html";
 	path = "tests/testContent";
+	requPath = "/testContent";
 	std::rename(templatePath.c_str(), templatePathModified.c_str());
 	resp.body.clear();
 	//----------------------------------------------------------//
 	//======================Running Test 3======================//
 	//----------------------------------------------------------//
-	_createIndexPage(path, resp);
+	_createIndexPage(path, requPath, resp);
 	if (resp.httpStatus != INTERNAL_SERVER_ERROR || resp.body != "") {
 		std::cout << "Template missing: \033[1;31mFAILED\033[0m" << std::endl;
 	} else if (this->silent == false) {
@@ -447,7 +451,7 @@ void MethodExecutor::testExecuteGet(void){
 	}
 	std::rename(templatePathModified.c_str(), templatePath.c_str());
 	//==========================================================//
-	//-------------------Preparing for Test 5-------------------//
+	//-------------------Preparing for Test 6-------------------//
 	//==========================================================//
 	requ.UsedRoute.dirListing = true;
 	requ.RoutedPath = "tests/testContent/indexPageTestsDir";
@@ -456,11 +460,11 @@ void MethodExecutor::testExecuteGet(void){
 	resp.body = "";
 	resp.headerFields["last-modified"] = "";
 	//----------------------------------------------------------//
-	//======================Running Test 5======================//
+	//======================Running Test 6======================//
 	//----------------------------------------------------------//
 	_executeGet(requ, resp);
 	if (resp.httpStatus != OK_HTTP || !resp.headerFields["last-modified"].empty() || \
-		resp.body.find("veryUniqueFileName") != 767) {
+		resp.body.find("veryUniqueFileName") != 783) {
 		std::cout << "Directory listing ON success: \033[1;31mFAILED\033[0m" << std::endl;
 	} else if (this->silent == false) {
 		std::cout << "Directory listing ON success: \033[1;32mOK\033[0m" << std::endl;
