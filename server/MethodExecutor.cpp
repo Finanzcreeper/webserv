@@ -62,7 +62,7 @@ void	MethodExecutor::wrapperRequest(Request &requ, Response &resp)
 		resp.responseBuffer.append(resp.body);
 	}
 	resp.isReady = true;
-	//std::cout << "**** RESPONSE: ****\n" << resp.responseBuffer << "**** END OF RESPONSE ****" << std::endl;
+	std::cout << "**** RESPONSE: ****\n" << resp.responseBuffer << "**** END OF RESPONSE ****" << std::endl;
 }
 
 void	MethodExecutor::_executeGet(Request &requ, Response &resp)
@@ -177,8 +177,8 @@ void	MethodExecutor::_writeHeaderFields(Response &resp)
 {
 	std::map<std::string,std::string>::iterator iter;
 	for(iter = resp.headerFields.begin(); iter != resp.headerFields.end(); ++iter){
-		resp.responseBuffer.append(iter->first + ": " + iter->second + "\n");
+		resp.responseBuffer.append(iter->first + ": " + iter->second + "\r\n");
 	}
-	resp.responseBuffer.append("\r\n\r\n");
+	resp.responseBuffer.append("\r\n");
 	return ;
 }

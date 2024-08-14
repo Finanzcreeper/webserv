@@ -692,7 +692,7 @@ void	MethodExecutor::testWriteHeaderFields(){
 	//======================Running Test 1======================//
 	//----------------------------------------------------------//
 	_writeHeaderFields(resp);
-	if (resp.responseBuffer != "\r\n\r\n") {
+	if (resp.responseBuffer != "\r\n") {
 		std::cout << "No header fields: \033[1;31mFAILED\033[0m" << std::endl;
 	} else if (this->silent == false) {
 		std::cout << "No header fields: \033[1;32mOK\033[0m" << std::endl;
@@ -705,7 +705,7 @@ void	MethodExecutor::testWriteHeaderFields(){
 	resp.headerFields["testField2"] = "testValue2";
 	resp.headerFields["testField3"] = "testValue3";
 	resp.headerFields["testField4"] = "testValue4";
-	std::string expected = "testField: testValue\ntestField2: testValue2\ntestField3: testValue3\ntestField4: testValue4\n\r\n\r\n";
+	std::string expected = "testField: testValue\r\ntestField2: testValue2\r\ntestField3: testValue3\r\ntestField4: testValue4\r\n\r\n";
 	//----------------------------------------------------------//
 	//======================Running Test 2======================//
 	//----------------------------------------------------------//
