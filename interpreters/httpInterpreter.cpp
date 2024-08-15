@@ -17,6 +17,10 @@ void interpretRequest(Request& request, const t_server& settings) {
 	if (request.RequestIntegrity != OK_HTTP) {
 		return;
 	}
+	checkContentType(request);
+	if (request.RequestIntegrity != OK_HTTP) {
+		return;
+	}
 }
 
 #include <iostream>
