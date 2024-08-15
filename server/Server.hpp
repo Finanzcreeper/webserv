@@ -68,7 +68,6 @@ private:
 
 	void cleanConnection();
 
-	void revcErrorHandler();
 	void setUpServer();
 
 public:

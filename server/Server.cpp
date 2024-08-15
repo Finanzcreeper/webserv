@@ -149,7 +149,8 @@ void Server::CheckForConnections() {
 					std::cout << "client sent closed connection" << std::endl;
 					cleanConnection();
 				} else if (this->recievedBytes == -1) {
-					revcErrorHandler();
+					std::cout << "Socket error" << std::endl;
+					cleanConnection();
 				}
 			} else if ((it->revents & POLLOUT) != 0 && answerMsgs.find(it->fd)->second.isReady) {
 				resps = answerMsgs.find(it->fd);
@@ -173,17 +174,6 @@ void Server::cleanConnection() {
 	Fds.erase(it);
 	connectionMsgs.erase(mt);
 	--it;
-}
-
-void Server::revcErrorHandler() {
-	std::cout << "\033[1;34m" << std::strerror(errno) << "\033[0m" << std::endl;
-	if(errno == ECONNRESET) {
-		std::cout << "hii" << std::endl;
-		cleanConnection();
-	}
-	if (errno != EWOULDBLOCK || errno != EAGAIN) {
-		return;
-	}
 }
 
 void Server::responder() {
