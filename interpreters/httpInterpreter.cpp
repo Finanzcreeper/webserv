@@ -85,7 +85,10 @@ void checkContentType(Request& request) {
 	std::vector<std::string> allowedContentSubtypes;
 
 	allowedContentTypes.push_back("text/");
+	allowedContentTypes.push_back("multipart/");
 	allowedContentSubtypes.push_back("plain");
+	allowedContentSubtypes.push_back("form-data");
+
 
 	std::string foundContentType;
 	std::string foundContentSubtype;
