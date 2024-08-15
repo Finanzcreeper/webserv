@@ -45,6 +45,7 @@ void handleHeader(Request &request, size_t endOfBlock) {
 	GetRequestedPath(request);
 	decapitalizeHeaderFields(request.HeaderBuffer);
 	extractHeaderFields(request);
+	checkMultipartDelimiter(request);
 	if (request.HeaderFields.find("content-length") == request.HeaderFields.end() && request.HeaderFields.find("transfer-encoding") == request.HeaderFields.end()) {
 		request.requestCompletlyRecieved = true;
 	}
@@ -100,6 +101,17 @@ void decapitalizeHeaderFields(std::string& Header) {
 	}
 }
 
+void checkMultipartDelimiter(Request& request) {
+	std::map<std::string,std::string>::iterator it;
+	it = request.HeaderFields.find("content-type");
+	if (it == request.HeaderFields.end()) {
+		return;
+	}
+	if( it->second.find("multipart/form-data; boundary=") == std::string::npos) {
+		request.RequestIntegrity = BAD_REQUEST;
+	}
+}
+
 void extractHeaderFields(Request& request) {
 	std::vector<std::string> SearchedHeaderFields;
 	//Add HeaderBuffer fields to extract here
@@ -127,6 +139,10 @@ void handleBody(Request &request) {
 	TransferCoding = request.HeaderFields.find("transfer-encoding");
 	ContentLenght = request.HeaderFields.find("content-length");
 	if (TransferCoding != request.HeaderFields.end() && TransferCoding->second == "chunked") {
+		if (request.RequestBuffer.find("0\r\n\r\n") == std::string::npos){
+			request.requestCompletlyRecieved = false;
+			return;
+		}
 		while (request.RequestBuffer.empty() == false) {
 			std::string ChunkHexSize = request.RequestBuffer.substr(
 				0, request.RequestBuffer.find_first_of("\r\n"));
