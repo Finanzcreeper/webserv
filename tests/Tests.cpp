@@ -674,21 +674,240 @@ void Tests::testHttpParser() {
 		std::cout << "not searched Header Fields: \033[1;32mOK\033[0m" << std::endl;
 	}
 
-	std::cout <<"[1;34m----------------handlBody---------------[0m" << std::endl;
+	std::cout <<"[1;34m---------------handleBody---------------[0m" << std::endl;
+	//==========================================================//
+	//-------------------Preparing for Test 1-------------------//
+	//==========================================================//
+	this->testRequest.HeaderFields.clear();
+	this->testRequest.RequestBuffer.clear();
+	this->testRequest.Body.clear();
+	this->testRequest.requestCompletlyRecieved = false;
+
+	this->testRequest.HeaderFields.insert(std::make_pair("content-length","12"));
+	this->testRequest.RequestBuffer = "a small body";
+	std::string comparisonBody = "a small body";
+
+	//----------------------------------------------------------//
+	//======================Running Test 1======================//
+	//----------------------------------------------------------//
+	handleBody(this->testRequest);
+	if (testRequest.Body != comparisonBody && testRequest.requestCompletlyRecieved != false) {
+		std::cout << "correct body: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent == false) {
+		std::cout << "correct body: \033[1;32mOK\033[0m" << std::endl;
+	}
+
 	//==========================================================//
 	//-------------------Preparing for Test 2-------------------//
 	//==========================================================//
-	this->testRequest.HeaderBuffer = "";
 	this->testRequest.HeaderFields.clear();
-	testHeaderFieldMap.clear();
+	this->testRequest.RequestBuffer.clear();
+	this->testRequest.Body.clear();
+	this->testRequest.requestCompletlyRecieved = false;
+
+	this->testRequest.HeaderFields.insert(std::make_pair("content-length","12"));
+	this->testRequest.RequestBuffer = "a not so small body";
+	comparisonBody = "a not so sma";
+
 	//----------------------------------------------------------//
 	//======================Running Test 2======================//
 	//----------------------------------------------------------//
-	extractHeaderFields(this->testRequest);
-	if (testRequest.HeaderFields != testHeaderFieldMap) {
-		std::cout << "not searched Header Fields: \033[1;31mFAILED\033[0m" << std::endl;
+	handleBody(this->testRequest);
+	if (testRequest.Body != comparisonBody && testRequest.requestCompletlyRecieved != false) {
+		std::cout << "content length to small: \033[1;31mFAILED\033[0m" << std::endl;
 	} else if (this->silent == false) {
-		std::cout << "not searched Header Fields: \033[1;32mOK\033[0m" << std::endl;
+		std::cout << "content length to small: \033[1;32mOK\033[0m" << std::endl;
+	}
+	//==========================================================//
+	//-------------------Preparing for Test 3-------------------//
+	//==========================================================//
+	this->testRequest.HeaderFields.clear();
+	this->testRequest.RequestBuffer.clear();
+	this->testRequest.Body.clear();
+	this->testRequest.requestCompletlyRecieved = false;
+
+	this->testRequest.HeaderFields.insert(std::make_pair("content-length","12"));
+	this->testRequest.RequestBuffer = "a not";
+	comparisonBody = "";
+
+	//----------------------------------------------------------//
+	//======================Running Test 3======================//
+	//----------------------------------------------------------//
+	handleBody(this->testRequest);
+	if (testRequest.Body != comparisonBody && testRequest.requestCompletlyRecieved != true) {
+		std::cout << "RequestBuffer to small: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent == false) {
+		std::cout << "RequestBuffer to small: \033[1;32mOK\033[0m" << std::endl;
+	}
+	//==========================================================//
+	//-------------------Preparing for Test 4-------------------//
+	//==========================================================//
+	this->testRequest.HeaderFields.clear();
+	this->testRequest.RequestBuffer.clear();
+	this->testRequest.Body.clear();
+	this->testRequest.requestCompletlyRecieved = false;
+
+	this->testRequest.HeaderFields.insert(std::make_pair("content-length","5"));
+	this->testRequest.RequestBuffer = "a not so small body";
+	comparisonBody = "a not";
+
+	//----------------------------------------------------------//
+	//======================Running Test 4======================//
+	//----------------------------------------------------------//
+	handleBody(this->testRequest);
+	if (testRequest.Body != comparisonBody && testRequest.requestCompletlyRecieved != false) {
+		std::cout << "Body with excess length: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent == false) {
+		std::cout << "Body with excess length: \033[1;32mOK\033[0m" << std::endl;
+	}
+	//==========================================================//
+	//-------------------Preparing for Test 5-------------------//
+	//==========================================================//
+	this->testRequest.HeaderFields.clear();
+	this->testRequest.RequestBuffer.clear();
+	this->testRequest.Body.clear();
+	this->testRequest.requestCompletlyRecieved = false;
+
+	this->testRequest.HeaderFields.insert(std::make_pair("transfer-encoding","chunked"));
+	this->testRequest.RequestBuffer = "5\r\na not\r\n7\r\n small \r\n4\r\nbody\r\n0\r\n\r\n";
+	comparisonBody = "a not small body";
+
+	//----------------------------------------------------------//
+	//======================Running Test 5======================//
+	//----------------------------------------------------------//
+	handleBody(this->testRequest);
+	if (testRequest.Body != comparisonBody && testRequest.requestCompletlyRecieved != false) {
+		std::cout << "Correctly Chunked Body: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent == false) {
+		std::cout << "Correctly Chunked Body: \033[1;32mOK\033[0m" << std::endl;
+	}
+	//==========================================================//
+	//-------------------Preparing for Test 6-------------------//
+	//==========================================================//
+	this->testRequest.HeaderFields.clear();
+	this->testRequest.RequestBuffer.clear();
+	this->testRequest.Body.clear();
+	this->testRequest.requestCompletlyRecieved = false;
+
+	this->testRequest.HeaderFields.insert(std::make_pair("content-length","5"));
+	this->testRequest.HeaderFields.insert(std::make_pair("transfer-encoding","chunked"));
+	this->testRequest.RequestBuffer = "5\r\na not\r\n7\r\n small \r\n4\r\nbody\r\n0\r\n\r\n";
+	comparisonBody = "a not small body";
+
+	//----------------------------------------------------------//
+	//======================Running Test 6======================//
+	//----------------------------------------------------------//
+	handleBody(this->testRequest);
+	if (testRequest.Body != comparisonBody && testRequest.requestCompletlyRecieved != false) {
+		std::cout << "Content-length and chunked: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent == false) {
+		std::cout << "Content-length and chunked: \033[1;32mOK\033[0m" << std::endl;
+	}
+	//==========================================================//
+	//-------------------Preparing for Test 7-------------------//
+	//==========================================================//
+	this->testRequest.HeaderFields.clear();
+	this->testRequest.RequestBuffer.clear();
+	this->testRequest.Body.clear();
+	this->testRequest.requestCompletlyRecieved = false;
+
+	this->testRequest.HeaderFields.insert(std::make_pair("content-length","5"));
+	this->testRequest.HeaderFields.insert(std::make_pair("transfer-encoding","chunked"));
+	this->testRequest.RequestBuffer = "5\r\na not\r\n7\r\n small \r\n3\r\nbod\r\n1\r\ny\r\n";
+	comparisonBody = "";
+
+	//----------------------------------------------------------//
+	//======================Running Test 7======================//
+	//----------------------------------------------------------//
+	handleBody(this->testRequest);
+	if (testRequest.Body != comparisonBody && testRequest.requestCompletlyRecieved != true) {
+		std::cout << "no last Chunk: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent == false) {
+		std::cout << "no last Chunk: \033[1;32mOK\033[0m" << std::endl;
+	}
+	//==========================================================//
+	//-------------------Preparing for Test 8-------------------//
+	//==========================================================//
+	this->testRequest.HeaderFields.clear();
+	this->testRequest.RequestBuffer.clear();
+	this->testRequest.Body.clear();
+	this->testRequest.requestCompletlyRecieved = false;
+
+	this->testRequest.HeaderFields.insert(std::make_pair("content-length","5"));
+	this->testRequest.HeaderFields.insert(std::make_pair("transfer-encoding","chunked"));
+	this->testRequest.RequestBuffer = "20\r\na not\r\n7\r\n small \r\n4\r\nbod\r\n0\r\n\r\n";
+	comparisonBody = "a not\r\n7\r\n small \r\n3\r\nbod\r\n1\r\ny\r small body";
+
+	//----------------------------------------------------------//
+	//======================Running Test 8======================//
+	//----------------------------------------------------------//
+	handleBody(this->testRequest);
+	if (testRequest.Body != comparisonBody && testRequest.requestCompletlyRecieved != false) {
+		std::cout << "Corrupted Chunking: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent == false) {
+		std::cout << "Corrupted Chunking: \033[1;32mOK\033[0m" << std::endl;
+	}
+
+	std::cout <<"[1;34m---------checkMultipartDelimiter--------[0m" << std::endl;
+	//==========================================================//
+	//-------------------Preparing for Test 1-------------------//
+	//==========================================================//
+	this->testRequest.HeaderBuffer.clear();
+	this->testRequest.HeaderFields.clear();
+	this->testRequest.RequestIntegrity = OK_HTTP;
+	testRequest.HeaderFields.insert(std::make_pair("connection","close"));
+	//----------------------------------------------------------//
+	//======================Running Test 1======================//
+	//----------------------------------------------------------//
+	checkMultipartDelimiter(this->testRequest);
+	if (testRequest.RequestIntegrity != OK_HTTP) {
+		std::cout << "No Multipart: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent == false) {
+		std::cout << "No Multipart: \033[1;32mOK\033[0m" << std::endl;
+	}
+	//==========================================================//
+	//-------------------Preparing for Test 2-------------------//
+	//==========================================================//
+	this->testRequest.HeaderFields.clear();
+	this->testRequest.RequestIntegrity = OK_HTTP;
+	testRequest.HeaderFields.insert(std::make_pair("content-type","multipart/form-data"));
+	//----------------------------------------------------------//
+	//======================Running Test 2======================//
+	//----------------------------------------------------------//
+	checkMultipartDelimiter(this->testRequest);
+	if (testRequest.RequestIntegrity != BAD_REQUEST) {
+		std::cout << "Invalid Multipart: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent == false) {
+		std::cout << "Invalid Multipart: \033[1;32mOK\033[0m" << std::endl;
+	}
+	//==========================================================//
+	//-------------------Preparing for Test 3-------------------//
+	//==========================================================//
+	this->testRequest.HeaderFields.clear();
+	this->testRequest.RequestIntegrity = OK_HTTP;
+	testRequest.HeaderFields.insert(std::make_pair("content-type","multipart/form-data; boundary=delim"));
+	//----------------------------------------------------------//
+	//======================Running Test 3======================//
+	//----------------------------------------------------------//
+	checkMultipartDelimiter(this->testRequest);
+	if (testRequest.RequestIntegrity != OK_HTTP) {
+		std::cout << "Valid Multipart: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent == false) {
+		std::cout << "Valid Multipart: \033[1;32mOK\033[0m" << std::endl;
+	}
+	//==========================================================//
+	//-------------------Preparing for Test 4-------------------//
+	//==========================================================//
+	this->testRequest.HeaderFields.clear();
+	this->testRequest.RequestIntegrity = OK_HTTP;
+	//----------------------------------------------------------//
+	//======================Running Test 4======================//
+	//----------------------------------------------------------//
+	checkMultipartDelimiter(this->testRequest);
+	if (testRequest.RequestIntegrity != OK_HTTP) {
+		std::cout << "Empty Header Fields: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent == false) {
+		std::cout << "Empty Header Fields: \033[1;32mOK\033[0m" << std::endl;
 	}
 }
 
