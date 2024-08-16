@@ -229,7 +229,7 @@ void MethodExecutor::testWrapperRequest(void){
 	//----------------------------------------------------------//
 	wrapperRequest(requ, resp);
 	if (resp.httpStatus != MOVED_PERMANENTLY || \
-		resp.responseBuffer.find("\nlocation: hallohallo\n") == std::string::npos) {
+		resp.responseBuffer.find("\nlocation: hallohallo\r\n") == std::string::npos) {
 		std::cout << "Redirection: \033[1;31mFAILED\033[0m" << std::endl;
 	} else if (this->silent == false) {
 		std::cout << "Redirection: \033[1;32mOK\033[0m" << std::endl;
