@@ -180,6 +180,9 @@ void Server::responder() {
 	int sentAmt = 0;
 
 	sentAmt = send(resps->first,resps->second.responseBuffer.c_str(),resps->second.responseBuffer.size(),MSG_DONTWAIT);
+	if (sentAmt == 0) {
+		return;
+	}
 	if (sentAmt == -1) {
 		cleanConnection();
 	}
