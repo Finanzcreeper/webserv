@@ -158,10 +158,6 @@ void Server::CheckForConnections() {
 				mt->second.t.msgAmt = 0;
 				resps->second.isReady = false;
 			}
-			if (mt->second.r.RequestIntegrity == REQUEST_TIMEOUT) {
-				std::cout << "Client Timed out" << std::endl;
-				cleanConnection();
-			}
 			++it;
 		}
 	}
@@ -184,6 +180,10 @@ void Server::responder() {
 		return;
 	}
 	if (sentAmt == -1) {
+		cleanConnection();
+	}
+	if (mt->second.r.RequestIntegrity == REQUEST_TIMEOUT) {
+		std::cout << "Client Timed out" << std::endl;
 		cleanConnection();
 	}
 	resps->second.responseBuffer.erase(0,sentAmt);
