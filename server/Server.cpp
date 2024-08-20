@@ -181,7 +181,7 @@ void Server::responder() {
 
 	sentAmt = send(resps->first,resps->second.responseBuffer.c_str(),resps->second.responseBuffer.size(),MSG_DONTWAIT);
 	if (sentAmt == -1) {
-		return;
+		cleanConnection();
 	}
 	resps->second.responseBuffer.erase(0,sentAmt);
 }
