@@ -891,17 +891,47 @@ void Tests::testHttpParser() {
 	//----------------------------------------------------------//
 	checkMultipartDelimiter(this->testRequest);
 	if (testRequest.RequestIntegrity != OK_HTTP) {
-		std::cout << "Valid Multipart: \033[1;31mFAILED\033[0m" << std::endl;
+		std::cout << "Valid Multipart 1: \033[1;31mFAILED\033[0m" << std::endl;
 	} else if (this->silent == false) {
-		std::cout << "Valid Multipart: \033[1;32mOK\033[0m" << std::endl;
+		std::cout << "Valid Multipart 1: \033[1;32mOK\033[0m" << std::endl;
 	}
 	//==========================================================//
 	//-------------------Preparing for Test 4-------------------//
 	//==========================================================//
 	this->testRequest.HeaderFields.clear();
 	this->testRequest.RequestIntegrity = OK_HTTP;
+	testRequest.HeaderFields.insert(std::make_pair("content-type","multipart/form-data;boundary=delim"));
 	//----------------------------------------------------------//
 	//======================Running Test 4======================//
+	//----------------------------------------------------------//
+	checkMultipartDelimiter(this->testRequest);
+	if (testRequest.RequestIntegrity != OK_HTTP) {
+		std::cout << "Valid Multipart 2: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent == false) {
+		std::cout << "Valid Multipart2 : \033[1;32mOK\033[0m" << std::endl;
+	}
+	//==========================================================//
+	//-------------------Preparing for Test 5-------------------//
+	//==========================================================//
+	this->testRequest.HeaderFields.clear();
+	this->testRequest.RequestIntegrity = OK_HTTP;
+	testRequest.HeaderFields.insert(std::make_pair("content-type","multipart/form-data;               boundary=delim"));
+	//----------------------------------------------------------//
+	//======================Running Test 5======================//
+	//----------------------------------------------------------//
+	checkMultipartDelimiter(this->testRequest);
+	if (testRequest.RequestIntegrity != OK_HTTP) {
+		std::cout << "Valid Multipart 2: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent == false) {
+		std::cout << "Valid Multipart2 : \033[1;32mOK\033[0m" << std::endl;
+	}
+	//==========================================================//
+	//-------------------Preparing for Test 6-------------------//
+	//==========================================================//
+	this->testRequest.HeaderFields.clear();
+	this->testRequest.RequestIntegrity = OK_HTTP;
+	//----------------------------------------------------------//
+	//======================Running Test 6======================//
 	//----------------------------------------------------------//
 	checkMultipartDelimiter(this->testRequest);
 	if (testRequest.RequestIntegrity != OK_HTTP) {
