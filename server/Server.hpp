@@ -42,7 +42,7 @@ private:
 
 	int socketOption;
 
-	long int recievedBytes;
+	//long int recievedBytes;
 
 	int connectionAmount;
 
