@@ -85,8 +85,8 @@ void checkContentType(Request& request) {
 		return;
 	}
 
-	std::map<std::string,std::vector<std::string> > ContentTypeMap;
-	std::map<std::string,std::vector<std::string> >::iterator ContentTypeIterator;
+	std::map<std::string,std::vector<std::string> > allowedContentTypeMap;
+	std::map<std::string,std::vector<std::string> >::iterator allowedContentTypeIterator;
 	std::vector<std::string> text;
 	std::vector<std::string> multipart;
 	std::vector<std::string>::iterator ContentSubtypeIterator;
@@ -94,8 +94,8 @@ void checkContentType(Request& request) {
 	text.push_back("plain");
 	multipart.push_back("form-data");
 
-	ContentTypeMap.insert(std::make_pair("text/",text));
-	ContentTypeMap.insert((std::make_pair("multipart/",multipart)));
+	allowedContentTypeMap.insert(std::make_pair("text/", text));
+	allowedContentTypeMap.insert((std::make_pair("multipart/", multipart)));
 
 	std::string foundContentType;
 	std::string foundContentSubtype;
@@ -103,13 +103,13 @@ void checkContentType(Request& request) {
 	foundContentType = headerField->second.substr(0,headerField->second.find('/') + 1);
 	foundContentSubtype = headerField->second.substr(headerField->second.find('/') + 1,headerField->second.size());
 
-	ContentTypeIterator = ContentTypeMap.find(foundContentType);
-	if (ContentTypeIterator == ContentTypeMap.end()) {
+	allowedContentTypeIterator = allowedContentTypeMap.find(foundContentType);
+	if (allowedContentTypeIterator == allowedContentTypeMap.end()) {
 		request.RequestIntegrity = UNSUPPORTED_MEDIA_TYPE;
 		return;
 	}
-	ContentSubtypeIterator = std::find(ContentTypeIterator->second.begin(), ContentTypeIterator->second.end(), foundContentSubtype);
-	if (ContentSubtypeIterator == ContentTypeIterator->second.end()) {
+	ContentSubtypeIterator = std::find(allowedContentTypeIterator->second.begin(), allowedContentTypeIterator->second.end(), foundContentSubtype);
+	if (ContentSubtypeIterator == allowedContentTypeIterator->second.end()) {
 		request.RequestIntegrity = UNSUPPORTED_MEDIA_TYPE;
 		return;
 	}
