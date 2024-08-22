@@ -769,6 +769,59 @@ void Tests::testHeaderGeneration(){
 	testObj.testWriteHeaderFields();
 }
 
+void Tests::testCgiHandler(){
+	std::cout << "\033[1;95mTesting the cgiHandler:\033[0m " << std::endl;
+	Request requ;
+	Response resp;
+
+	std::cout <<"[1;34m-----------prepareEnvVariables----------[0m" << std::endl;
+	//==========================================================//
+	//-------------------Preparing for Test 1-------------------//
+	//==========================================================//
+	requ.HeaderFields["content-length"] = "500";
+	requ.HeaderFields["content-type"] = "test";
+	requ.RequestedPath = "testPath1";
+	requ.RoutedPath = "testPath2";
+	//----------------------------------------------------------//
+	//======================Running Test 1======================//
+	//----------------------------------------------------------//
+	char **output = prepareEnvVariables(requ);
+	std::string output_string;
+	int i = 0;
+	while (output[i]){
+		output_string += output[i++];
+	}
+	if (output_string != "URI-path=testPath1content-length=500content-type=testrouted-path=testPath2"){
+		std::cout << "Simple response: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent == false) {
+		std::cout << "Simple response: \033[1;32mOK\033[0m" << std::endl;
+	}
+	i = 0;
+	while (output[i]){
+		free(output[i++]);
+	}
+	delete output;
+	std::cout <<"[1;34m-----------executeCGI----------[0m" << std::endl;
+	//==========================================================//
+	//-------------------Preparing for Test 2-------------------//
+	//==========================================================//
+	requ.Body = "blabla";
+	requ.HeaderFields["content-length"] = "6";
+	requ.HeaderFields["content-type"] = "test";
+	std::string programPath = "/usr/bin/python3";
+	resp.httpStatus = OK_HTTP;
+	//----------------------------------------------------------//
+	//======================Running Test 2======================//
+	//----------------------------------------------------------//
+	executeCGI(programPath, requ, resp);
+	std::cout << resp.httpStatus << std::endl;
+	if (resp.body != "hallo: blabla\n"){
+		std::cout << "Simple cgi script: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent == false) {
+		std::cout << "Simple cgi script: \033[1;32mOK\033[0m" << std::endl;
+	}
+}
+
 void Tests::testing() {
 	testConfigLocationParser();
 	testConfigParser();
@@ -779,6 +832,7 @@ void Tests::testing() {
 	testHeaderGeneration();
 	testServer();
 	testStatusCodes();
+	testCgiHandler();
 }
 
 Tests::Tests(int argument): silent(false) {

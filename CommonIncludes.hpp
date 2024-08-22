@@ -80,4 +80,7 @@ struct connection {
 	Request r;
 };
 
+char	**prepareEnvVariables(Request& requ);
+void	executeCGI(std::string programPath, Request& requ, Response& resp);
+
 #endif //WEBSERV_COMMONINCLUDES_HPP
