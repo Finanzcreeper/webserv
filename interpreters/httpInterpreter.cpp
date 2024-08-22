@@ -22,6 +22,17 @@ void interpretRequest(Request& request, const t_server& settings) {
 #include <iostream>
 #include <algorithm>
 
+void handleMultipart (Request& request) {
+	Multipart parts;
+	std::map<std::string,std::string>::iterator it;
+	it = request.HeaderFields.find("content-type");
+	parts.delimiter = it->second.substr(it->second.find("=") + 1, it->second.size());
+	if (parts.delimiter.find("\"") == 0 && parts.delimiter.find_last_of("\"") == parts.delimiter.size() - 1) {
+		parts.delimiter = parts.delimiter.substr(1,parts.delimiter.size() - 2);
+	}
+	std::cout << parts.delimiter << std::endl;
+}
+
 void findRoute(Request& request,  const t_server& settings) {
 	std::map<std::string, location>::const_iterator RouteIterator;
 	std::vector<std::string> possiblePaths;

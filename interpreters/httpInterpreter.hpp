@@ -16,4 +16,6 @@ void redirectionChecker(Request& request);
 
 void checkContentType(Request& request);
 
+void handleMultipart (Request& request);
+
 #endif //WEBSERV_HTTPINTERPRETER_HPP

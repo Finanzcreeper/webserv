@@ -343,6 +343,25 @@ void Tests::testHttpInterpreter() {
 	} else if (this->silent == false) {
 		std::cout << "not accepted subContent type: \033[1;32mOK\033[0m" << std::endl;
 	}
+
+	std::cout <<"[1;34m-------------handleMultipart------------[0m" << std::endl;
+//==========================================================//
+//-------------------Preparing for Test 1-------------------//
+//==========================================================//
+	testRequest.HeaderFields.clear();
+	testRequest.HeaderFields.insert(std::make_pair("content-type", "multipart/form-data; boundary=\"delimiterTesting\""));
+	testRequest.RequestIntegrity = OK_HTTP;
+	Multipart testMultipart;
+	testMultipart.delimiter = "delimiterTesting";
+//----------------------------------------------------------//
+//======================Running Test 1======================//
+//----------------------------------------------------------//
+	handleMultipart(testRequest);
+	if ( testRequest.bodyParts.delimiter != testMultipart.delimiter) {
+		std::cout << "M: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent == false) {
+		std::cout << "not accepted content type: \033[1;32mOK\033[0m" << std::endl;
+	}
 }
 
 void Tests::testConfigParser() {
