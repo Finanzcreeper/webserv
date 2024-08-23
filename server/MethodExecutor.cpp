@@ -20,15 +20,23 @@ void	MethodExecutor::wrapperRequest(Request &requ, Response &resp)
 	//std::cout << "Used route: " + requ.UsedRoute.locationName << std::endl;
 	//std::cout << "Used redirect: " + requ.UsedRoute.root << std::endl;
 	//std::cout << "Used path: " + requ.RoutedPath << std::endl;
-	std::cout << "**** HEADER OF REQUEST: ****\n" << requ.HeaderBuffer << std::endl << "**** END OF HEADER ****" << std::endl;
-	std::cout << "**** BODY OF REQUEST: ****\n" << requ.Body << std::endl << "**** END OF BODY ****" << std::endl;
-	std::cout << "REQUEST TYPE: " << requ.ReqType << std::endl;
+	//std::cout << "**** HEADER OF REQUEST: ****\n" << requ.HeaderBuffer << std::endl << "**** END OF HEADER ****" << std::endl;
+	//std::cout << "**** BODY OF REQUEST: ****\n" << requ.Body << std::endl << "**** END OF BODY ****" << std::endl;
+	//std::cout << "REQUEST TYPE: " << requ.ReqType << std::endl;
 	resp.body.clear();
 	resp.responseBuffer.clear();
 	resp.headerFields.clear();
 	resp.httpStatus = requ.RequestIntegrity;
 	requ.HeaderFields["content-type"] = "text/plain";
-	if (resp.httpStatus == MOVED_PERMANENTLY) {
+	if (resp.httpStatus == OK_HTTP && requ.UsedRoute.locationName == "/cgi/"){
+		executeCGI(requ, resp, _serverSettings);
+		if (!((int)resp.httpStatus >= MIN_CLIENT_ERROR && \
+			(int)resp.httpStatus <= MAX_SERVER_ERROR)){
+			resp.isReady = true;
+			return ;
+		}
+	}
+	else if (resp.httpStatus == MOVED_PERMANENTLY) {
 		resp.headerFields["location"] = requ.UsedRoute.redirect;
 	} else if (resp.httpStatus == OK_HTTP) {
 		switch (requ.ReqType){
@@ -61,8 +69,8 @@ void	MethodExecutor::wrapperRequest(Request &requ, Response &resp)
 	if (requ.ReqType != HEAD) {
 		resp.responseBuffer.append(resp.body);
 	}
+	
 	resp.isReady = true;
-	//std::cout << "**** RESPONSE: ****\n" << resp.responseBuffer << "**** END OF RESPONSE ****" << std::endl;
 }
 
 void	MethodExecutor::_executeGet(Request &requ, Response &resp)

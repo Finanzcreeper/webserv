@@ -7,6 +7,7 @@
 #include <ctime>
 
 #define HTTP_PROTOCOL "HTTP/1.1"
+#define CGI_TIMEOUT 10
 
 struct location {
 	int									httpMethods;
@@ -60,6 +61,7 @@ struct Request {
 	location	UsedRoute;
 	std::string Body;
 	bool requestCompletlyRecieved;
+	bool isCgi;
 };
 
 struct Response {
@@ -80,7 +82,7 @@ struct connection {
 	Request r;
 };
 
-char	**prepareEnvVariables(Request& requ);
-void	executeCGI(std::string programPath, Request& requ, Response& resp);
+std::map<std::string,std::string>	prepareEnvVariables(Request& requ, const t_server* settings);
+void	executeCGI(Request& requ, Response& resp, const t_server* settings);
 
 #endif //WEBSERV_COMMONINCLUDES_HPP
