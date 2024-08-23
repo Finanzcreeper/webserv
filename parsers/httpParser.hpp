@@ -20,6 +20,7 @@
 	void GetRequestType(Request& request);
 	void decapitalizeHeaderFields(std::string& Header);
 	void extractHeaderFields(Request& req);
+	void checkMultipartDelimiter(Request& request);
 	void handleHeader(Request &request, size_t endOfBlock);
 	void handleBody(Request &request);
 	size_t findEndOfBlock(std::string buffer);
