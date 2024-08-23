@@ -30,3 +30,10 @@ Deleting files on the webserver can be executed with a DELETE request. The link
 http://localhost:8080/file_delete_test.html
 ```
 provides an example. Pressing the button sends a DELETE request with the path `/delete/text.txt`.
+
+## CGI
+If the site
+```
+http://localhost:8080/function_plotter.html
+```
+is loaded, you can type in an mathematical expression, depended on x like 'sin(x)' and the interval boundaries of your plot, e.g. '-5' and '5'. When submitted, the server resondes with an plotted image
