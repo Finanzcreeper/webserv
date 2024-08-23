@@ -107,8 +107,16 @@ void checkMultipartDelimiter(Request& request) {
 	if (it == request.HeaderFields.end()) {
 		return;
 	}
-	if(it->second.find("multipart/form-data;") != std::string::npos &&
-		it->second.find("boundary=") == std::string::npos) {
+	if(it->second.find("multipart/form-data;") == std::string::npos) {
+		request.RequestIntegrity = BAD_REQUEST;
+		return;
+	}
+	if (it->second.find("boundary=") == std::string::npos) {
+		request.RequestIntegrity = BAD_REQUEST;
+		return;
+	}
+	int delimlenghth = it->second.substr(it->second.find("=") + 1, it->second.size()).size();
+	if (delimlenghth < 1 || delimlenghth > 72) {
 		request.RequestIntegrity = BAD_REQUEST;
 	}
 }
