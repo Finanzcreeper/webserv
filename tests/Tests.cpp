@@ -954,7 +954,21 @@ void Tests::testHttpParser() {
 	} else if (this->silent == false) {
 		std::cout << "Empty Header Fields: \033[1;32mOK\033[0m" << std::endl;
 	}
-
+	//==========================================================//
+	//-------------------Preparing for Test 7-------------------//
+	//==========================================================//
+	this->testRequest.HeaderFields.clear();
+	this->testRequest.RequestIntegrity = OK_HTTP;
+	testRequest.HeaderFields.insert(std::make_pair("content-type","text/plain;               boundary=delim"));
+	//----------------------------------------------------------//
+	//======================Running Test 7======================//
+	//----------------------------------------------------------//
+	checkMultipartDelimiter(this->testRequest);
+	if (testRequest.RequestIntegrity != BAD_REQUEST) {
+		std::cout << "Wrong content-type: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent == false) {
+		std::cout << "Wrong content-type : \033[1;32mOK\033[0m" << std::endl;
+	}
 }
 
 void Tests::testServer() {
