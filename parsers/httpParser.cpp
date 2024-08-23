@@ -115,10 +115,6 @@ void checkMultipartDelimiter(Request& request) {
 		request.RequestIntegrity = BAD_REQUEST;
 		return;
 	}
-	int delimlenghth = it->second.substr(it->second.find("=") + 1, it->second.size()).size();
-	if (delimlenghth < 1 || delimlenghth > 72) {
-		request.RequestIntegrity = BAD_REQUEST;
-	}
 }
 
 void extractHeaderFields(Request& request) {
