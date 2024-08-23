@@ -47,15 +47,6 @@ Server::Server(t_server sett) : settings(sett), socketOption(ON) {
 		//throw socket settings exception
 	}
 
-	if (setsockopt(listening_socket.fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &socketOption,
-				   sizeof(socketOption)) == -1) {
-		std::cerr << "\033[1;31msocket option could not be applied: " << std::strerror(errno) << "\033[0m"
-				  << std::endl;
-		freeaddrinfo(serverInfo);
-		throw std::runtime_error("");
-		//throw socket settings exception
-	}
-
 	if (bind(listening_socket.fd, serverInfo->ai_addr, serverInfo->ai_addrlen) == -1) {
 		std::cerr << "\033[1;31msocked binding failure: " << std::strerror(errno) << "\033[0m" << std::endl;
 		freeaddrinfo(serverInfo);
