@@ -107,7 +107,7 @@ void checkMultipartDelimiter(Request& request) {
 	if (it == request.HeaderFields.end()) {
 		return;
 	}
-	if(it->second.find("multipart/form-data;") == std::string::npos &&
+	if(it->second.find("multipart/form-data;") != std::string::npos &&
 		it->second.find("boundary=") == std::string::npos) {
 		request.RequestIntegrity = BAD_REQUEST;
 	}
