@@ -779,39 +779,104 @@ void Tests::testCgiHandler(){
 	//==========================================================//
 	//-------------------Preparing for Test 1-------------------//
 	//==========================================================//
-	requ.HeaderFields["content-length"] = "500";
-	requ.HeaderFields["content-type"] = "test";
-	requ.RequestedPath = "testPath1";
-	requ.RoutedPath = "testPath2";
+	settings.host = "127.0.0.65";
+	settings.port = "500";
+	settings.serverName = "testServer";
+	requ.HeaderFields["content-length"] = "40";
+	requ.HeaderFields["content-type"] = "text/plain";
+	requ.HeaderFields["authorization"] = "userxy";
+	requ.ReqType = GET;
+	requ.RequestedPath = "testPath2?here_begins_query_string";
+	requ.RoutedPath = "content/testPath1?here_begins_query_string";
 	//----------------------------------------------------------//
 	//======================Running Test 1======================//
 	//----------------------------------------------------------//
 	std::map<std::string,std::string> output = prepareEnvVariables(requ, &settings);
-	std::string output_string;
-	if (output_string != "URI-path=testPath1content-length=500content-type=testrouted-path=testPath2"){
-		std::cout << "Simple response: \033[1;31mFAILED\033[0m" << std::endl;
+	std::string concat_string;
+	std::map<std::string,std::string>::iterator it = output.begin();
+	while (it != output.end()){
+		concat_string.append(it->first + "=" + it->second + '\n');
+		it++;
+	}
+	if (concat_string != "AUTH_TYPE=userxy\nCONTENT_LENGTH=40\nCONTENT_TYPE=text/plain\n\
+GATEWAY_INTERFACE=CGI/1.1\nQUERY_STRING=here_begins_query_string\nREMOTE_ADDR=127.0.0.65\nREMOTE_IDENT=userxy\n\
+REMOTE_USER=userxy\nREQUEST_METHOD=GET\nSCRIPT_NAME=content/testPath1\nSERVER_NAME=testServer\n\
+SERVER_PORT=500\nSERVER_PROTOCOL=HTTP/1.1\nSERVER_SOFTWARE=webserv\n"){
+		std::cout << "All mandatory cgi headers get: \033[1;31mFAILED\033[0m" << std::endl;
 	} else if (this->silent == false) {
-		std::cout << "Simple response: \033[1;32mOK\033[0m" << std::endl;
+		std::cout << "All mandatory cgi headers get: \033[1;32mOK\033[0m" << std::endl;
+	}
+	//==========================================================//
+	//-------------------Preparing for Test 2-------------------//
+	//==========================================================//
+	settings.host = "127.0.0.65";
+	settings.port = "500";
+	settings.serverName = "testServer";
+	requ.HeaderFields["content-length"] = "40";
+	requ.HeaderFields["content-type"] = "text/plain";
+	requ.HeaderFields["authorization"] = "userxy";
+	requ.ReqType = POST;
+	requ.RequestedPath = "testPath2";
+	requ.RoutedPath = "content/testPath1";
+	requ.Body = "here_begins_query_string";
+	//----------------------------------------------------------//
+	//======================Running Test 2======================//
+	//----------------------------------------------------------//
+	output = prepareEnvVariables(requ, &settings);
+	concat_string = "";
+	it = output.begin();
+	while (it != output.end()){
+		concat_string.append(it->first + "=" + it->second + '\n');
+		it++;
+	}
+	if (concat_string != "AUTH_TYPE=userxy\nCONTENT_LENGTH=40\nCONTENT_TYPE=text/plain\n\
+GATEWAY_INTERFACE=CGI/1.1\nQUERY_STRING=here_begins_query_string\nREMOTE_ADDR=127.0.0.65\nREMOTE_IDENT=userxy\n\
+REMOTE_USER=userxy\nREQUEST_METHOD=POST\nSCRIPT_NAME=content/testPath1\nSERVER_NAME=testServer\n\
+SERVER_PORT=500\nSERVER_PROTOCOL=HTTP/1.1\nSERVER_SOFTWARE=webserv\n"){
+		std::cout << "All mandatory cgi headers post: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent == false) {
+		std::cout << "All mandatory cgi headers post: \033[1;32mOK\033[0m" << std::endl;
 	}
 	std::cout <<"[1;34m-----------executeCGI----------[0m" << std::endl;
 	//==========================================================//
-	//-------------------Preparing for Test 2-------------------//
+	//-------------------Preparing for Test 3-------------------//
 	//==========================================================//
 	requ.Body = "blabla";
 	requ.HeaderFields["content-length"] = "6";
 	requ.HeaderFields["content-type"] = "test";
-	requ.RoutedPath = "tests/testContent/cgi/test.py";
-	requ.ReqType = POST;
+	requ.Body = "bodyContent";
+	requ.RoutedPath = "tests/testContent/cgi/test.py?thisisthestring";
+	requ.ReqType = GET;
+	resp.responseBuffer = "";
 	resp.httpStatus = OK_HTTP;
 	//----------------------------------------------------------//
-	//======================Running Test 2======================//
+	//======================Running Test 3======================//
 	//----------------------------------------------------------//
 	executeCGI(requ, resp, &settings);
-	std::cout << resp.httpStatus << std::endl;
-	if (resp.body != "hallo: blabla\n"){
-		std::cout << "Simple cgi script: \033[1;31mFAILED\033[0m" << std::endl;
+	if (resp.responseBuffer != "hallo: thisisthestring\n"){
+		std::cout << "Simple cgi script get: \033[1;31mFAILED\033[0m" << std::endl;
 	} else if (this->silent == false) {
-		std::cout << "Simple cgi script: \033[1;32mOK\033[0m" << std::endl;
+		std::cout << "Simple cgi script get: \033[1;32mOK\033[0m" << std::endl;
+	}
+	//==========================================================//
+	//-------------------Preparing for Test 4-------------------//
+	//==========================================================//
+	requ.Body = "blabla";
+	requ.HeaderFields["content-length"] = "6";
+	requ.HeaderFields["content-type"] = "test";
+	requ.Body = "bodyContent";
+	requ.RoutedPath = "tests/testContent/cgi/test.py";
+	requ.ReqType = POST;
+	resp.responseBuffer = "";
+	resp.httpStatus = OK_HTTP;
+	//----------------------------------------------------------//
+	//======================Running Test 4======================//
+	//----------------------------------------------------------//
+	executeCGI(requ, resp, &settings);
+	if (resp.responseBuffer != "hallo: bodyContent\n"){
+		std::cout << "Simple cgi script post: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent == false) {
+		std::cout << "Simple cgi script post: \033[1;32mOK\033[0m" << std::endl;
 	}
 }
 

@@ -69,7 +69,6 @@ void	MethodExecutor::wrapperRequest(Request &requ, Response &resp)
 	if (requ.ReqType != HEAD) {
 		resp.responseBuffer.append(resp.body);
 	}
-	
 	resp.isReady = true;
 }
 
@@ -155,8 +154,7 @@ void	MethodExecutor::_executeDelete(Request &requ, Response &resp)
 	}
 	struct stat	file_stat;
 	struct stat dir_stat;
-
-	if (dir_path != "" && stat(dir_path.c_str(), &dir_stat) == -1){
+	if (stat(dir_path.c_str(), &dir_stat) == -1 && dir_path != ""){
 		resp.httpStatus = NOT_FOUND;
 	} else if (!(dir_stat.st_mode & S_IRWXG)) {
 		resp.httpStatus = UNAUTHORIZED;

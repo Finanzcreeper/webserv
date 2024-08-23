@@ -120,7 +120,6 @@ void	executeCGI(Request& requ, Response& resp, const t_server* settings) {
 		dup2(fd_out, STDOUT_FILENO);
 		close(fd_in);
 		close(fd_out);
-		std::cerr << env["SCRIPT_NAME"] << std::endl;
 		char *argv[] = { (char *)"/usr/bin/python3", (char *)env["SCRIPT_NAME"].c_str(), NULL};
 		execve("/usr/bin/python3", argv, env_c);
 		cleanupCGI(env_c);
