@@ -154,7 +154,7 @@ void	MethodExecutor::_executeDelete(Request &requ, Response &resp)
 	}
 	struct stat	file_stat;
 	struct stat dir_stat;
-	if (stat(dir_path.c_str(), &dir_stat) == -1 && dir_path != ""){
+	if (dir_path != "" && stat(dir_path.c_str(), &dir_stat) == -1){
 		resp.httpStatus = NOT_FOUND;
 	} else if (!(dir_stat.st_mode & S_IRWXG)) {
 		resp.httpStatus = UNAUTHORIZED;
