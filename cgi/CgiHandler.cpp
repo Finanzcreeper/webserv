@@ -59,7 +59,7 @@ void	cleanupCGI(char **env){
 	delete[] env;
 }
 
-char **converteStringMapToArray(std::map<std::string,std::string> env){
+char **convertStringMapToArray(std::map<std::string,std::string> env){
 	size_t len = env.size();
 	std::string variable;
 	std::map<std::string,std::string>::iterator iter = env.begin();
@@ -91,7 +91,7 @@ void handle_alarm(int sig) {
 void	executeCGI(Request& requ, Response& resp, const t_server* settings) {
 	std::map<std::string,std::string> env;
 	env = prepareEnvVariables(requ, settings);
-	char **env_c = converteStringMapToArray(env);
+	char **env_c = convertStringMapToArray(env);
 	if (env_c == NULL){
 		resp.httpStatus = INTERNAL_SERVER_ERROR;
 		return ;
