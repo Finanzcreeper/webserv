@@ -358,9 +358,153 @@ void Tests::testHttpInterpreter() {
 //----------------------------------------------------------//
 	handleMultipart(testRequest);
 	if ( testRequest.bodyParts.delimiter != testMultipart.delimiter) {
-		std::cout << "M: \033[1;31mFAILED\033[0m" << std::endl;
+		std::cout << "delimiter in \"\": \033[1;31mFAILED\033[0m" << std::endl;
 	} else if (this->silent == false) {
-		std::cout << "not accepted content type: \033[1;32mOK\033[0m" << std::endl;
+		std::cout << "delimiter in \"\": \033[1;32mOK\033[0m" << std::endl;
+	}
+//==========================================================//
+//-------------------Preparing for Test 2-------------------//
+//==========================================================//
+	testRequest.HeaderFields.clear();
+	testRequest.HeaderFields.insert(std::make_pair("content-type", "multipart/form-data; boundary=delimiterTesting"));
+	testRequest.RequestIntegrity = OK_HTTP;
+	testMultipart.delimiter = "delimiterTesting";
+//----------------------------------------------------------//
+//======================Running Test 2======================//
+//----------------------------------------------------------//
+	handleMultipart(testRequest);
+	if ( testRequest.bodyParts.delimiter != testMultipart.delimiter) {
+		std::cout << "delimiter without \"\": \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent == false) {
+		std::cout << "delimiter without \"\": \033[1;32mOK\033[0m" << std::endl;
+	}
+//==========================================================//
+//-------------------Preparing for Test 3-------------------//
+//==========================================================//
+	testRequest.HeaderFields.clear();
+	testRequest.HeaderFields.insert(std::make_pair("content-type", "multipart/form-data; boundary=a"));
+	testRequest.RequestIntegrity = OK_HTTP;
+	testMultipart.delimiter = "a";
+//----------------------------------------------------------//
+//======================Running Test 3======================//
+//----------------------------------------------------------//
+	handleMultipart(testRequest);
+	if ( testRequest.bodyParts.delimiter != testMultipart.delimiter) {
+		std::cout << "single char delimiter no \"\": \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent == false) {
+		std::cout << "single char delimiter no \"\": \033[1;32mOK\033[0m" << std::endl;
+	}
+//==========================================================//
+//-------------------Preparing for Test 4-------------------//
+//==========================================================//
+	testRequest.HeaderFields.clear();
+	testRequest.HeaderFields.insert(std::make_pair("content-type", "multipart/form-data; boundary=qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq"));
+	testRequest.RequestIntegrity = OK_HTTP;
+	testMultipart.delimiter = "qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq";
+//----------------------------------------------------------//
+//======================Running Test 4======================//
+//----------------------------------------------------------//
+	handleMultipart(testRequest);
+	if ( testRequest.bodyParts.delimiter != testMultipart.delimiter) {
+		std::cout << "70 char delimiter no \"\": \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent == false) {
+		std::cout << "70 char delimiter no \"\": \033[1;32mOK\033[0m" << std::endl;
+	}
+//==========================================================//
+//-------------------Preparing for Test 5-------------------//
+//==========================================================//
+	testRequest.HeaderFields.clear();
+	testRequest.HeaderFields.insert(std::make_pair("content-type", "multipart/form-data; boundary=\"a\""));
+	testRequest.RequestIntegrity = OK_HTTP;
+	testMultipart.delimiter = "a";
+//----------------------------------------------------------//
+//======================Running Test 5======================//
+//----------------------------------------------------------//
+	handleMultipart(testRequest);
+	if ( testRequest.bodyParts.delimiter != testMultipart.delimiter) {
+		std::cout << "single char delimiter with \"\": \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent == false) {
+		std::cout << "single char delimiter with \"\": \033[1;32mOK\033[0m" << std::endl;
+	}
+//==========================================================//
+//-------------------Preparing for Test 6-------------------//
+//==========================================================//
+	testRequest.HeaderFields.clear();
+	testRequest.HeaderFields.insert(std::make_pair("content-type", "multipart/form-data; boundary=\"qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq\""));
+	testRequest.RequestIntegrity = OK_HTTP;
+	testMultipart.delimiter = "qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq";
+//----------------------------------------------------------//
+//======================Running Test 6======================//
+//----------------------------------------------------------//
+	handleMultipart(testRequest);
+	if ( testRequest.bodyParts.delimiter != testMultipart.delimiter) {
+		std::cout << "70 char delimiter with \"\": \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent == false) {
+		std::cout << "70 char delimiter with \"\": \033[1;32mOK\033[0m" << std::endl;
+	}
+//==========================================================//
+//-------------------Preparing for Test 7-------------------//
+//==========================================================//
+	testRequest.HeaderFields.clear();
+	testRequest.HeaderFields.insert(std::make_pair("content-type", "multipart/form-data; boundary=\"\""));
+	testRequest.RequestIntegrity = OK_HTTP;
+	testMultipart.delimiter = "\"\"";
+//----------------------------------------------------------//
+//======================Running Test 7======================//
+//----------------------------------------------------------//
+	handleMultipart(testRequest);
+	if ( testRequest.RequestIntegrity != BAD_REQUEST) {
+		std::cout << "just\"\": \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent == false) {
+		std::cout << "just \"\": \033[1;32mOK\033[0m" << std::endl;
+	}
+//==========================================================//
+//-------------------Preparing for Test 8-------------------//
+//==========================================================//
+	testRequest.HeaderFields.clear();
+	testRequest.HeaderFields.insert(std::make_pair("content-type", "multipart/form-data; boundary="));
+	testRequest.RequestIntegrity = OK_HTTP;
+	testMultipart.delimiter = "";
+//----------------------------------------------------------//
+//======================Running Test 8======================//
+//----------------------------------------------------------//
+	handleMultipart(testRequest);
+	if ( testRequest.RequestIntegrity != BAD_REQUEST) {
+		std::cout << "empty boundary: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent == false) {
+		std::cout << "empty boundary: \033[1;32mOK\033[0m" << std::endl;
+	}
+//==========================================================//
+//-------------------Preparing for Test 9-------------------//
+//==========================================================//
+	testRequest.HeaderFields.clear();
+	testRequest.HeaderFields.insert(std::make_pair("content-type", "multipart/form-data; boundary=qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq"));
+	testRequest.RequestIntegrity = OK_HTTP;
+	testMultipart.delimiter = "";
+//----------------------------------------------------------//
+//======================Running Test 9======================//
+//----------------------------------------------------------//
+	handleMultipart(testRequest);
+	if ( testRequest.RequestIntegrity != BAD_REQUEST) {
+		std::cout << "delimiter to long by one: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent == false) {
+		std::cout << "delimiter to long by one: \033[1;32mOK\033[0m" << std::endl;
+	}
+//==========================================================//
+//-------------------Preparing for Test 10-------------------//
+//==========================================================//
+	testRequest.HeaderFields.clear();
+	testRequest.HeaderFields.insert(std::make_pair("content-type", "multipart/form-data; boundary=qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq"));
+	testRequest.RequestIntegrity = OK_HTTP;
+	testMultipart.delimiter = "";
+//----------------------------------------------------------//
+//======================Running Test 10======================//
+//----------------------------------------------------------//
+	handleMultipart(testRequest);
+	if ( testRequest.RequestIntegrity != BAD_REQUEST) {
+		std::cout << "delimiter to long: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent == false) {
+		std::cout << "delimiter to long: \033[1;32mOK\033[0m" << std::endl;
 	}
 }
 
