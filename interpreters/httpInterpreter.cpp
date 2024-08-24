@@ -23,14 +23,17 @@ void interpretRequest(Request& request, const t_server& settings) {
 #include <algorithm>
 
 void handleMultipart (Request& request) {
-	Multipart parts;
 	std::map<std::string,std::string>::iterator it;
 	it = request.HeaderFields.find("content-type");
-	parts.delimiter = it->second.substr(it->second.find("=") + 1, it->second.size());
-	if (parts.delimiter.find("\"") == 0 && parts.delimiter.find_last_of("\"") == parts.delimiter.size() - 1) {
-		parts.delimiter = parts.delimiter.substr(1,parts.delimiter.size() - 2);
+	request.bodyParts.delimiter = it->second.substr(it->second.find("=") + 1, it->second.size());
+	if (request.bodyParts.delimiter.find("\"") == 0 && request.bodyParts.delimiter.find_last_of("\"") == request.bodyParts.delimiter.size() - 1) {
+		request.bodyParts.delimiter = request.bodyParts.delimiter.substr(1,request.bodyParts.delimiter.size() - 2);
 	}
-	std::cout << parts.delimiter << std::endl;
+	if (request.bodyParts.delimiter.size() <= 0 || request.bodyParts.delimiter.size() > 70) {
+		request.RequestIntegrity = BAD_REQUEST;
+		return;
+	}
+	
 }
 
 void findRoute(Request& request,  const t_server& settings) {
