@@ -23,17 +23,43 @@ void interpretRequest(Request& request, const t_server& settings) {
 #include <algorithm>
 
 void handleMultipart (Request& request) {
+	std::string delimiter;
+	std::string BodyBuffer;
+
 	std::map<std::string,std::string>::iterator it;
 	it = request.HeaderFields.find("content-type");
-	request.bodyParts.delimiter = it->second.substr(it->second.find("=") + 1, it->second.size());
-	if (request.bodyParts.delimiter.find("\"") == 0 && request.bodyParts.delimiter.find_last_of("\"") == request.bodyParts.delimiter.size() - 1) {
-		request.bodyParts.delimiter = request.bodyParts.delimiter.substr(1,request.bodyParts.delimiter.size() - 2);
+	delimiter = it->second.substr(it->second.find("=") + 1, it->second.size());
+	if (delimiter.find("\"") == 0 && delimiter.find_last_of("\"") == delimiter.size() - 1) {
+		delimiter = delimiter.substr(1,delimiter.size() - 2);
 	}
-	if (request.bodyParts.delimiter.size() <= 0 || request.bodyParts.delimiter.size() > 70) {
+	if (delimiter.size() <= 0 || delimiter.size() > 70) {
 		request.RequestIntegrity = BAD_REQUEST;
 		return;
 	}
-	
+	delimiter.insert(0,"\r\n--");
+	Multipart mp;
+	std::string endDelimiter = delimiter + "--";
+	request.Body.erase(0, request.Body.find(delimiter) + delimiter.size());
+	while (request.Body.find(endDelimiter) != 0) {
+		if (request.Body.find(delimiter) == 0) {
+			request.Body.erase(0, request.Body.find(delimiter) + delimiter.size());
+		}
+		if (request.Body.find("\r\n\r\n") != 0 && request.Body.find("\r\n") == 0) {
+			request.Body.erase(0,2);
+			std::string Head = request.Body.substr(0,request.Body.find(":"));
+			std::string Data = request.Body.substr(request.Body.find(":") + 1,request.Body.find("\r\n"));
+			mp.MultipartHeaderFields.insert(std::make_pair(Head ,Data));
+			request.Body.erase(0,request.Body.find("\r\n"));
+		} else if (request.Body.find("\r\n\r\n") == 0) {
+			mp.Body = request.Body.substr(4,request.Body.find(delimiter) - 4);
+			request.bodyParts.push_back(mp);
+			mp.MultipartHeaderFields.clear();
+			request.Body.erase(0, request.Body.find(delimiter));
+		} else {
+			request.RequestIntegrity = BAD_REQUEST;
+			break;
+		}
+	}
 }
 
 void findRoute(Request& request,  const t_server& settings) {
