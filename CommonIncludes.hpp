@@ -49,7 +49,8 @@ enum sockoption{
 };
 
 struct Multipart {
-	std::string delimiter;
+	std::map<std::string,std::string> MultipartHeaderFields;
+	std::string Body;
 };
 
 struct Request {
@@ -63,7 +64,7 @@ struct Request {
 	std::string BodyBuffer;
 	location	UsedRoute;
 	std::string Body;
-	Multipart bodyParts;
+	std::vector<Multipart> bodyParts;
 	bool requestCompletlyRecieved;
 };
 
