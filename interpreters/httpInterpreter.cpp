@@ -70,8 +70,38 @@ std::string MultipartDelimiterValidation(Request& request) {
 		delimiter.clear();
 		return (delimiter);
 	}
+	if (IsAllowedDelimChar(delimiter) == false) {
+		request.RequestIntegrity = BAD_REQUEST;
+		delimiter.clear();
+		return (delimiter);
+	}
 	delimiter.insert(0,"\r\n--");
 	return (delimiter);
+}
+
+bool IsAllowedDelimChar(std::string delim) {
+	std::string::iterator it;
+	it = delim.begin();
+	while (it != delim.end()) {
+		if (*it >= '\'' && *it <= ')') {
+			++it;
+		} else if (*it >= '+' && *it <= ':') {
+			++it;
+		} else if (*it == '=') {
+			++it;
+		} else if (*it == '?') {
+			++it;
+		} else if (*it >= 'A' && *it <= 'Z') {
+			++it;
+		} else if (*it == '_') {
+			++it;
+		} else if (*it >= 'a' && *it <= 'z') {
+			++it;
+		} else {
+			return (false);
+		}
+	}
+	return (true);
 }
 
 void findRoute(Request& request,  const t_server& settings) {
