@@ -18,4 +18,7 @@ void checkContentType(Request& request);
 
 void handleMultipart (Request& request);
 
+std::string MultipartDelimiterValidation(Request& request);
+
+
 #endif //WEBSERV_HTTPINTERPRETER_HPP

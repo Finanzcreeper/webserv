@@ -26,17 +26,11 @@ void handleMultipart (Request& request) {
 	std::string delimiter;
 	std::string BodyBuffer;
 
-	std::map<std::string,std::string>::iterator it;
-	it = request.HeaderFields.find("content-type");
-	delimiter = it->second.substr(it->second.find("=") + 1, it->second.size());
-	if (delimiter.find("\"") == 0 && delimiter.find_last_of("\"") == delimiter.size() - 1) {
-		delimiter = delimiter.substr(1,delimiter.size() - 2);
-	}
-	if (delimiter.size() <= 0 || delimiter.size() > 70) {
-		request.RequestIntegrity = BAD_REQUEST;
+	delimiter = MultipartDelimiterValidation(request);
+	if (request.RequestIntegrity != OK_HTTP) {
 		return;
 	}
-	delimiter.insert(0,"\r\n--");
+
 	Multipart mp;
 	std::string endDelimiter = delimiter + "--";
 	request.Body.erase(0, request.Body.find(delimiter) + delimiter.size());
@@ -60,6 +54,24 @@ void handleMultipart (Request& request) {
 			break;
 		}
 	}
+}
+
+std::string MultipartDelimiterValidation(Request& request) {
+	std::string delimiter;
+
+	std::map<std::string,std::string>::iterator it;
+	it = request.HeaderFields.find("content-type");
+	delimiter = it->second.substr(it->second.find("=") + 1, it->second.size());
+	if (delimiter.find("\"") == 0 && delimiter.find_last_of("\"") == delimiter.size() - 1) {
+		delimiter = delimiter.substr(1,delimiter.size() - 2);
+	}
+	if (delimiter.size() <= 0 || delimiter.size() > 70) {
+		request.RequestIntegrity = BAD_REQUEST;
+		delimiter.clear();
+		return (delimiter);
+	}
+	delimiter.insert(0,"\r\n--");
+	return (delimiter);
 }
 
 void findRoute(Request& request,  const t_server& settings) {
