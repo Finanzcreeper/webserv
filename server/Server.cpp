@@ -136,6 +136,7 @@ void Server::CheckForConnections() {
 							}
 						}
 						mt->second.r.HeaderFields.clear();
+						mt->second.r.RequestIntegrity = OK_HTTP;
 					}
 				} else if (this->recievedBytes == 0) {
 					std::cout << "client sent closed connection" << std::endl;
