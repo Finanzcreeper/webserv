@@ -89,13 +89,16 @@ void checkContentType(Request& request) {
 	std::map<std::string,std::vector<std::string> >::iterator allowedContentTypeIterator;
 	std::vector<std::string> text;
 	std::vector<std::string> multipart;
+	std::vector<std::string> application;
 	std::vector<std::string>::iterator ContentSubtypeIterator;
 
 	text.push_back("plain");
 	multipart.push_back("form-data");
+	application.push_back("x-www-form-urlencoded");
 
 	allowedContentTypeMap.insert(std::make_pair("text/", text));
 	allowedContentTypeMap.insert((std::make_pair("multipart/", multipart)));
+	allowedContentTypeMap.insert((std::make_pair("application/", application)));
 
 	std::string foundContentType;
 	std::string foundContentSubtype;
