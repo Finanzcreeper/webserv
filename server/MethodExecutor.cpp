@@ -27,7 +27,6 @@ void	MethodExecutor::wrapperRequest(Request &requ, Response &resp)
 	resp.responseBuffer.clear();
 	resp.headerFields.clear();
 	resp.httpStatus = requ.RequestIntegrity;
-	requ.HeaderFields["content-type"] = "text/plain";
 	if (resp.httpStatus == OK_HTTP && requ.UsedRoute.locationName == "/cgi/"){
 		executeCGI(requ, resp, _serverSettings);
 		if (!((int)resp.httpStatus >= MIN_CLIENT_ERROR && \
