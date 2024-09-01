@@ -135,6 +135,7 @@ void Server::CheckForConnections() {
 								cleanConnection();
 							}
 						}
+						mt->second.r.HeaderFields.clear();
 					}
 				} else if (this->recievedBytes == 0) {
 					std::cout << "client sent closed connection" << std::endl;

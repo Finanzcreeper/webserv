@@ -27,7 +27,6 @@ void	MethodExecutor::wrapperRequest(Request &requ, Response &resp)
 	resp.responseBuffer.clear();
 	resp.headerFields.clear();
 	resp.httpStatus = requ.RequestIntegrity;
-	requ.HeaderFields["content-type"] = "text/plain";
 	if (resp.httpStatus == MOVED_PERMANENTLY) {
 		resp.headerFields["location"] = requ.UsedRoute.redirect;
 	} else if (resp.httpStatus == OK_HTTP) {
