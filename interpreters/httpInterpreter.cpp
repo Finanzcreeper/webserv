@@ -26,6 +26,12 @@ void handleMultipart (Request& request) {
 	std::string delimiter;
 	std::string BodyBuffer;
 
+	std::map<std::string,std::string>::iterator it;
+	it = request.HeaderFields.find("content-type");
+	if (it == request.HeaderFields.end()) {
+		return;
+	}
+
 	delimiter = MultipartDelimiterValidation(request);
 	if (request.RequestIntegrity != OK_HTTP) {
 		return;
