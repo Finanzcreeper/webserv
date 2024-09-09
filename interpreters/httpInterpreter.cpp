@@ -47,7 +47,7 @@ void handleMultipart (Request& request) {
 		if (request.Body.find("\r\n\r\n") != 0 && request.Body.find("\r\n") == 0) {
 			request.Body.erase(0,2);
 			std::string Head = request.Body.substr(0,request.Body.find(":"));
-			std::string Data = request.Body.substr(request.Body.find(":") + 1,request.Body.find("\r\n"));
+			std::string Data = request.Body.substr(request.Body.find(":") + 2,(request.Body.find("\r\n") - (request.Body.find(":") + 2)));
 			mp.MultipartHeaderFields.insert(std::make_pair(Head ,Data));
 			request.Body.erase(0,request.Body.find("\r\n"));
 		} else if (request.Body.find("\r\n\r\n") == 0) {
