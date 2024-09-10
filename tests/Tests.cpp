@@ -573,78 +573,205 @@ void Tests::testHttpInterpreter() {
 		std::cout << "Disallowed symbol: \033[1;32mOK\033[0m" << std::endl;
 	}
 	std::cout <<"[1;34m----------------Multipart---------------[0m" << std::endl;
-//==========================================================//
-//-------------------Preparing for Test 1-------------------//
-//==========================================================//
-	testRequest.HeaderFields.clear();
-	testRequest.HeaderFields.insert(std::make_pair("content-type", "multipart/form-data; boundary=delimiterTesting"));
-	testRequest.RequestIntegrity = OK_HTTP;
-	testRequest.Body = "\r\n--delimiterTesting\r\nContent-Disposition: form-data; name=\"text\"\r\n\r\ntext default\r\n--delimiterTesting\r\nContent-Disposition: form-data; name=\"file1\"; filename=\"a.txt\"\r\nContent-Type: text/plain\r\n\r\nContent of a.txt.\r\n--delimiterTesting\r\nContent-Disposition: form-data; name=\"file2\"; filename=\"a.html\"\r\nContent-Type: text/html\r\n\r\n<!DOCTYPE html><title>Content of a.html.</title>\r\n--delimiterTesting--";
-	std::vector<Multipart> testBodyParts;
+	{
+	//==========================================================//
+	//-------------------Preparing for Test 1-------------------//
+	//==========================================================//
+		testRequest.HeaderFields.clear();
+		testRequest.HeaderFields.insert(std::make_pair("content-type", "multipart/form-data; boundary=delimiterTesting"));
+		testRequest.HeaderFields.insert(std::make_pair("content-length", "396"));
+		testRequest.RequestIntegrity = OK_HTTP;
+		testRequest.Body = "\r\n--delimiterTesting\r\nContent-Disposition: form-data; name=\"text\"\r\n\r\ntext default\r\n--delimiterTesting\r\nContent-Disposition: form-data; name=\"file1\"; filename=\"a.txt\"\r\nContent-Type: text/plain\r\n\r\nContent of a.txt.\r\n--delimiterTesting\r\nContent-Disposition: form-data; name=\"file2\"; filename=\"a.html\"\r\nContent-Type: text/html\r\n\r\n<!DOCTYPE html><title>Content of a.html.</title>\r\n--delimiterTesting--";
 
-	testMultipart.MultipartHeaderFields.clear();
-	testMultipart.Body.clear();
-	testMultipart.MultipartHeaderFields.insert(std::make_pair("Content-Disposition", "form-data; name=\"text\""));
-	testMultipart.Body = "text default";
-	testBodyParts.push_back(testMultipart);
+		std::vector<Multipart> testBodyParts;
+		testMultipart.MultipartHeaderFields.clear();
+		testMultipart.Body.clear();
+		testMultipart.MultipartHeaderFields.insert(std::make_pair("Content-Disposition", "form-data; name=\"text\""));
+		testMultipart.Body = "text default";
+		testBodyParts.push_back(testMultipart);
 
-	testMultipart.MultipartHeaderFields.clear();
-	testMultipart.Body.clear();
-	testMultipart.MultipartHeaderFields.insert(std::make_pair("Content-Disposition","form-data; name=\"file1\"; filename=\"a.txt\""));
-	testMultipart.MultipartHeaderFields.insert((std::make_pair("Content-Type","text/plain")));
-	testMultipart.Body = "Content of a.txt.";
-	testBodyParts.push_back(testMultipart);
+		testMultipart.MultipartHeaderFields.clear();
+		testMultipart.Body.clear();
+		testMultipart.MultipartHeaderFields.insert(std::make_pair("Content-Disposition","form-data; name=\"file1\"; filename=\"a.txt\""));
+		testMultipart.MultipartHeaderFields.insert((std::make_pair("Content-Type","text/plain")));
+		testMultipart.Body = "Content of a.txt.";
+		testBodyParts.push_back(testMultipart);
 
-	testMultipart.MultipartHeaderFields.clear();
-	testMultipart.Body.clear();
-	testMultipart.MultipartHeaderFields.insert(std::make_pair("Content-Disposition","form-data; name=\"file2\"; filename=\"a.html\""));
-	testMultipart.MultipartHeaderFields.insert(std::make_pair("Content-Type","text/html"));
-	testMultipart.Body = "<!DOCTYPE html><title>Content of a.html.</title>";
-	testBodyParts.push_back(testMultipart);
-//----------------------------------------------------------//
-//======================Running Test 1======================//
-//----------------------------------------------------------//
-	handleMultipart(testRequest);
-	std::vector<Multipart>::iterator mit;
-	std::vector<Multipart>::iterator testmit;
-	bool OK = true;
-	testmit = testBodyParts.begin();
-	mit = testRequest.bodyParts.begin();
-	while (mit != testBodyParts.end() && testmit != testBodyParts.end()) {
-		if (mit->MultipartHeaderFields != testmit->MultipartHeaderFields) {
-			std::cout << "Header wrong" << std::endl;
+		testMultipart.MultipartHeaderFields.clear();
+		testMultipart.Body.clear();
+		testMultipart.MultipartHeaderFields.insert(std::make_pair("Content-Disposition","form-data; name=\"file2\"; filename=\"a.html\""));
+		testMultipart.MultipartHeaderFields.insert(std::make_pair("Content-Type","text/html"));
+		testMultipart.Body = "<!DOCTYPE html><title>Content of a.html.</title>";
+		testBodyParts.push_back(testMultipart);
+	//----------------------------------------------------------//
+	//======================Running Test 1======================//
+	//----------------------------------------------------------//
+		handleMultipart(testRequest);
+		bool OK = true;
+		if (testRequest.RequestIntegrity == OK_HTTP) {
+			std::vector<Multipart>::iterator mit;
+			std::vector<Multipart>::iterator testmit;
+			testmit = testBodyParts.begin();
+			mit = testRequest.bodyParts.begin();
+			while (mit != testBodyParts.end() && testmit != testBodyParts.end()) {
+				if (mit->MultipartHeaderFields != testmit->MultipartHeaderFields) {
+					std::cout << "Header wrong" << std::endl;
 
 
-			std::map<std::string,std::string>::iterator Headt;
-			std::map<std::string,std::string>::iterator Head;
-			Head = mit->MultipartHeaderFields.begin();
-			Headt = testmit->MultipartHeaderFields.begin();
-			while (Head != mit->MultipartHeaderFields.end() && Headt != testmit->MultipartHeaderFields.end()) {
-				std::cout << "\033[1;31mgot VS wanted\033[0m" << std::endl;
-				std::cout << "|" << Head->first << "|" << " VS " << "|" << Headt->first << "|" << std::endl;
-				std::cout << "++++++++++++++++++++++++++++++++++" << std::endl;
-				std::cout << "|" << Head->second << "|" << " VS " << "|" << Headt->second << "|" << std::endl;
-				++Head;
-				++Headt;
+					std::map<std::string,std::string>::iterator Headt;
+					std::map<std::string,std::string>::iterator Head;
+					Head = mit->MultipartHeaderFields.begin();
+					Headt = testmit->MultipartHeaderFields.begin();
+					while (Head != mit->MultipartHeaderFields.end() && Headt != testmit->MultipartHeaderFields.end()) {
+						std::cout << "\033[1;31mgot VS wanted\033[0m" << std::endl;
+						std::cout << "|" << Head->first << "|" << " VS " << "|" << Headt->first << "|" << std::endl;
+						std::cout << "++++++++++++++++++++++++++++++++++" << std::endl;
+						std::cout << "|" << Head->second << "|" << " VS " << "|" << Headt->second << "|" << std::endl;
+						++Head;
+						++Headt;
+					}
+
+					OK = false;
+				}
+				if (mit->Body != testmit->Body) {
+					std::cout << "Body wrong" << std::endl;
+					std::cout << mit->Body << " VS " << testmit->Body << std::endl;
+					std::cout << "-----------------------------------------------------" << std::endl;
+					OK = false;
+				}
+				++mit;
+				++testmit;
 			}
-
+		} else {
 			OK = false;
 		}
-		if (mit->Body != testmit->Body) {
-			std::cout << "Body wrong" << std::endl;
-			std::cout << mit->Body << " VS " << testmit->Body << std::endl;
-			std::cout << "-----------------------------------------------------" << std::endl;
-			OK = false;
+		if (OK != true) {
+			std::cout << "normal Multipart: \033[1;31mFAILED\033[0m" << std::endl;
+		} else if (this->silent == false) {
+			std::cout << "normal Multipart: \033[1;32mOK\033[0m" << std::endl;
 		}
-		++mit;
-		++testmit;
 	}
+	{
+		//==========================================================//
+		//-------------------Preparing for Test 2-------------------//
+		//==========================================================//
+		testRequest.bodyParts.clear();
+		testRequest.HeaderFields.clear();
+		testRequest.HeaderFields.insert(std::make_pair("content-type", "multipart/form-data; boundary=delimiterTesting"));
+		testRequest.RequestIntegrity = OK_HTTP;
+		testRequest.Body = "\r\n--delimiterTesting\r\nContent-Disposition: form-data; name=\"text\"\r\n\r\ntext default\r\n--brokendelimiterTesting\r\nContent-Disposition: form-data; name=\"file1\"; filename=\"a.txt\"\r\nContent-Type: text/plain\r\n\r\nContent of a.txt.\r\n--delimiterTesting\r\nContent-Disposition: form-data; name=\"file2\"; filename=\"a.html\"\r\nContent-Type: text/html\r\n\r\n<!DOCTYPE html><title>Content of a.html.</title>\r\n--delimiterTesting--";
+		testRequest.HeaderFields.insert(std::make_pair("content-length", "396"));
+		std::vector<Multipart> testBodyParts;
+		testBodyParts.clear();
+
+		testMultipart.MultipartHeaderFields.clear();
+		testMultipart.Body.clear();
+		testMultipart.MultipartHeaderFields.insert(std::make_pair("Content-Disposition", "form-data; name=\"text\""));
+		testMultipart.Body = "text default";
+		testBodyParts.push_back(testMultipart);
+
+		testMultipart.MultipartHeaderFields.clear();
+		testMultipart.Body.clear();
+		testMultipart.MultipartHeaderFields.insert(std::make_pair("Content-Disposition","form-data; name=\"file1\"; filename=\"a.txt\""));
+		testMultipart.MultipartHeaderFields.insert((std::make_pair("Content-Type","text/plain")));
+		testMultipart.Body = "Content of a.txt.";
+		testBodyParts.push_back(testMultipart);
+
+		testMultipart.MultipartHeaderFields.clear();
+		testMultipart.Body.clear();
+		testMultipart.MultipartHeaderFields.insert(std::make_pair("Content-Disposition","form-data; name=\"file2\"; filename=\"a.html\""));
+		testMultipart.MultipartHeaderFields.insert(std::make_pair("Content-Type","text/html"));
+		testMultipart.Body = "<!DOCTYPE html><title>Content of a.html.</title>";
+		std::vector<Multipart>::iterator mit;
+		std::vector<Multipart>::iterator testmit;
+		testBodyParts.push_back(testMultipart);
+	//----------------------------------------------------------//
+	//======================Running Test 2======================//
+	//----------------------------------------------------------//
+		handleMultipart(testRequest);
+		if (testRequest.RequestIntegrity != BAD_REQUEST) {
+			std::cout << "Wrong length body: \033[1;31mFAILED\033[0m" << std::endl;
+		} else if (this->silent == false) {
+			std::cout << "Wrong length body: \033[1;32mOK\033[0m" << std::endl;
+		}
+	}
+	{
+		//==========================================================//
+		//-------------------Preparing for Test 3-------------------//
+		//==========================================================//
+		testRequest.HeaderFields.clear();
+		testRequest.HeaderFields.insert(std::make_pair("content-type", "multipart/form-data; boundary=delimiterTesting"));
+		testRequest.HeaderFields.insert(std::make_pair("content-length", "379"));
+		testRequest.RequestIntegrity = OK_HTTP;
+		testRequest.Body = "\r\n--delimiterTesting\r\nContent-Disposition: form-data; name=\"text\"\r\n\r\ntext default\r\n--delimiterTesting\r\nContent-Disposition: form-data; name=\"file1\"; filename=\"a.txt\"\r\nContent-Type: text/plain\r\n\r\n\r\n--delimiterTesting\r\nContent-Disposition: form-data; name=\"file2\"; filename=\"a.html\"\r\nContent-Type: text/html\r\n\r\n<!DOCTYPE html><title>Content of a.html.</title>\r\n--delimiterTesting--";
+
+		std::vector<Multipart> testBodyParts;
+		testMultipart.MultipartHeaderFields.clear();
+		testMultipart.Body.clear();
+		testMultipart.MultipartHeaderFields.insert(std::make_pair("Content-Disposition", "form-data; name=\"text\""));
+		testMultipart.Body = "text default";
+		testBodyParts.push_back(testMultipart);
+
+		testMultipart.MultipartHeaderFields.clear();
+		testMultipart.Body.clear();
+		testMultipart.MultipartHeaderFields.insert(std::make_pair("Content-Disposition","form-data; name=\"file1\"; filename=\"a.txt\""));
+		testMultipart.MultipartHeaderFields.insert((std::make_pair("Content-Type","text/plain")));
+		testMultipart.Body = "";
+		testBodyParts.push_back(testMultipart);
+
+		testMultipart.MultipartHeaderFields.clear();
+		testMultipart.Body.clear();
+		testMultipart.MultipartHeaderFields.insert(std::make_pair("Content-Disposition","form-data; name=\"file2\"; filename=\"a.html\""));
+		testMultipart.MultipartHeaderFields.insert(std::make_pair("Content-Type","text/html"));
+		testMultipart.Body = "<!DOCTYPE html><title>Content of a.html.</title>";
+		testBodyParts.push_back(testMultipart);
+		//----------------------------------------------------------//
+		//======================Running Test 3======================//
+		//----------------------------------------------------------//
+		handleMultipart(testRequest);
+		bool OK = true;
+		if (testRequest.RequestIntegrity == OK_HTTP) {
+			std::vector<Multipart>::iterator mit;
+			std::vector<Multipart>::iterator testmit;
+			testmit = testBodyParts.begin();
+			mit = testRequest.bodyParts.begin();
+			while (mit != testBodyParts.end() && testmit != testBodyParts.end()) {
+				if (mit->MultipartHeaderFields != testmit->MultipartHeaderFields) {
+					std::cout << "Header wrong" << std::endl;
 
 
-	if (OK != true) {
-		std::cout << "normal Multipart: \033[1;31mFAILED\033[0m" << std::endl;
-	} else if (this->silent == false) {
-		std::cout << "normal Multipart: \033[1;32mOK\033[0m" << std::endl;
+					std::map<std::string,std::string>::iterator Headt;
+					std::map<std::string,std::string>::iterator Head;
+					Head = mit->MultipartHeaderFields.begin();
+					Headt = testmit->MultipartHeaderFields.begin();
+					while (Head != mit->MultipartHeaderFields.end() && Headt != testmit->MultipartHeaderFields.end()) {
+						std::cout << "\033[1;31mgot VS wanted\033[0m" << std::endl;
+						std::cout << "|" << Head->first << "|" << " VS " << "|" << Headt->first << "|" << std::endl;
+						std::cout << "++++++++++++++++++++++++++++++++++" << std::endl;
+						std::cout << "|" << Head->second << "|" << " VS " << "|" << Headt->second << "|" << std::endl;
+						++Head;
+						++Headt;
+					}
+
+					OK = false;
+				}
+				if (mit->Body != testmit->Body) {
+					std::cout << "Body wrong" << std::endl;
+					std::cout  << "|" << mit->Body << "|"  << " VS " << "|"  << testmit->Body << "|"  << std::endl;
+					std::cout << "-----------------------------------------------------" << std::endl;
+					OK = false;
+				}
+				++mit;
+				++testmit;
+			}
+		} else {
+			OK = false;
+		}
+		if (OK != true) {
+			std::cout << "No body in one multipart: \033[1;31mFAILED\033[0m" << std::endl;
+		} else if (this->silent == false) {
+			std::cout << "No body in one multipart: \033[1;32mOK\033[0m" << std::endl;
+		}
 	}
 }
 
