@@ -42,7 +42,7 @@ private:
 
 	int socketOption;
 
-	//long int recievedBytes;
+	long int recievedBytes;
 
 	int connectionAmount;
 
@@ -62,11 +62,12 @@ private:
 	std::map<int, connection>connectionMsgs;
 	std::map<int, Response>answerMsgs;
 
-	void responder(std::map <int, Response>::iterator& response);
+	void responder();
 
 	void checkConnectionsForTimeout();
 
-	void revcErrorHandler();
+	void cleanConnection();
+
 	void setUpServer();
 
 public:

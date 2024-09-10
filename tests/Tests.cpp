@@ -335,13 +335,28 @@ void Tests::testHttpInterpreter() {
 	testRequest.HeaderFields.insert(std::make_pair("content-type", "text/rain"));
 	testRequest.RequestIntegrity = OK_HTTP;
 //----------------------------------------------------------//
-//======================Running Test 5======================//
+//======================Running Test 4======================//
 //----------------------------------------------------------//
 	checkContentType(testRequest);
 	if (testRequest.RequestIntegrity != UNSUPPORTED_MEDIA_TYPE) {
 		std::cout << "not accepted subContent type: \033[1;31mFAILED\033[0m" << std::endl;
 	} else if (this->silent == false) {
 		std::cout << "not accepted subContent type: \033[1;32mOK\033[0m" << std::endl;
+	}
+//==========================================================//
+//-------------------Preparing for Test 5-------------------//
+//==========================================================//
+	testRequest.HeaderFields.clear();
+	testRequest.HeaderFields.insert(std::make_pair("content-type", "text/form-data"));
+	testRequest.RequestIntegrity = OK_HTTP;
+//----------------------------------------------------------//
+//======================Running Test 5======================//
+//----------------------------------------------------------//
+	checkContentType(testRequest);
+	if (testRequest.RequestIntegrity != UNSUPPORTED_MEDIA_TYPE) {
+		std::cout << "Mismatched Content and Subcontent type: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent == false) {
+		std::cout << "Mismatched Content and Subcontent type: \033[1;32mOK\033[0m" << std::endl;
 	}
 
 	std::cout <<"[1;34m-------MultipartDelimiterValidation-----[0m" << std::endl;

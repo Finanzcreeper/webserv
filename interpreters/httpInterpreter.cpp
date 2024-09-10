@@ -17,6 +17,10 @@ void interpretRequest(Request& request, const t_server& settings) {
 	if (request.RequestIntegrity != OK_HTTP) {
 		return;
 	}
+	checkContentType(request);
+	if (request.RequestIntegrity != OK_HTTP) {
+		return;
+	}
 }
 
 #include <iostream>
@@ -192,41 +196,32 @@ void checkContentType(Request& request) {
 		return;
 	}
 
-	std::vector<std::string> allowedContentTypes;
-	std::vector<std::string> allowedContentSubtypes;
+	std::map<std::string,std::vector<std::string> > allowedContentTypeMap;
+	std::map<std::string,std::vector<std::string> >::iterator allowedContentTypeIterator;
+	std::vector<std::string> text;
+	std::vector<std::string> multipart;
+	std::vector<std::string>::iterator ContentSubtypeIterator;
 
-	allowedContentTypes.push_back("text/");
-	allowedContentSubtypes.push_back("plain");
+	text.push_back("plain");
+	multipart.push_back("form-data");
+
+	allowedContentTypeMap.insert(std::make_pair("text/", text));
+	allowedContentTypeMap.insert((std::make_pair("multipart/", multipart)));
 
 	std::string foundContentType;
 	std::string foundContentSubtype;
 
 	foundContentType = headerField->second.substr(0,headerField->second.find('/') + 1);
 	foundContentSubtype = headerField->second.substr(headerField->second.find('/') + 1,headerField->second.size());
-	bool contentTypeFound = false;
-	bool contentSubtypeFound = false;
 
-	std::vector<std::string>::iterator allowedContentTypeIterator = allowedContentTypes.begin();
-	while (allowedContentTypeIterator != allowedContentTypes.end()) {
-		if  (*allowedContentTypeIterator == foundContentType) {
-			contentTypeFound = true;
-			break;
-		}
-		++allowedContentTypeIterator;
-	}
-	if  (contentTypeFound == false) {
+	allowedContentTypeIterator = allowedContentTypeMap.find(foundContentType);
+	if (allowedContentTypeIterator == allowedContentTypeMap.end()) {
 		request.RequestIntegrity = UNSUPPORTED_MEDIA_TYPE;
-	} else {
-		std::vector<std::string>::iterator allowedContentSubtypeIterator = allowedContentSubtypes.begin();
-		while (allowedContentSubtypeIterator != allowedContentSubtypes.end()) {
-			if (*allowedContentSubtypeIterator == foundContentSubtype) {
-				contentSubtypeFound = true;
-				break;
-			}
-			++allowedContentSubtypeIterator;
-		}
+		return;
 	}
-	if (contentSubtypeFound == false) {
+	ContentSubtypeIterator = std::find(allowedContentTypeIterator->second.begin(), allowedContentTypeIterator->second.end(), foundContentSubtype);
+	if (ContentSubtypeIterator == allowedContentTypeIterator->second.end()) {
 		request.RequestIntegrity = UNSUPPORTED_MEDIA_TYPE;
+		return;
 	}
 }
