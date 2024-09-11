@@ -17,6 +17,13 @@ http://localhost:8080/templates
 ```
 will show the files which are contained in the folder `content/templates`. **You can put own html files in the folder `content` and easily reach them with the browser.**
 
+It is possible to request a page and the server redirects you to another page. For example
+```
+http://localhost:8080/redirect/arte
+```
+should route the user to the page
+http://arte.tv
+
 ## POST method
 Uploading files to the webserver is implemented via POST requests. To test it in the browser, we need the webpage `content/file_upload_test.html`. So we start by requesting
 ```
