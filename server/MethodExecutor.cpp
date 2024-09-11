@@ -84,23 +84,26 @@ void	MethodExecutor::_executeGet(Request &requ, Response &resp)
         path = requ.RoutedPath;
 	}
 	if (stat(path.c_str(), &s) == -1) {
+		std::cout << "Could not find file \'" << path << "\'" << std::endl;
 		resp.httpStatus = NOT_FOUND;
 	} else if (!(s.st_mode & S_IRGRP)) {
+		std::cout << "Could not access file \'" << path << "\'" << std::endl;
 		resp.httpStatus = UNAUTHORIZED;
 	} else if ((s.st_mode & S_IFDIR)) {
 		if (requ.UsedRoute.dirListing) {
 			if (_createIndexPage(path, requ.RequestedPath, resp) == -1) {
+				std::cout << "Could not create index page" << std::endl;
 				resp.httpStatus = INTERNAL_SERVER_ERROR;
 			}
 			return;
 		} else {
+			std::cout << "Could not find directory \'" << path << "\'" << std::endl;
 		resp.httpStatus = NOT_FOUND;
 		}
 	} else if (s.st_mode & S_IFREG) {
 		std::ifstream	ifs(path.c_str());
 		if (ifs.good()) {
 			std::stringstream ss;
-			//std::cout << ifs.rdbuf();
 			ss << ifs.rdbuf();
 			resp.body.append(ss.str());
 			// read modification time
@@ -123,6 +126,7 @@ void	MethodExecutor::_executePost(Request &requ, Response &resp)
 	struct stat	s;
 	// check if file already exists
 	if (stat(path.c_str(), &s) == 0) {
+		std::cout << "File \'" << requ.RoutedPath << "\' already exists" << std::endl;
 		resp.httpStatus = FORBIDDEN;
 		return ;
 	}
@@ -131,6 +135,7 @@ void	MethodExecutor::_executePost(Request &requ, Response &resp)
 		ofs << requ.Body;
 		if(ofs.fail()) {
 			resp.httpStatus = INTERNAL_SERVER_ERROR;
+			std::cout << "Could not create file \'" << requ.RoutedPath << "\'" << std::endl;
 		} else {
 			resp.httpStatus = CREATED;
 			resp.headerFields["location"] = requ.RequestedPath;
@@ -154,10 +159,13 @@ void	MethodExecutor::_executeDelete(Request &requ, Response &resp)
 	struct stat	file_stat;
 	struct stat dir_stat;
 	if (dir_path != "" && stat(dir_path.c_str(), &dir_stat) == -1){
+		std::cout << "Could not find directory \'" << dir_path << "\'" << std::endl;
 		resp.httpStatus = NOT_FOUND;
 	} else if (!(dir_stat.st_mode & S_IRWXG)) {
+		std::cout << "No access for file \'" << requ.RoutedPath << "\'" << std::endl;
 		resp.httpStatus = UNAUTHORIZED;
 	} else if (stat(path.c_str(), &file_stat) == -1) {
+		std::cout << "Could not find file \'" << requ.RoutedPath << "\'" << std::endl;
 		resp.httpStatus = NOT_FOUND;
 	} else if (std::remove(path.c_str()) == 0) {
 		resp.httpStatus = NO_CONTENT;
