@@ -172,7 +172,7 @@ void	MethodExecutor::_executePost(Request &requ, Response &resp)
 	} else {
 		writeFile(requ.Body, requ.RoutedPath, resp.httpStatus);
 		if (resp.httpStatus == CREATED){
-			resp.headerFields["location"] = requ.RoutedPath;
+			resp.headerFields["location"] = requ.RequestedPath;
 		}
 		
 	}
