@@ -20,9 +20,10 @@ void	MethodExecutor::wrapperRequest(Request &requ, Response &resp)
 	//std::cout << "Used route: " + requ.UsedRoute.locationName << std::endl;
 	//std::cout << "Used redirect: " + requ.UsedRoute.root << std::endl;
 	//std::cout << "Used path: " + requ.RoutedPath << std::endl;
-	//std::cout << "**** HEADER OF REQUEST: ****\n" << requ.HeaderBuffer << std::endl << "**** END OF HEADER ****" << std::endl;
-	//std::cout << "**** BODY OF REQUEST: ****\n" << requ.Body << std::endl << "**** END OF BODY ****" << std::endl;
-	//std::cout << "REQUEST TYPE: " << requ.ReqType << std::endl;
+	std::cout << "**** HEADER OF REQUEST: ****\n" << requ.HeaderBuffer << std::endl << "**** END OF HEADER ****" << std::endl;
+	std::cout << "**** BODY OF REQUEST: ****\n" << requ.Body << std::endl << "**** END OF BODY ****" << std::endl;
+	std::cout << "REQUEST TYPE: " << requ.ReqType << std::endl;
+	std::cout << "STATUS: " << requ.RequestIntegrity << std::endl;
 	resp.body.clear();
 	resp.responseBuffer.clear();
 	resp.headerFields.clear();
@@ -34,10 +35,10 @@ void	MethodExecutor::wrapperRequest(Request &requ, Response &resp)
 			resp.isReady = true;
 			return ;
 		}
-	}
-	else if (resp.httpStatus == MOVED_PERMANENTLY) {
+	} else if (resp.httpStatus == MOVED_PERMANENTLY) {
 		resp.headerFields["location"] = requ.UsedRoute.redirect;
 	} else if (resp.httpStatus == OK_HTTP) {
+		std::cout << "HALLO" << std::endl;
 		switch (requ.ReqType){
 			case (GET):
 				_executeGet(requ, resp);
@@ -120,30 +121,57 @@ void	MethodExecutor::_executeGet(Request &requ, Response &resp)
 	}
 }
 
-void	MethodExecutor::_executePost(Request &requ, Response &resp)
-{
-	std::string	path = requ.RoutedPath;
+static void	writeFile(std::string& content, std::string path, statusCode &code){
 	struct stat	s;
 	// check if file already exists
 	if (stat(path.c_str(), &s) == 0) {
-		std::cout << "File \'" << requ.RoutedPath << "\' already exists" << std::endl;
-		resp.httpStatus = FORBIDDEN;
+		std::cout << "File \'" << path << "\' already exists" << std::endl;
+		code = FORBIDDEN;
 		return ;
 	}
 	std::ofstream	ofs(path.c_str(), std::ios::out);
 	if (ofs.good()) {
-		ofs << requ.Body;
+		ofs << content;
 		if(ofs.fail()) {
-			resp.httpStatus = INTERNAL_SERVER_ERROR;
-			std::cout << "Could not create file \'" << requ.RoutedPath << "\'" << std::endl;
+			code = INTERNAL_SERVER_ERROR;
+			std::cout << "Could not create file \'" << path << "\'" << std::endl;
 		} else {
-			resp.httpStatus = CREATED;
-			resp.headerFields["location"] = requ.RequestedPath;
+			code = CREATED;
 		}
 	} else {
-		resp.httpStatus = INTERNAL_SERVER_ERROR;
+		code = INTERNAL_SERVER_ERROR;
 	}
 	ofs.close();
+}
+
+void	MethodExecutor::_executePost(Request &requ, Response &resp)
+{
+	if (requ.HeaderFields["content-type"].find("multipart") == 0){
+		std::vector<Multipart>::iterator it;
+		for (it = requ.bodyParts.begin(); it != requ.bodyParts.end(); it++){
+			if (it->MultipartHeaderFields.find("content-disposition") != it->MultipartHeaderFields.end()){
+				std::string disposition = it->MultipartHeaderFields["content-disposition"];
+				size_t	filename_pos = disposition.find("filename");
+				if (filename_pos == std::string::npos){
+					std::cout << "No filename given for content:\'" << it->Body << "\'" << std::endl;
+					continue ;
+				}
+				std::string filename = requ.RoutedPath + "/" + \
+					disposition.substr(filename_pos + 10, disposition.find("\"", filename_pos + 10) - filename_pos + 10);
+				std::cout << filename << std::endl;
+				writeFile(it->Body, filename, resp.httpStatus);
+				resp.body.append("File \'" + filename + "\': " + getStatusCodeMessage(resp.httpStatus) + "\n");
+				if (resp.httpStatus == CREATED){
+					resp.headerFields["location"] = filename;
+				}
+			}
+		}
+	} else {
+		writeFile(requ.Body, requ.RoutedPath, resp.httpStatus);
+		if (resp.httpStatus == CREATED){
+			resp.headerFields["location"] = requ.RoutedPath;
+		}
+	}
 }
 
 void	MethodExecutor::_executeDelete(Request &requ, Response &resp)

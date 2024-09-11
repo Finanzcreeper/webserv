@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Upload Form</title>
+</head>
+<body>
+    <h1>Upload Files and Form Data</h1>
+
+    <!-- The form action is set to '/upload' -->
+    <form id="uploadForm" action="/upload" method="POST" enctype="multipart/form-data">
+        
+        <!-- Input field for text data -->
+        <label for="username">Username:</label>
+        <input type="text" name="username" id="username" required><br><br>
+
+        <!-- Input field for multiple file uploads -->
+        <label for="file_1">Upload File 1:</label>
+        <input type="file" name="file_1" id="file_1" multiple><br><br>
+
+        <!-- Submit button -->
+        <button type="submit">Upload</button>
+    </form>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', function(event) {
+            // Prevent the default form submission behavior
+            event.preventDefault();
+
+            // Create a FormData object to store the form data
+            const formData = new FormData(this);
+
+            // Send a multipart POST request to the server using fetch API
+            fetch(this.action, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json()) // Assuming the server returns JSON
+            .then(result => {
+                // Handle the response from the server
+                console.log('Success:', result);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>
