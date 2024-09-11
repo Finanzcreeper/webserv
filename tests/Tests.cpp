@@ -358,7 +358,21 @@ void Tests::testHttpInterpreter() {
 	} else if (this->silent == false) {
 		std::cout << "Mismatched Content and Subcontent type: \033[1;32mOK\033[0m" << std::endl;
 	}
-
+//==========================================================//
+//-------------------Preparing for Test 6-------------------//
+//==========================================================//
+	testRequest.HeaderFields.clear();
+	testRequest.HeaderFields.insert(std::make_pair("content-type", "multipart/form-data; boundary=----WebKitFormBoundarywpbnCmQSfN4bb10g"));
+	testRequest.RequestIntegrity = OK_HTTP;
+//----------------------------------------------------------//
+//======================Running Test 6======================//
+//----------------------------------------------------------//
+	checkContentType(testRequest);
+	if (testRequest.RequestIntegrity != OK_HTTP) {
+		std::cout << "additional info after subcontent: \033[1;31mFAILED\033[0m" << std::endl;
+	} else if (this->silent == false) {
+		std::cout << "additional info after subcontent: \033[1;32mOK\033[0m" << std::endl;
+	}
 	std::cout <<"[1;34m-------MultipartDelimiterValidation-----[0m" << std::endl;
 	std::string delimiter;
 	std::string result;

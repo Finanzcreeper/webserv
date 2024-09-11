@@ -227,8 +227,7 @@ void checkContentType(Request& request) {
 	std::string foundContentSubtype;
 
 	foundContentType = headerField->second.substr(0,headerField->second.find('/') + 1);
-	foundContentSubtype = headerField->second.substr(headerField->second.find('/') + 1,headerField->second.size());
-
+	foundContentSubtype = headerField->second.substr(headerField->second.find('/') + 1,std::min(headerField->second.size(),headerField->second.find(";") - headerField->second.find('/') -1 ));
 	allowedContentTypeIterator = allowedContentTypeMap.find(foundContentType);
 	if (allowedContentTypeIterator == allowedContentTypeMap.end()) {
 		request.RequestIntegrity = UNSUPPORTED_MEDIA_TYPE;
