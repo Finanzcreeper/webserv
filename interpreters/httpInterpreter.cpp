@@ -222,7 +222,6 @@ void checkContentType(Request& request) {
 	allowedContentTypeMap.insert((std::make_pair("application/",application)));
 	allowedContentTypeMap.insert(std::make_pair("text/", text));
 	allowedContentTypeMap.insert((std::make_pair("multipart/", multipart)));
-	allowedContentTypeMap.insert((std::make_pair("application/", application)));
 
 	std::string foundContentType;
 	std::string foundContentSubtype;
