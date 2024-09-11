@@ -39,8 +39,8 @@ bool hasBody(Request& request) {
 }
 
 void handleHeader(Request &request, size_t endOfBlock) {
-	request.HeaderBuffer = request.RequestBuffer.substr(0, endOfBlock + 4);
-	request.RequestBuffer.erase(0,endOfBlock + 4);
+	request.HeaderBuffer = request.RequestBuffer.substr(0, endOfBlock + 2);
+	request.RequestBuffer.erase(0,endOfBlock + 2);
 	GetRequestType(request);
 	GetRequestedPath(request);
 	decapitalizeHeaderFields(request.HeaderBuffer);
@@ -157,6 +157,8 @@ void handleBody(Request &request) {
 			request.RequestBuffer.erase(0, ChunkSize + 2);
 		}
 	} else if(ContentLenght != request.HeaderFields.end()) {
+		//std::cout << "|\033[1;31m" << request.RequestBuffer << "\033[0m|" << std::endl;
+		//std::cout << "body is: " << request.RequestBuffer.size() << " chars long." << std::endl;
 		std::istringstream iss(ContentLenght->second);
 		size_t contentLength;
 		iss >> contentLength;

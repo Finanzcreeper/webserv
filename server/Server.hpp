@@ -54,7 +54,7 @@ private:
 	pollfd client;
 	//socklen_t client_address_length;
 
-	char buffer[1000];
+	char buffer[1001];
 
 	time_t lastTimeoutCheck;
 
