@@ -21,6 +21,7 @@ void interpretRequest(Request& request, const t_server& settings) {
 	if (request.RequestIntegrity != OK_HTTP) {
 		return;
 	}
+	handleMultipart(request);
 }
 
 #include <iostream>
@@ -33,6 +34,8 @@ void handleMultipart (Request& request) {
 	std::map<std::string,std::string>::iterator it;
 	it = request.HeaderFields.find("content-type");
 	if (it == request.HeaderFields.end()) {
+		return;
+	} else if (it->second.find("multipart") != 0) {
 		return;
 	}
 
