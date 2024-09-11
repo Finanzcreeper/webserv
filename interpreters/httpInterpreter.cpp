@@ -59,6 +59,12 @@ void handleMultipart (Request& request) {
 
 	Multipart mp;
 	std::string endDelimiter = delimiter + "--";
+
+	if (request.Body.find(endDelimiter) == std::string::npos) {
+		request.RequestIntegrity = BAD_REQUEST;
+		return;
+	}
+
 	request.Body.erase(0, request.Body.find(delimiter) + delimiter.size());
 ///*			*/std::cout << "\033[1;34mINIT: \033[0m"  << request.Body << std::endl;
 ///*			*/std::cout << "\033[1;33m=====================================================\033[0m" << std::endl;
