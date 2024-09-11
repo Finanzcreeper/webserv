@@ -20,8 +20,8 @@ void	MethodExecutor::wrapperRequest(Request &requ, Response &resp)
 	//std::cout << "Used route: " + requ.UsedRoute.locationName << std::endl;
 	//std::cout << "Used redirect: " + requ.UsedRoute.root << std::endl;
 	//std::cout << "Used path: " + requ.RoutedPath << std::endl;
-	std::cout << "REQUEST TYPE: " << requ.ReqType << std::endl;
-	std::cout << "STATUS: " << requ.RequestIntegrity << std::endl;
+	//std::cout << "REQUEST TYPE: " << requ.ReqType << std::endl;
+	//std::cout << "STATUS: " << requ.RequestIntegrity << std::endl;
 	resp.body.clear();
 	resp.responseBuffer.clear();
 	resp.headerFields.clear();
@@ -67,7 +67,7 @@ void	MethodExecutor::wrapperRequest(Request &requ, Response &resp)
 		resp.responseBuffer.append(resp.body);
 	}
 	resp.isReady = true;
-	std::cout << resp.responseBuffer << std::endl;
+	//std::cout << resp.responseBuffer << std::endl;
 }
 
 void	MethodExecutor::_executeGet(Request &requ, Response &resp)
