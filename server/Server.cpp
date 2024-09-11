@@ -128,6 +128,7 @@ void Server::CheckForConnections() {
 						executor.wrapperRequest(mt->second.r, resps->second);
 						mt->second.r.HeaderBuffer.clear();
 						mt->second.r.RequestBuffer.clear();
+						mt->second.r.Body.clear();
 						if (mt->second.r.HeaderFields.find("connection") != mt->second.r.HeaderFields.end()) {
 							std::string connection = mt->second.r.HeaderFields.find("connection")->second;
 							if (connection == "close") {

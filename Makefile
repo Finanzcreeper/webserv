@@ -2,7 +2,8 @@ SRCS =	server/MethodExecutor.cpp server/statusCodes.cpp server/Server.cpp \
 		server/headerGeneration.cpp server/bodyGeneration.cpp \
 		parsers/ConfigParse.cpp parsers/ConfigLocationParse.cpp parsers/httpParser.cpp\
 		interpreters/httpInterpreter.cpp \
-		tests/Tests.cpp tests/TestsMethodExecutor.cpp
+		tests/Tests.cpp tests/TestsMethodExecutor.cpp \
+		cgi/CgiHandler.cpp
 
 MAIN = main.cpp
 TESTMAIN =	testmain.cpp

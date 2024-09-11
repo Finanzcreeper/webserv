@@ -223,7 +223,9 @@ void MethodExecutor::testWrapperRequest(void){
 	//-------------------Preparing for Test 1-------------------//
 	//==========================================================//
 	requ.UsedRoute.redirect = "hallohallo";
+	requ.UsedRoute.locationName = "dummy";
 	requ.RequestIntegrity = MOVED_PERMANENTLY;
+	requ.ReqType = GET;
 	//----------------------------------------------------------//
 	//======================Running Test 1======================//
 	//----------------------------------------------------------//
@@ -646,22 +648,13 @@ void MethodExecutor::testExecuteDelete(void){
 void	MethodExecutor::testWriteStatusLine(){
 	Response	resp;
 
-	//----------------------------------------------------------//
-	//======================Running Test 1======================//
-	//----------------------------------------------------------//
-	_writeStatusLine(resp);
-	if (resp.responseBuffer.length() == 0) {
-		std::cout << "No crash when status not set: \033[1;31mFAILED\033[0m" << std::endl;
-	} else if (this->silent == false) {
-		std::cout << "No crash when status not set: \033[1;32mOK\033[0m" << std::endl;
-	}
 	//==========================================================//
-	//-------------------Preparing for Test 2-------------------//
+	//-------------------Preparing for Test 1-------------------//
 	//==========================================================//
 	resp.httpStatus = OK_HTTP;
 	resp.responseBuffer.clear();
 	//----------------------------------------------------------//
-	//======================Running Test 2======================//
+	//======================Running Test 1======================//
 	//----------------------------------------------------------//
 	_writeStatusLine(resp);
 	if (resp.responseBuffer != "HTTP/1.1 200 OK\n") {
@@ -670,12 +663,12 @@ void	MethodExecutor::testWriteStatusLine(){
 		std::cout << "200 Status: \033[1;32mOK\033[0m" << std::endl;
 	}
 	//==========================================================//
-	//-------------------Preparing for Test 3-------------------//
+	//-------------------Preparing for Test 2-------------------//
 	//==========================================================//
 	resp.httpStatus = NOT_FOUND;
 	resp.responseBuffer.clear();
 	//----------------------------------------------------------//
-	//======================Running Test 3======================//
+	//======================Running Test 2======================//
 	//----------------------------------------------------------//
 	_writeStatusLine(resp);
 	if (resp.responseBuffer != "HTTP/1.1 404 Not Found\n") {

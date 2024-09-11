@@ -42,6 +42,7 @@ private:
 	void testHeaderGeneration();
 	void testServer();
 	void testStatusCodes();
+	void testCgiHandler();
 public:
 	void testing();
 	Tests(int argument);
