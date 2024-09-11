@@ -144,10 +144,11 @@ static void	writeFile(std::string& content, std::string path, statusCode &code){
 
 void	MethodExecutor::_executePost(Request &requ, Response &resp)
 {
+	statusCode code;
+
 	if (requ.HeaderFields["content-type"].find("multipart") == 0){
 		std::vector<Multipart>::iterator it;
 		for (it = requ.bodyParts.begin(); it != requ.bodyParts.end(); it++){
-			std::cout << "BODY PART:" << it->MultipartHeaderFields.begin()->second << std::endl;
 			if (it->MultipartHeaderFields.find("Content-Disposition") != it->MultipartHeaderFields.end()){
 				std::string disposition = it->MultipartHeaderFields["Content-Disposition"];
 				size_t	filename_pos = disposition.find("filename");
@@ -155,12 +156,16 @@ void	MethodExecutor::_executePost(Request &requ, Response &resp)
 					std::cout << "No filename given for content: \n\"\"\"\n" << it->Body << "\n\"\"\"" << std::endl;
 					continue ;
 				}
-				std::string filename = requ.RoutedPath + "/" + \
-					disposition.substr(filename_pos + 10, disposition.find("\"", filename_pos + 10) - (filename_pos + 10));
-				writeFile(it->Body, filename, resp.httpStatus);
-				resp.body.append("File \'" + filename + "\': " + getStatusCodeMessage(resp.httpStatus) + "\n");
-				if (resp.httpStatus == CREATED){
+				std::string filename = disposition.substr(filename_pos + 10, disposition.find("\"", filename_pos + 10) - (filename_pos + 10));
+				writeFile(it->Body, requ.RoutedPath + "/" + filename, code);
+				resp.body.append("File \'" + requ.RequestedPath + "/" + filename + "\': " + getStatusCodeMessage(code) + "\n");
+				if (resp.httpStatus == OK_HTTP && code == CREATED){
 					resp.headerFields["location"] = filename;
+					resp.httpStatus = CREATED;
+				} else if (code == CREATED || resp.httpStatus != ACCEPTED){
+					resp.httpStatus = ACCEPTED;
+				} else {
+					resp.httpStatus = code;
 				}
 			}
 		}
@@ -169,6 +174,7 @@ void	MethodExecutor::_executePost(Request &requ, Response &resp)
 		if (resp.httpStatus == CREATED){
 			resp.headerFields["location"] = requ.RoutedPath;
 		}
+		
 	}
 }
 
