@@ -16,4 +16,10 @@ void redirectionChecker(Request& request);
 
 void checkContentType(Request& request);
 
+void handleMultipart (Request& request);
+
+std::string MultipartDelimiterValidation(Request& request);
+
+bool IsAllowedDelimChar(std::string delim);
+
 #endif //WEBSERV_HTTPINTERPRETER_HPP
