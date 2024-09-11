@@ -51,8 +51,12 @@ std::map<std::string,std::string>	prepareEnvVariables(Request& requ, const t_ser
 	return env;
 }
 
-void	cleanupCGI(char **env){
+void	cleanupCGI(char **env, FILE* tmpf_in, FILE* tmpf_out, int fd_in, int fd_out){
 	size_t len = 0;
+	close(fd_in);
+	close(fd_out);
+	fclose(tmpf_in);
+	fclose(tmpf_out);
 	while (env[len]){
 		free(env[len++]);
 	}
@@ -69,7 +73,15 @@ char **convertStringMapToArray(std::map<std::string,std::string> env){
 		array = new char*[len + 1];
 		while (iter != env.end()){
 			variable = iter->first + "=" + iter->second;
-			array[i++] = strdup(variable.c_str());
+			array[i] = strdup(variable.c_str());
+			if (!array[i]){
+				while (i >= 0){
+					free(array[i--]);
+				}
+				delete [] array;
+				return (NULL);
+			}
+			i++;
 			iter++;
 		}
 		array[i] = NULL;
@@ -108,12 +120,14 @@ void	executeCGI(Request& requ, Response& resp, const t_server* settings) {
 
 	if (write(fd_in, env["QUERY_STRING"].c_str(), env["QUERY_STRING"].length()) == -1) {
 		resp.httpStatus = INTERNAL_SERVER_ERROR;
+		cleanupCGI(env_c, tmpf_in, tmpf_out, fd_in, fd_out);
 		return;
 	}
 	lseek(fd_in, 0, SEEK_SET);
 	pid = fork();
 	if (pid == -1){
 		resp.httpStatus = INTERNAL_SERVER_ERROR;
+		cleanupCGI(env_c, tmpf_in, tmpf_out, fd_in, fd_out);
 		return ;
 	} else if (pid == 0) {
 		dup2(fd_in, STDIN_FILENO);
@@ -122,7 +136,7 @@ void	executeCGI(Request& requ, Response& resp, const t_server* settings) {
 		close(fd_out);
 		char *argv[] = { (char *)"/usr/bin/python3", (char *)env["SCRIPT_NAME"].c_str(), NULL};
 		execve("/usr/bin/python3", argv, env_c);
-		cleanupCGI(env_c);
+		cleanupCGI(env_c, tmpf_in, tmpf_out, fd_in, fd_out);
 		exit(EXIT_FAILURE);
 	} else {
 		g_child_pid = pid;
@@ -138,8 +152,8 @@ void	executeCGI(Request& requ, Response& resp, const t_server* settings) {
 			lseek(fd_out, 0, SEEK_SET);
 			char buffer[4096];
             size_t bytesRead;
-            while ((bytesRead = fread(buffer, 1, sizeof(buffer), tmpf_out)) > 0) {
-                resp.responseBuffer.append(buffer, bytesRead);
+			while ((bytesRead = fread(buffer, 1, sizeof(buffer), tmpf_out)) > 0){
+				resp.responseBuffer.append(buffer, bytesRead);
             }
 		} else {
 			resp.httpStatus = INTERNAL_SERVER_ERROR;
@@ -149,9 +163,5 @@ void	executeCGI(Request& requ, Response& resp, const t_server* settings) {
 	g_timeout_occured = false;
 	dup2(stdIn, STDIN_FILENO);
 	dup2(stdOut, STDOUT_FILENO);
-	close(fd_in);
-	close(fd_out);
-	fclose(tmpf_in);
-	fclose(tmpf_out);
-	cleanupCGI(env_c);
+	cleanupCGI(env_c, tmpf_in, tmpf_out, fd_in, fd_out);
 }
