@@ -49,6 +49,11 @@ enum sockoption{
 	ON,
 };
 
+struct Multipart {
+	std::map<std::string,std::string> MultipartHeaderFields;
+	std::string Body;
+};
+
 struct Request {
 	std::string RequestBuffer;
 	std::string HeaderBuffer;
@@ -60,6 +65,7 @@ struct Request {
 	std::string BodyBuffer;
 	location	UsedRoute;
 	std::string Body;
+	std::vector<Multipart> bodyParts;
 	bool requestCompletlyRecieved;
 	bool isCgi;
 };

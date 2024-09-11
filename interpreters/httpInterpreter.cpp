@@ -21,10 +21,130 @@ void interpretRequest(Request& request, const t_server& settings) {
 	if (request.RequestIntegrity != OK_HTTP) {
 		return;
 	}
+	handleMultipart(request);
 }
 
 #include <iostream>
 #include <algorithm>
+#include <stdlib.h>
+void handleMultipart (Request& request) {
+	std::string delimiter;
+	std::string BodyBuffer;
+
+	std::map<std::string,std::string>::iterator it;
+	it = request.HeaderFields.find("content-type");
+	if (it == request.HeaderFields.end()) {
+		return;
+	} else if (it->second.find("multipart") != 0) {
+		return;
+	}
+
+	delimiter = MultipartDelimiterValidation(request);
+	if (request.RequestIntegrity != OK_HTTP) {
+		return;
+	}
+
+	std::map<std::string,std::string>::iterator lt = request.HeaderFields.find("content-length");
+	if (lt == request.HeaderFields.end()) {
+		request.RequestIntegrity = LENGTH_REQUIRED;
+		return;
+	}
+
+	unsigned long length = std::atoi(lt->second.c_str());
+	if (length != request.Body.size()) {
+///*			*/std::cout << request.Body.size() << std::endl;
+		request.RequestIntegrity = BAD_REQUEST;
+		return;
+	}
+
+	Multipart mp;
+	std::string endDelimiter = delimiter + "--";
+
+	if (request.Body.find(endDelimiter) == std::string::npos) {
+		request.RequestIntegrity = BAD_REQUEST;
+		return;
+	}
+
+	request.Body.erase(0, request.Body.find(delimiter) + delimiter.size());
+///*			*/std::cout << "\033[1;34mINIT: \033[0m"  << request.Body << std::endl;
+///*			*/std::cout << "\033[1;33m=====================================================\033[0m" << std::endl;
+	while (request.Body.find(endDelimiter) != 0) {
+		if (request.Body.find(delimiter) == 0) {
+			request.Body.erase(0, request.Body.find(delimiter) + delimiter.size());
+///*			*/std::cout << "\033[1;34mDELIM REMOVED: \033[0m" << request.Body << std::endl;
+		}
+		if (request.Body.find("\r\n\r\n") == 0) {
+			//found multipart body (because double crlf)
+			mp.Body = request.Body.substr(4,request.Body.find(delimiter) - 4);
+///*			*/std::cout << request.Body.find(delimiter) << std::endl;
+			request.bodyParts.push_back(mp);
+			mp.MultipartHeaderFields.clear();
+			request.Body.erase(0, request.Body.find(delimiter));
+///*			*/std::cout << "\033[1;34mBODY REMOVED: \033[0m" << request.Body << std::endl;
+		} else if (request.Body.find("\r\n") == 0) {
+			//found multipart header (because single crlf)
+			request.Body.erase(0,2);
+			std::string Head = request.Body.substr(0,request.Body.find(":"));
+			std::string Data = request.Body.substr(request.Body.find(":") + 2,(request.Body.find("\r\n") - (request.Body.find(":") + 2)));
+			mp.MultipartHeaderFields.insert(std::make_pair(Head ,Data));
+			request.Body.erase(0,request.Body.find("\r\n"));
+///*			*/std::cout << "\033[1;34mREMOVED HEADER LINE: \033[0m" << request.Body << std::endl;
+		} else {
+			request.RequestIntegrity = BAD_REQUEST;
+			break;
+		}
+///*			*/std::cout << "\033[1;33m=====================================================\033[0m" << std::endl;
+	}
+	request.Body.clear();
+}
+
+std::string MultipartDelimiterValidation(Request& request) {
+	std::string delimiter;
+
+	std::map<std::string,std::string>::iterator it;
+	it = request.HeaderFields.find("content-type");
+	delimiter = it->second.substr(it->second.find("=") + 1, it->second.size());
+	if (delimiter.find("\"") == 0 && delimiter.find_last_of("\"") == delimiter.size() - 1) {
+		delimiter = delimiter.substr(1,delimiter.size() - 2);
+	}
+	if (delimiter.size() <= 0 || delimiter.size() > 70) {
+		request.RequestIntegrity = BAD_REQUEST;
+		delimiter.clear();
+		return (delimiter);
+	}
+	if (IsAllowedDelimChar(delimiter) == false) {
+		request.RequestIntegrity = BAD_REQUEST;
+		delimiter.clear();
+		return (delimiter);
+	}
+	delimiter.insert(0,"\r\n--");
+	return (delimiter);
+}
+
+bool IsAllowedDelimChar(std::string delim) {
+	std::string::iterator it;
+	it = delim.begin();
+	while (it != delim.end()) {
+		if (*it >= '\'' && *it <= ')') {
+			++it;
+		} else if (*it >= '+' && *it <= ':') {
+			++it;
+		} else if (*it == '=') {
+			++it;
+		} else if (*it == '?') {
+			++it;
+		} else if (*it >= 'A' && *it <= 'Z') {
+			++it;
+		} else if (*it == '_') {
+			++it;
+		} else if (*it >= 'a' && *it <= 'z') {
+			++it;
+		} else {
+			return (false);
+		}
+	}
+	return (true);
+}
 
 void findRoute(Request& request,  const t_server& settings) {
 	std::map<std::string, location>::const_iterator RouteIterator;
@@ -87,15 +207,19 @@ void checkContentType(Request& request) {
 
 	std::map<std::string,std::vector<std::string> > allowedContentTypeMap;
 	std::map<std::string,std::vector<std::string> >::iterator allowedContentTypeIterator;
-	std::vector<std::string> text;
-	std::vector<std::string> multipart;
-	std::vector<std::string> application;
-	std::vector<std::string>::iterator ContentSubtypeIterator;
 
+	std::vector<std::string> text;
 	text.push_back("plain");
+
+	std::vector<std::string> multipart;
 	multipart.push_back("form-data");
+
+	std::vector<std::string> application;
 	application.push_back("x-www-form-urlencoded");
 
+	std::vector<std::string>::iterator ContentSubtypeIterator;
+
+	allowedContentTypeMap.insert((std::make_pair("application/",application)));
 	allowedContentTypeMap.insert(std::make_pair("text/", text));
 	allowedContentTypeMap.insert((std::make_pair("multipart/", multipart)));
 	allowedContentTypeMap.insert((std::make_pair("application/", application)));
