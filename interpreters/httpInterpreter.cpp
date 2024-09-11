@@ -31,6 +31,7 @@ void handleMultipart (Request& request) {
 	std::string delimiter;
 	std::string BodyBuffer;
 
+	request.bodyParts.clear();
 	std::map<std::string,std::string>::iterator it;
 	it = request.HeaderFields.find("content-type");
 	if (it == request.HeaderFields.end()) {

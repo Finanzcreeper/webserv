@@ -124,6 +124,8 @@ void Server::CheckForConnections() {
 					httpParser(mt);
 					//std::cout << "after parser: " << mt->second.r.RequestIntegrity << std::endl;
 					if (mt->second.r.requestCompletlyRecieved == true){
+						std::cout << "**** HEADER OF REQUEST: ****\n" << mt->second.r.HeaderBuffer << std::endl << "**** END OF HEADER ****" << std::endl;
+						std::cout << "**** BODY OF REQUEST: ****\n" << mt->second.r.Body << std::endl << "**** END OF BODY ****" << std::endl;
 						interpretRequest(mt->second.r, settings);
 						executor.wrapperRequest(mt->second.r, resps->second);
 						mt->second.r.HeaderBuffer.clear();

@@ -20,8 +20,6 @@ void	MethodExecutor::wrapperRequest(Request &requ, Response &resp)
 	//std::cout << "Used route: " + requ.UsedRoute.locationName << std::endl;
 	//std::cout << "Used redirect: " + requ.UsedRoute.root << std::endl;
 	//std::cout << "Used path: " + requ.RoutedPath << std::endl;
-	std::cout << "**** HEADER OF REQUEST: ****\n" << requ.HeaderBuffer << std::endl << "**** END OF HEADER ****" << std::endl;
-	std::cout << "**** BODY OF REQUEST: ****\n" << requ.Body << std::endl << "**** END OF BODY ****" << std::endl;
 	std::cout << "REQUEST TYPE: " << requ.ReqType << std::endl;
 	std::cout << "STATUS: " << requ.RequestIntegrity << std::endl;
 	resp.body.clear();
@@ -38,7 +36,6 @@ void	MethodExecutor::wrapperRequest(Request &requ, Response &resp)
 	} else if (resp.httpStatus == MOVED_PERMANENTLY) {
 		resp.headerFields["location"] = requ.UsedRoute.redirect;
 	} else if (resp.httpStatus == OK_HTTP) {
-		std::cout << "HALLO" << std::endl;
 		switch (requ.ReqType){
 			case (GET):
 				_executeGet(requ, resp);
@@ -70,6 +67,7 @@ void	MethodExecutor::wrapperRequest(Request &requ, Response &resp)
 		resp.responseBuffer.append(resp.body);
 	}
 	resp.isReady = true;
+	std::cout << resp.responseBuffer << std::endl;
 }
 
 void	MethodExecutor::_executeGet(Request &requ, Response &resp)
@@ -149,16 +147,16 @@ void	MethodExecutor::_executePost(Request &requ, Response &resp)
 	if (requ.HeaderFields["content-type"].find("multipart") == 0){
 		std::vector<Multipart>::iterator it;
 		for (it = requ.bodyParts.begin(); it != requ.bodyParts.end(); it++){
-			if (it->MultipartHeaderFields.find("content-disposition") != it->MultipartHeaderFields.end()){
-				std::string disposition = it->MultipartHeaderFields["content-disposition"];
+			std::cout << "BODY PART:" << it->MultipartHeaderFields.begin()->second << std::endl;
+			if (it->MultipartHeaderFields.find("Content-Disposition") != it->MultipartHeaderFields.end()){
+				std::string disposition = it->MultipartHeaderFields["Content-Disposition"];
 				size_t	filename_pos = disposition.find("filename");
 				if (filename_pos == std::string::npos){
-					std::cout << "No filename given for content:\'" << it->Body << "\'" << std::endl;
+					std::cout << "No filename given for content: \n\"\"\"\n" << it->Body << "\n\"\"\"" << std::endl;
 					continue ;
 				}
 				std::string filename = requ.RoutedPath + "/" + \
-					disposition.substr(filename_pos + 10, disposition.find("\"", filename_pos + 10) - filename_pos + 10);
-				std::cout << filename << std::endl;
+					disposition.substr(filename_pos + 10, disposition.find("\"", filename_pos + 10) - (filename_pos + 10));
 				writeFile(it->Body, filename, resp.httpStatus);
 				resp.body.append("File \'" + filename + "\': " + getStatusCodeMessage(resp.httpStatus) + "\n");
 				if (resp.httpStatus == CREATED){
