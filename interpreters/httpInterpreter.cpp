@@ -95,6 +95,8 @@ void handleMultipart (Request& request) {
 ///*			*/std::cout << "\033[1;33m=====================================================\033[0m" << std::endl;
 	}
 	request.Body.clear();
+
+	std::cout << "\033[1;33mmultpart body amount: \033[0m" << request.bodyParts.size() << std::endl;
 }
 
 std::string MultipartDelimiterValidation(Request& request) {

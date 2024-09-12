@@ -30,6 +30,8 @@
 class Server {
 private:
 
+	int connAMT;
+
 	std::vector<pollfd>::iterator it;
 	std::map<int, connection>::iterator mt;
 	std::map<int, Response>::iterator resps;

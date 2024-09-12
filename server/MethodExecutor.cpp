@@ -67,7 +67,8 @@ void	MethodExecutor::wrapperRequest(Request &requ, Response &resp)
 		resp.responseBuffer.append(resp.body);
 	}
 	resp.isReady = true;
-	//std::cout << resp.responseBuffer << std::endl;
+	std::cout << resp.isReady << std::endl;
+	std::cout << resp.responseBuffer << std::endl;
 }
 
 void	MethodExecutor::_executeGet(Request &requ, Response &resp)

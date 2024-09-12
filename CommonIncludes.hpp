@@ -67,7 +67,6 @@ struct Request {
 	std::string Body;
 	std::vector<Multipart> bodyParts;
 	bool requestCompletlyRecieved;
-	bool isCgi;
 };
 
 struct Response {
@@ -76,6 +75,7 @@ struct Response {
 	statusCode							httpStatus;
 	std::string 						body;
 	bool								isReady;
+	bool								isDone;
 };
 
 struct timeoutHandler {
