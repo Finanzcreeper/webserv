@@ -39,8 +39,8 @@ bool hasBody(Request& request) {
 }
 
 void handleHeader(Request &request, size_t endOfBlock) {
-	request.HeaderBuffer = request.RequestBuffer.substr(0, endOfBlock + 2);
-	request.RequestBuffer.erase(0,endOfBlock + 2);
+	request.HeaderBuffer = request.RequestBuffer.substr(0, endOfBlock + 4);
+	request.RequestBuffer.erase(0,endOfBlock + 4);
 	GetRequestType(request);
 	GetRequestedPath(request);
 	decapitalizeHeaderFields(request.HeaderBuffer);
@@ -117,6 +117,7 @@ void checkMultipartDelimiter(Request& request) {
 }
 
 void extractHeaderFields(Request& request) {
+	request.HeaderFields.clear();
 	std::vector<std::string> SearchedHeaderFields;
 	//Add HeaderBuffer fields to extract here
 	SearchedHeaderFields.push_back("connection");
