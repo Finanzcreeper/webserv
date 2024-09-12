@@ -85,7 +85,6 @@ void Server::setUpServer() {
 	listening_socket.events = POLLIN;
 	Fds.push_back(listening_socket);
 
-	std::cout << "listening on socket: " << Fds[0].fd << std::endl;
 	connectionAmount = 0;
 }
 
@@ -95,18 +94,16 @@ void Server::CheckForConnections() {
 	 //accepting new connection if there is one
 	if ((Fds[0].revents & POLLIN)!= 0) {
 		client.fd = accept(listening_socket.fd, NULL, NULL);
-		if (client.fd == -1) {
-			//throw accept connection exception
-			std::cerr << "a connection failed: " << std::strerror(errno) << std::endl;
+		if (client.fd != -1) {
+			client.events = (POLLIN | POLLOUT);
+			client.revents = 0;
+			connectionMsgs.insert(std::make_pair(client.fd, request));
+			answerMsgs.insert(std::make_pair(client.fd,response));
+			Fds.push_back(client);
+			connectionMsgs.find(client.fd)->second.t.msgAmt = 0;
+			connectionMsgs.find(client.fd)->second.t.lastMsg = time(NULL);
+			--connectionAmount;
 		}
-		client.events = (POLLIN | POLLOUT);
-		client.revents = 0;
-		connectionMsgs.insert(std::make_pair(client.fd, request));
-		answerMsgs.insert(std::make_pair(client.fd,response));
-		Fds.push_back(client);
-		connectionMsgs.find(client.fd)->second.t.msgAmt = 0;
-		connectionMsgs.find(client.fd)->second.t.lastMsg = time(NULL);
-		--connectionAmount;
 	}
 	//reading from connection (reading into buffers, or closing connections
 	if (connectionAmount > 0) {
@@ -117,10 +114,8 @@ void Server::CheckForConnections() {
 			mt = connectionMsgs.find(it->fd);
 			resps = answerMsgs.find(it->fd);
 			if ((it->revents & POLLERR) != 0) {
-				std::cout << "Socket error Occurred" << std::endl;
 				cleanConnection();
 			} else if ((it->revents & POLLHUP) != 0) {
-				std::cout << "Socket hung up" << std::endl;
 				cleanConnection();
 			} else if ((it->revents & POLLIN) != 0) {
 				bzero(buffer, sizeof(buffer));
@@ -134,8 +129,6 @@ void Server::CheckForConnections() {
 					}
 					httpParser(mt);
 					if (mt->second.r.requestCompletlyRecieved == true){
-						//std::cout << "**** HEADER OF REQUEST: ****\n" << mt->second.r.HeaderBuffer << std::endl << "**** END OF HEADER ****" << std::endl;
-						//std::cout << "**** BODY OF REQUEST: ****\n" << mt->second.r.Body << std::endl << "**** END OF BODY ****" << std::endl;
 						interpretRequest(mt->second.r, settings);
 						executor.wrapperRequest(mt->second.r, resps->second);
 						mt->second.r.HeaderBuffer.clear();
@@ -143,10 +136,8 @@ void Server::CheckForConnections() {
 						mt->second.r.Body.clear();
 					}
 				} else if (this->recievedBytes == 0) {
-					std::cout << "client sent closed connection" << std::endl;
 					cleanConnection();
 				} else if (this->recievedBytes == -1) {
-					std::cout << "Socket error" << std::endl;
 					cleanConnection();
 				}
 			} else if ((it->revents & POLLOUT) != 0 &&  resps->second.isReady == true) {
@@ -157,7 +148,6 @@ void Server::CheckForConnections() {
 					if (mt->second.r.HeaderFields.find("connection") != mt->second.r.HeaderFields.end()) {
 						std::string connection = mt->second.r.HeaderFields.find("connection")->second;
 						if (connection == "close") {
-							std::cout << "client requested closing of connection" << std::endl;
 							cleanConnection();
 						}
 					}
@@ -170,7 +160,6 @@ checkConnectionsForTimeout();
 }
 
 void Server::cleanConnection() {
-	std::cout << "\033[1;31mConnection NR: " << connAMT++ << " disconnected\033[0m" << std::endl;
 	close(mt->first);
 	Fds.erase(it);
 	connectionMsgs.erase(mt);
@@ -182,7 +171,6 @@ void Server::responder() {
 	int sentAmt = 0;
 
 	sentAmt = send(resps->first,resps->second.responseBuffer.c_str(),resps->second.responseBuffer.size(),MSG_DONTWAIT);
-	std::cout << "sent " << sentAmt << " chars to connection nr: " << connAMT << std::endl;
 	if (sentAmt == 0) {
 		return;
 	}
@@ -191,7 +179,6 @@ void Server::responder() {
 		return;
 	}
 	if (mt->second.r.RequestIntegrity == REQUEST_TIMEOUT) {
-		std::cout << "Client Timed out" << std::endl;
 		cleanConnection();
 		return;
 	}

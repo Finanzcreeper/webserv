@@ -17,11 +17,6 @@ MethodExecutor::MethodExecutor(const t_server *serverSettings): _serverSettings(
 
 void	MethodExecutor::wrapperRequest(Request &requ, Response &resp)
 {
-	//std::cout << "Used route: " + requ.UsedRoute.locationName << std::endl;
-	//std::cout << "Used redirect: " + requ.UsedRoute.root << std::endl;
-	//std::cout << "Used path: " + requ.RoutedPath << std::endl;
-	//std::cout << "REQUEST TYPE: " << requ.ReqType << std::endl;
-	//std::cout << "STATUS: " << requ.RequestIntegrity << std::endl;
 	resp.body.clear();
 	resp.responseBuffer.clear();
 	resp.headerFields.clear();

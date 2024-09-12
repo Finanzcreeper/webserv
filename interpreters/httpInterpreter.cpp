@@ -52,7 +52,6 @@ void handleMultipart (Request& request) {
 	}
 	unsigned long length = std::atoi(lt->second.c_str());
 	if (length != request.Body.size()) {
-///*			*/std::cout << request.Body.size() << std::endl;
 		request.RequestIntegrity = BAD_REQUEST;
 		return;
 	}
@@ -65,21 +64,16 @@ void handleMultipart (Request& request) {
 		return;
 	}
 	request.Body.erase(0, request.Body.find(delimiter) + delimiter.size());
-///*			*/std::cout << "\033[1;34mINIT: \033[0m"  << request.Body << std::endl;
-///*			*/std::cout << "\033[1;33m=====================================================\033[0m" << std::endl;
 	while (request.Body.find(endDelimiter) != 0) {
 		if (request.Body.find(delimiter) == 0) {
 			request.Body.erase(0, request.Body.find(delimiter) + delimiter.size());
-///*			*/std::cout << "\033[1;34mDELIM REMOVED: \033[0m" << request.Body << std::endl;
 		}
 		if (request.Body.find("\r\n\r\n") == 0) {
 			//found multipart body (because double crlf)
 			mp.Body = request.Body.substr(4,request.Body.find(delimiter) - 4);
-///*			*/std::cout << request.Body.find(delimiter) << std::endl;
 			request.bodyParts.push_back(mp);
 			mp.MultipartHeaderFields.clear();
 			request.Body.erase(0, request.Body.find(delimiter));
-///*			*/std::cout << "\033[1;34mBODY REMOVED: \033[0m" << request.Body << std::endl;
 		} else if (request.Body.find("\r\n") == 0) {
 			//found multipart header (because single crlf)
 			request.Body.erase(0,2);
@@ -87,16 +81,12 @@ void handleMultipart (Request& request) {
 			std::string Data = request.Body.substr(request.Body.find(":") + 2,(request.Body.find("\r\n") - (request.Body.find(":") + 2)));
 			mp.MultipartHeaderFields.insert(std::make_pair(Head ,Data));
 			request.Body.erase(0,request.Body.find("\r\n"));
-///*			*/std::cout << "\033[1;34mREMOVED HEADER LINE: \033[0m" << request.Body << std::endl;
 		} else {
 			request.RequestIntegrity = BAD_REQUEST;
 			break;
 		}
-///*			*/std::cout << "\033[1;33m=====================================================\033[0m" << std::endl;
 	}
 	request.Body.clear();
-
-	std::cout << "\033[1;33mmultpart body amount: \033[0m" << request.bodyParts.size() << std::endl;
 }
 
 std::string MultipartDelimiterValidation(Request& request) {

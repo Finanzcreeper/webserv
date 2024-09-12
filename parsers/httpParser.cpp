@@ -157,8 +157,6 @@ void handleBody(Request &request) {
 			request.RequestBuffer.erase(0, ChunkSize + 2);
 		}
 	} else if(ContentLenght != request.HeaderFields.end()) {
-		//std::cout << "|\033[1;31m" << request.RequestBuffer << "\033[0m|" << std::endl;
-		//std::cout << "body is: " << request.RequestBuffer.size() << " chars long." << std::endl;
 		std::istringstream iss(ContentLenght->second);
 		size_t contentLength;
 		iss >> contentLength;

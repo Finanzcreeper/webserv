@@ -33,9 +33,10 @@ int main(int argn, char *argv[]) {
 	for (size_t i = 0; i < Config.size(); ++i) {
 		try {
 			Servers.push_back(new Server(Config[i]));
+			std::cout << "\033[1;32mServer: " << Config[i].host << ":" << Config[i].port << " created!\033[0m" << std::endl;
 			std::cout << "-------------------------------------------------------------------------" << std::endl;
 		} catch (std::runtime_error &e) {
-			std::cout << "Server: " << Config[i].host << ":" << Config[i].port << " not created!" << std::endl;
+			std::cout << "\033[1;31mServer: " << Config[i].host << ":" << Config[i].port << " not created!\033[0m" << std::endl;
 			std::cout << "-------------------------------------------------------------------------" << std::endl;
 		}
 	}
