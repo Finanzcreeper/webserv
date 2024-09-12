@@ -1,4 +1,7 @@
 #include "httpInterpreter.hpp"
+#include <iostream>
+#include <algorithm>
+#include <stdlib.h>
 
 void interpretRequest(Request& request, const t_server& settings) {
 	findRoute(request,settings);
@@ -24,13 +27,11 @@ void interpretRequest(Request& request, const t_server& settings) {
 	handleMultipart(request);
 }
 
-#include <iostream>
-#include <algorithm>
-#include <stdlib.h>
 void handleMultipart (Request& request) {
 	std::string delimiter;
 	std::string BodyBuffer;
 
+	request.bodyParts.clear();
 	std::map<std::string,std::string>::iterator it;
 	it = request.HeaderFields.find("content-type");
 	if (it == request.HeaderFields.end()) {
@@ -49,7 +50,6 @@ void handleMultipart (Request& request) {
 		request.RequestIntegrity = LENGTH_REQUIRED;
 		return;
 	}
-
 	unsigned long length = std::atoi(lt->second.c_str());
 	if (length != request.Body.size()) {
 ///*			*/std::cout << request.Body.size() << std::endl;
@@ -64,7 +64,6 @@ void handleMultipart (Request& request) {
 		request.RequestIntegrity = BAD_REQUEST;
 		return;
 	}
-
 	request.Body.erase(0, request.Body.find(delimiter) + delimiter.size());
 ///*			*/std::cout << "\033[1;34mINIT: \033[0m"  << request.Body << std::endl;
 ///*			*/std::cout << "\033[1;33m=====================================================\033[0m" << std::endl;
@@ -96,6 +95,8 @@ void handleMultipart (Request& request) {
 ///*			*/std::cout << "\033[1;33m=====================================================\033[0m" << std::endl;
 	}
 	request.Body.clear();
+
+	std::cout << "\033[1;33mmultpart body amount: \033[0m" << request.bodyParts.size() << std::endl;
 }
 
 std::string MultipartDelimiterValidation(Request& request) {
