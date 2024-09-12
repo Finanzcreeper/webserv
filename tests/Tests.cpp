@@ -5,7 +5,6 @@ void Tests::testHttpInterpreter() {
 	std::cout <<"[1;34m--------------findRoute----------------[0m" << std::endl;
 
 	location empty;
-	empty.cgi.clear();
 	empty.dirListing = "";
 	empty.httpMethods = 0;
 	empty.index = "";

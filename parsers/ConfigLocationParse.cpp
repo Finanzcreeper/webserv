@@ -10,6 +10,8 @@ int parseMethod(const std::vector<std::pair<std::string, int> >& chunck) {
 	size_t i = 0;
 	while (i < chunck.size() && nth_word(chunck[i].first, 1) != "method")
 		++i;
+	if (i == chunck.size())
+		return INVALID;
 	str = chunck[i].first;
 	std::istringstream stream(str);
 	stream >> method;
@@ -67,7 +69,7 @@ std::map<std::string, location> parseLocations(std::vector<std::pair<std::string
 		loc.dirListing = !strcmp("ON", parseString(locationChuncks[i], "dirlisting").c_str());
 		loc.index = parseString(locationChuncks[i], "index");
 		loc.redirect = parseString(locationChuncks[i], "redirect");
-		loc.cgi = parseCgi(locationChuncks[i]);
+		//loc.cgi = parseCgi(locationChuncks[i]);
 		loc.root = parseString(locationChuncks[i], "path") + "/";
 		locations.insert(std::pair<std::string, location>(tmp, loc));
 	}
