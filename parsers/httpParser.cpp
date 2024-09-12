@@ -39,8 +39,8 @@ bool hasBody(Request& request) {
 }
 
 void handleHeader(Request &request, size_t endOfBlock) {
-	request.HeaderBuffer = request.RequestBuffer.substr(0, endOfBlock + 2);
-	request.RequestBuffer.erase(0,endOfBlock + 2);
+	request.HeaderBuffer = request.RequestBuffer.substr(0, endOfBlock + 4);
+	request.RequestBuffer.erase(0,endOfBlock + 4);
 	GetRequestType(request);
 	GetRequestedPath(request);
 	decapitalizeHeaderFields(request.HeaderBuffer);
