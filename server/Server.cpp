@@ -114,6 +114,8 @@ void Server::CheckForConnections() {
 		mt = connectionMsgs.begin();
 		resps = answerMsgs.begin();
 		while (it != Fds.end()) {
+			mt = connectionMsgs.find(it->fd);
+			resps = answerMsgs.find(it->fd);
 			if ((it->revents & POLLERR) != 0) {
 				std::cout << "Socket error Occurred" << std::endl;
 				cleanConnection();
@@ -122,8 +124,6 @@ void Server::CheckForConnections() {
 				cleanConnection();
 			} else if ((it->revents & POLLIN) != 0) {
 				bzero(buffer, sizeof(buffer));
-				mt = connectionMsgs.find(it->fd);
-				resps = answerMsgs.find(it->fd);
 				this->recievedBytes = recv(it->fd, buffer, 1000, 0);
 				if (this->recievedBytes > 0 ) {
 					mt->second.r.RequestBuffer.append(buffer);
@@ -150,8 +150,6 @@ void Server::CheckForConnections() {
 					cleanConnection();
 				}
 			} else if ((it->revents & POLLOUT) != 0 &&  resps->second.isReady == true) {
-				mt = connectionMsgs.find(it->fd);
-				resps = answerMsgs.find(it->fd);
 				responder();
 				if (resps->second.isDone == true) {
 					mt->second.t.msgAmt = 0;
