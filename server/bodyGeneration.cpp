@@ -12,7 +12,7 @@ static void	checkAndReplace(std::string& line, std::string subStr, std::string& 
 // Creates the body when a directory is requested
 int	MethodExecutor::_createIndexPage(std::string& path, std::string requPath, Response &resp)
 {
-	std::ifstream is("content/templates/dir_listing_page.html");
+	std::ifstream is("templates/dir_listing_page.html");
 	if (!is.good())
 	{
 		resp.httpStatus = INTERNAL_SERVER_ERROR;
@@ -98,7 +98,7 @@ void	MethodExecutor::_generateErrorBody(Response &resp)
 	std::string	statusMessage = getStatusCodeMessage(resp.httpStatus);
 	std::string statusDescription = getStatusCodeDescription(resp.httpStatus);
 
-	std::ifstream is("content/templates/error_page.html");
+	std::ifstream is("templates/error_page.html");
 	if (!is.good()) {
 		return ;
 	}

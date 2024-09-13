@@ -11,6 +11,8 @@ parsed_query = dict(parse_qs(query_string))
 expression_string = parsed_query['expression'][0]
 x_min = int(parsed_query['x_min'][0])
 x_max = int(parsed_query['x_max'][0])
+while (True):
+	i = 1
 
 # Create mathematical expression
 x = sp.Symbol('x')

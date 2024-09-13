@@ -64,33 +64,8 @@ void	MethodExecutor::wrapperRequest(Request &requ, Response &resp)
 	resp.isReady = true;
 }
 
-void	MethodExecutor::_executeGet(Request &requ, Response &resp)
-{
-	std::string path;
-    struct stat s;
-
-    // default page if no path specified
-    if ((requ.RequestedPath.length() == requ.RoutedPath.length()) && \
-		(requ.UsedRoute.index.length() > 0)) {
-        path = requ.UsedRoute.root + requ.UsedRoute.index;
-	} else {
-        path = requ.RoutedPath;
-	}
-	if (stat(path.c_str(), &s) == -1) {
-		resp.httpStatus = NOT_FOUND;
-	} else if (!(s.st_mode & S_IRGRP)) {
-		resp.httpStatus = UNAUTHORIZED;
-	} else if ((s.st_mode & S_IFDIR)) {
-		if (requ.UsedRoute.dirListing) {
-			if (_createIndexPage(path, requ.RequestedPath, resp) == -1) {
-				resp.httpStatus = INTERNAL_SERVER_ERROR;
-			}
-			return;
-		} else {
-		resp.httpStatus = NOT_FOUND;
-		}
-	} else if (s.st_mode & S_IFREG) {
-		std::ifstream	ifs(path.c_str());
+static void	readFile(Response& resp, std::string path, struct stat& s){
+	std::ifstream	ifs(path.c_str());
 		if (ifs.good()) {
 			std::stringstream ss;
 			ss << ifs.rdbuf();
@@ -104,8 +79,39 @@ void	MethodExecutor::_executeGet(Request &requ, Response &resp)
 			resp.httpStatus = INTERNAL_SERVER_ERROR;
 		}
 		ifs.close();
+}
+
+void	MethodExecutor::_executeGet(Request &requ, Response &resp)
+{
+	std::string path;
+    struct stat s;
+
+    path = requ.RoutedPath;
+	if (stat(path.c_str(), &s) == -1) {
+		resp.httpStatus = NOT_FOUND;
+		return ;
+	}
+	if (s.st_mode & S_IFDIR){
+		if (!(s.st_mode & S_IXGRP)) {
+			resp.httpStatus = UNAUTHORIZED;
+		} else if (requ.UsedRoute.dirListing) {
+			if (_createIndexPage(path, requ.RequestedPath, resp) == -1) {
+				resp.httpStatus = INTERNAL_SERVER_ERROR;
+			}
+			return;
+		} else if (!requ.UsedRoute.index.empty()) {
+			readFile(resp, requ.UsedRoute.root + requ.UsedRoute.index, s);
+		} else {
+			readFile(resp, std::string("templates/index.html"), s);
+		}
+	} else if (s.st_mode & S_IFREG){
+		if (!(s.st_mode & S_IRGRP)) {
+			resp.httpStatus = UNAUTHORIZED;
+			return ;
+		}
+		readFile(resp, path, s);
 	} else {
-		resp.httpStatus = INTERNAL_SERVER_ERROR;
+		resp.httpStatus = NOT_FOUND;
 	}
 }
 
