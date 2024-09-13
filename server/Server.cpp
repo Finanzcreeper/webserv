@@ -200,6 +200,15 @@ void Server::checkConnectionsForTimeout() {
 	}
 }
 
+void Server::CleanFds() {
+	std::vector<pollfd>::iterator it;
+	it = Fds.begin();
+	while (it != Fds.end()) {
+		close (it->fd);
+		++it;
+	}
+}
+
 Server::~Server() {
 	freeaddrinfo(serverInfo);
 }
