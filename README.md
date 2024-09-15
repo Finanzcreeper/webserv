@@ -15,7 +15,7 @@ in the browser should display the website which is stored in `content/example.ht
 ```
 http://localhost:8080/templates
 ```
-will show the files which are contained in the folder `content/templates`. **You can put own html files in the folder `content` and easily reach them with the browser.**
+will show the files which are contained in the folder `templates`. **You can put own html files in the folder `content` and easily reach them with the browser.**
 
 It is possible to request a page and the server redirects you to another page. For example
 ```

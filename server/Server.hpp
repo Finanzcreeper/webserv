@@ -75,6 +75,7 @@ private:
 public:
 	Server(t_server sett);
 	void CheckForConnections();
+	void CleanFds();
 	~Server();
 };
 

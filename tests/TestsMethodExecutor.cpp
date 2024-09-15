@@ -57,8 +57,8 @@ void	MethodExecutor::testCreateIndexPage(){
 	//==========================================================//
 	//-------------------Preparing for Test 3-------------------//
 	//==========================================================//
-	std::string templatePath = "content/templates/dir_listing_page.html";
-	std::string templatePathModified = "content/templates/dir_listing_page_temp___.html";
+	std::string templatePath = "templates/dir_listing_page.html";
+	std::string templatePathModified = "templates/dir_listing_page_temp___.html";
 	path = "tests/testContent";
 	requPath = "/testContent";
 	std::rename(templatePath.c_str(), templatePathModified.c_str());
@@ -124,8 +124,8 @@ void	MethodExecutor::testGenerateErrorBody(){
 	//==========================================================//
 	//-------------------Preparing for Test 4-------------------//
 	//==========================================================//
-	std::string templatePath = "content/templates/error_page.html";
-	std::string templatePathModified = "content/templates/error_page_temp___.html";
+	std::string templatePath = "templates/error_page.html";
+	std::string templatePathModified = "templates/error_page_temp___.html";
 	std::rename(templatePath.c_str(), templatePathModified.c_str());
 	resp.body.clear();
 	resp.httpStatus = REQUEST_TIMEOUT;
@@ -424,7 +424,7 @@ void MethodExecutor::testExecuteGet(void){
 	//======================Running Test 4======================//
 	//----------------------------------------------------------//
 	_executeGet(requ, resp);
-	if (resp.httpStatus != NOT_FOUND || !resp.headerFields["last-modified"].empty()) {
+	if (resp.httpStatus != OK_HTTP || resp.body.find("Default Index") == std::string::npos) {
 		std::cout << "Directory listing off: \033[1;31mFAILED\033[0m" << std::endl;
 	} else if (this->silent == false) {
 		std::cout << "Directory listing off: \033[1;32mOK\033[0m" << std::endl;
@@ -432,8 +432,8 @@ void MethodExecutor::testExecuteGet(void){
 	//==========================================================//
 	//-------------------Preparing for Test 5-------------------//
 	//==========================================================//
-	std::string templatePath = "content/templates/dir_listing_page.html";
-	std::string templatePathModified = "content/templates/dir_listing_page_temp___.html";
+	std::string templatePath = "templates/dir_listing_page.html";
+	std::string templatePathModified = "templates/dir_listing_page_temp___.html";
 	requ.UsedRoute.dirListing = true;
 	std::rename(templatePath.c_str(), templatePathModified.c_str());
 	requ.RoutedPath = "tests/testContent";

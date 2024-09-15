@@ -14,7 +14,6 @@ struct location {
 	std::string							redirect;
 	bool								dirListing;
 	std::string							index;
-	std::map<std::string, std::string>	cgi;
 	std::string							root;
 	std::string	 						locationName;
 };

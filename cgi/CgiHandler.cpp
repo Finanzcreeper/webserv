@@ -118,7 +118,17 @@ void	executeCGI(Request& requ, Response& resp, const t_server* settings) {
 	int		fd_in = fileno(tmpf_in);
 	int		fd_out = fileno(tmpf_out);
 
-	if (write(fd_in, env["QUERY_STRING"].c_str(), env["QUERY_STRING"].length()) == -1) {
+	int	returnValue;
+	returnValue = write(fd_in, env["QUERY_STRING"].c_str(), env["QUERY_STRING"].length());
+	if (returnValue == -1) {
+		resp.httpStatus = INTERNAL_SERVER_ERROR;
+		cleanupCGI(env_c, tmpf_in, tmpf_out, fd_in, fd_out);
+		return;
+	} else if (returnValue == 0 && env["QUERY_STRING"].length() > 0){
+		resp.httpStatus = INTERNAL_SERVER_ERROR;
+		cleanupCGI(env_c, tmpf_in, tmpf_out, fd_in, fd_out);
+		return;
+	} else if (env["QUERY_STRING"].length() != (size_t)returnValue){
 		resp.httpStatus = INTERNAL_SERVER_ERROR;
 		cleanupCGI(env_c, tmpf_in, tmpf_out, fd_in, fd_out);
 		return;

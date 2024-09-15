@@ -30,12 +30,27 @@ int main(int argn, char *argv[]) {
 		std::cout <<e.what() << std::endl;
 		return (1);
 	}
+
+	for (size_t i = 0; i < Config.size(); ++i){
+		for (size_t j = i + 1; j < Config.size(); ++j) {
+			if (Config[i].host == Config[j].host && Config[i].port == Config[j].port && Config[i].serverName == Config[j].serverName){
+				std::vector<s_server>::iterator it;
+				it = Config.begin() + static_cast<long>((j));
+				Config.erase(it);
+				--j;
+			}
+		}
+	}
+
+
+
 	for (size_t i = 0; i < Config.size(); ++i) {
 		try {
 			Servers.push_back(new Server(Config[i]));
+			std::cout << "\033[1;32mServer: " << Config[i].host << ":" << Config[i].port << " created!\033[0m" << std::endl;
 			std::cout << "-------------------------------------------------------------------------" << std::endl;
 		} catch (std::runtime_error &e) {
-			std::cout << "Server: " << Config[i].host << ":" << Config[i].port << " not created!" << std::endl;
+			std::cout << "\033[1;31mServer: " << Config[i].host << ":" << Config[i].port << " not created!\033[0m" << std::endl;
 			std::cout << "-------------------------------------------------------------------------" << std::endl;
 		}
 	}
