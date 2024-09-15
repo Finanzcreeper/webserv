@@ -1,12 +1,13 @@
 import sys
 import io
-from urllib.parse import parse_qs
 
 # Parse query string input
 query_string = sys.stdin.read().strip()
-parsed_query = dict(parse_qs(query_string))
-num_1 = int(parsed_query['num1'][0])
-num_2 = int(parsed_query['num2'][0])
+pos1 = query_string.find("num1")
+pos_and = query_string.find("&")
+pos2 = query_string.find("num2")
+num_1 = int(query_string[pos1 + len("num1="): pos_and])
+num_2 = int(query_string[pos2 + len("num2="):])
 
 result = num_1 + num_2
 webpage = f"""
